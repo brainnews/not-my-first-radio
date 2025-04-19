@@ -322,7 +322,6 @@ class RadioPlayer {
         this.editBtn = document.getElementById('edit-stations');
 
         // Event listeners
-        this.playPauseBtn.addEventListener('click', () => this.togglePlay());
         this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
         this.audio.addEventListener('ended', () => this.handleStreamEnd());
         this.editBtn.addEventListener('click', () => this.toggleEditMode());
@@ -491,25 +490,36 @@ class RadioPlayer {
     }
 
     togglePlay() {
-        if (!this.currentStation) return;
+        if (!this.currentStation) {
+            // If no station is selected, ensure audio is stopped
+            this.audio.pause();
+            this.isPlaying = false;
+            this.updateUI();
+            this.displayStations();
+            return;
+        }
+
+        // Toggle the playing state first
+        this.isPlaying = !this.isPlaying;
 
         if (this.isPlaying) {
-            this.audio.pause();
-        } else {
             this.audio.play()
                 .then(() => {
-                    this.isPlaying = true;
                     this.updateUI();
-                    this.displayStations(); // Refresh the stations list
+                    this.displayStations();
                 })
                 .catch(error => {
                     console.error('Error playing station:', error);
+                    this.isPlaying = false; // Reset the state if play failed
                     this.stationDetails.textContent = 'Error playing station. Please try another one.';
+                    this.updateUI();
+                    this.displayStations();
                 });
+        } else {
+            this.audio.pause();
+            this.updateUI();
+            this.displayStations();
         }
-        this.isPlaying = !this.isPlaying;
-        this.updateUI();
-        this.displayStations(); // Refresh the stations list
     }
 
     setVolume(value) {
@@ -525,7 +535,8 @@ class RadioPlayer {
         const currentFavicon = document.getElementById('current-favicon');
         const stationName = document.getElementById('station-name');
         const stationDetails = document.getElementById('station-details');
-        const playPauseIcon = document.getElementById('play-pause').querySelector('.material-symbols-rounded');
+        const playPauseBtn = document.getElementById('play-pause');
+        const playPauseIcon = playPauseBtn.querySelector('.material-symbols-rounded');
         
         if (this.currentStation) {
             // Update station name
@@ -609,28 +620,20 @@ class RadioPlayer {
 // Initialize the radio player
 const radioPlayer = new RadioPlayer();
 
-// Get the player bar element
-const playerBar = document.querySelector('.player-bar');
-
-// Update the player bar HTML structure
-if (playerBar) {
-    playerBar.innerHTML = `
-        <div class="now-playing">
-            <div class="station-info">
-                <img id="current-favicon" src="" alt="" class="current-favicon" style="display: none;">
-                <div class="current-details">
-                    <h3 id="station-name">Select a station</h3>
-                    <p id="station-details"></p>
-                </div>
-            </div>
-            <div class="player-controls">
-                <button id="play-pause" class="control-btn">
-                    <span class="material-symbols-rounded">play_arrow</span>
-                </button>
-            </div>
-        </div>
-    `;
+// Set up play/pause button event listener
+const playPauseBtn = document.getElementById('play-pause');
+if (playPauseBtn) {
+    playPauseBtn.addEventListener('click', () => {
+        console.log('Play/pause button clicked'); // Debug log
+        radioPlayer.togglePlay();
+    });
 }
+
+// Debug: Check localStorage on page load
+window.addEventListener('load', () => {
+    // Ensure stations are displayed after page load
+    radioPlayer.displayStations();
+});
 
 // Username management
 const usernameInput = document.getElementById('username-input');
@@ -947,12 +950,6 @@ closeScannerBtn.addEventListener('click', () => {
     if (html5QrcodeScanner) {
         html5QrcodeScanner.clear();
     }
-});
-
-// Debug: Check localStorage on page load
-window.addEventListener('load', () => {
-    // Ensure stations are displayed after page load
-    radioPlayer.displayStations();
 });
 
 // Search functionality
