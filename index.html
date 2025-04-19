@@ -9,6 +9,25 @@
 </head>
 <body>
     <div class="app-container">
+        <!-- Add notification container -->
+        <div class="notification-container"></div>
+
+        <!-- Add confirmation modal -->
+        <div class="confirmation-modal">
+            <div class="confirmation-content">
+                <div class="confirmation-header">
+                    <h3>Confirm Action</h3>
+                </div>
+                <div class="confirmation-body">
+                    Are you sure you want to proceed?
+                </div>
+                <div class="confirmation-actions">
+                    <button class="confirmation-btn cancel">Cancel</button>
+                    <button class="confirmation-btn confirm">Confirm</button>
+                </div>
+            </div>
+        </div>
+
         <header>
             <div class="header-top">
                 <h1>Not my first radio.</h1>
@@ -40,7 +59,12 @@
             </section>
 
             <section id="saved-stations" class="saved-stations">
-                <h2 class="section-title">Your stations</h2>
+                <div class="section-header">
+                    <h2 class="section-title">Your stations</h2>
+                    <button id="edit-stations" class="edit-btn">
+                        <span class="material-symbols-rounded">edit</span>
+                    </button>
+                </div>
                 <div id="stations" class="stations-grid"></div>
             </section>
         </main>
@@ -144,10 +168,13 @@
                         <span class="material-symbols-rounded">close</span>
                     </button>
                 </div>
-                <div class="modal-body">
-                    <div id="scanner-container"></div>
-                    <p class="scanner-instructions">Point your camera at a QR code to import stations</p>
+                <div id="scanner-container"></div>
+                <div class="scanner-controls">
+                    <button id="toggle-camera" class="control-btn">
+                        <span class="material-symbols-rounded">flip_camera_ios</span>
+                    </button>
                 </div>
+                <p class="scanner-instructions">Point your camera at a QR code to scan it.</p>
             </div>
         </div>
 

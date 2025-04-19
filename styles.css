@@ -155,7 +155,31 @@ main {
     gap: 1rem;
 }
 
-.station-favicon, .current-favicon {
+.station-favicon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: var(--surface-variant);
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.station-favicon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    padding: 8px;
+}
+
+.station-favicon .material-symbols-rounded {
+    font-size: 24px;
+    color: var(--on-surface-variant);
+}
+
+.current-favicon {
     width: 40px;
     height: 40px;
     border-radius: 4px;
@@ -173,6 +197,17 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+}
+
+.station-details h3 {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 800px;
+    @media (max-width: 768px) {
+        font-size: 0.875rem;
+        max-width: 220px;
+    }
 }
 
 .station-controls, .search-result-controls {
@@ -366,6 +401,14 @@ input[type="range"] {
 
 .station-meta .material-symbols-rounded {
     font-size: 16px;
+}
+
+.search-results {
+    margin-bottom: 4rem;
+}
+
+.saved-stations {
+    margin-bottom: 4rem;
 }
 
 .search-result-card .station-details {
@@ -863,4 +906,324 @@ input[type="range"] {
 
 .station-list .add-to-main-btn:hover {
     background: var(--bg-hover);
+}
+
+/* Add success animation styles */
+@keyframes checkmark {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+.success-check {
+    color: #4CAF50;
+    animation: checkmark 0.5s ease-in-out;
+}
+
+/* Update the add button to handle the success state */
+.add-btn .material-symbols-rounded {
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.add-btn.success .material-symbols-rounded {
+    color: #4CAF50;
+}
+
+/* Loading indicator styles */
+.loading-indicator {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    gap: 1rem;
+}
+
+.loading-spinner {
+    width: 40px;
+    height: 40px;
+    border: 3px solid var(--border-color);
+    border-top-color: var(--accent-color);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.loading-text {
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+/* Update search results section to handle loading state */
+.search-results.loading .results-grid {
+    display: none;
+}
+
+.search-results.loading .loading-indicator {
+    display: flex;
+}
+
+/* Notification system */
+.notification-container {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 1100;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-width: 300px;
+}
+
+.notification {
+    background: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    padding: 0.75rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    animation: slideIn 0.3s ease-out;
+    transform: translateX(0);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.notification.success {
+    border-left: 4px solid #4CAF50;
+}
+
+.notification.error {
+    border-left: 4px solid #f44336;
+}
+
+.notification.warning {
+    border-left: 4px solid #ff9800;
+}
+
+.notification .icon {
+    font-size: 1.25rem;
+}
+
+.notification .message {
+    flex: 1;
+    font-size: 0.875rem;
+}
+
+.notification .close-btn {
+    background: none;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.notification .close-btn:hover {
+    color: var(--text-primary);
+}
+
+/* Confirmation Modal */
+.confirmation-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.confirmation-modal.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.confirmation-content {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.confirmation-modal.visible .confirmation-content {
+    transform: translateY(0);
+}
+
+.confirmation-header {
+    margin-bottom: 1rem;
+}
+
+.confirmation-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+.confirmation-body {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.confirmation-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+}
+
+.confirmation-btn {
+    padding: 0.5rem 1rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.3s ease;
+}
+
+.confirmation-btn.cancel {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.confirmation-btn.confirm {
+    background: #4CAF50;
+    color: white;
+}
+
+.confirmation-btn.danger {
+    background: #f44336;
+    color: white;
+}
+
+.confirmation-btn:hover {
+    opacity: 0.9;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+
+.edit-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.edit-btn:hover {
+    background: var(--border-color);
+    color: var(--text-primary);
+}
+
+.edit-btn.active {
+    color: var(--accent-color);
+}
+
+.edit-btn.active:hover {
+    background: var(--accent-color);
+    color: var(--bg-primary);
+}
+
+.edit-btn .material-symbols-rounded {
+    font-size: 1.25rem;
+}
+
+/* Hide remove buttons by default */
+.station-controls .remove-btn {
+    display: none;
+}
+
+/* Show remove buttons in edit mode */
+.edit-mode .station-controls .remove-btn {
+    display: flex;
+}
+
+/* Add animation for remove button appearance */
+.station-controls .remove-btn {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.9);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.scanner-controls {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin: 1rem 0;
+}
+
+.scanner-controls .control-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background: var(--surface-variant);
+    color: var(--on-surface-variant);
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.scanner-controls .control-btn:hover {
+    background: var(--surface-variant-hover);
+}
+
+.scanner-controls .material-symbols-rounded {
+    font-size: 24px;
 } 
