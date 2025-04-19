@@ -214,6 +214,7 @@ class RadioPlayer {
         this.audio = new Audio();
         this.currentStation = null;
         this.stations = this.loadStations(); // Load stations from localStorage
+        this.stationLists = this.loadStationLists(); // Load station lists
         this.isPlaying = false;
 
         // DOM elements
@@ -230,6 +231,7 @@ class RadioPlayer {
 
         // Display initial stations
         this.displayStations();
+        this.displayStationLists();
     }
 
     // Load stations from localStorage
@@ -253,6 +255,23 @@ class RadioPlayer {
         }
     }
 
+    // Load station lists from localStorage
+    loadStationLists() {
+        try {
+            const savedLists = localStorage.getItem('radio-station-lists');
+            if (savedLists) {
+                const parsedLists = JSON.parse(savedLists);
+                if (Array.isArray(parsedLists)) {
+                    return parsedLists;
+                }
+            }
+            return [];
+        } catch (error) {
+            console.error('Error loading station lists from localStorage:', error);
+            return [];
+        }
+    }
+
     // Save stations to localStorage
     saveStations() {
         console.log('Saving stations:', this.stations);
@@ -260,6 +279,115 @@ class RadioPlayer {
             localStorage.setItem('radio-stations', JSON.stringify(this.stations));
         } catch (error) {
             console.error('Error saving stations to localStorage:', error);
+        }
+    }
+
+    // Save station lists to localStorage
+    saveStationLists() {
+        try {
+            localStorage.setItem('radio-station-lists', JSON.stringify(this.stationLists));
+        } catch (error) {
+            console.error('Error saving station lists to localStorage:', error);
+        }
+    }
+
+    // Display station lists
+    displayStationLists() {
+        if (this.stationLists.length === 0) return;
+
+        const listsContainer = document.createElement('div');
+        listsContainer.className = 'station-lists';
+
+        this.stationLists.forEach((list, index) => {
+            const listElement = document.createElement('div');
+            listElement.className = 'station-list';
+            
+            const listHeader = document.createElement('div');
+            listHeader.className = 'list-header';
+            listHeader.innerHTML = `
+                <h3>${list.name}</h3>
+                <button class="remove-list-btn" data-index="${index}">
+                    <span class="material-symbols-rounded">close</span>
+                </button>
+            `;
+
+            const stationsGrid = document.createElement('div');
+            stationsGrid.className = 'stations-grid';
+            stationsGrid.innerHTML = list.stations.map(station => `
+                <div class="station-card" data-url="${station.url}">
+                    <div class="station-info">
+                        ${station.favicon ? 
+                            `<img src="${station.favicon}" alt="${station.name} logo" class="station-favicon">` : 
+                            `<div class="station-favicon"></div>`
+                        }
+                        <div class="station-details">
+                            <h3>${station.name}</h3>
+                            <div class="station-meta">
+                                ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
+                                ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
+                                ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-controls">
+                        <button class="play-btn">
+                            <span class="material-symbols-rounded">play_arrow</span>
+                        </button>
+                        <button class="add-to-main-btn">
+                            <span class="material-symbols-rounded">add</span>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            listElement.appendChild(listHeader);
+            listElement.appendChild(stationsGrid);
+            listsContainer.appendChild(listElement);
+
+            // Add event listeners for list controls
+            listElement.querySelector('.remove-list-btn').addEventListener('click', () => {
+                this.removeStationList(index);
+            });
+
+            // Add event listeners for station controls
+            listElement.querySelectorAll('.station-card').forEach(card => {
+                const url = card.dataset.url;
+                
+                // Play button
+                card.querySelector('.play-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const station = list.stations.find(s => s.url === url);
+                    if (station) {
+                        this.playStation(station);
+                    }
+                });
+
+                // Add to main list button
+                card.querySelector('.add-to-main-btn').addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const station = list.stations.find(s => s.url === url);
+                    if (station) {
+                        this.addStation(station);
+                    }
+                });
+            });
+        });
+
+        // Insert lists after the main stations section
+        const mainStationsSection = document.getElementById('saved-stations');
+        const existingLists = document.querySelector('.station-lists');
+        if (existingLists) {
+            existingLists.remove();
+        }
+        mainStationsSection.after(listsContainer);
+    }
+
+    // Remove a station list
+    removeStationList(index) {
+        if (confirm('Are you sure you want to remove this station list?')) {
+            this.stationLists.splice(index, 1);
+            this.saveStationLists();
+            this.displayStationLists();
         }
     }
 
@@ -351,7 +479,7 @@ class RadioPlayer {
                         <div class="station-meta">
                             ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
                             ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
-                            ${station.votes ? `<span><span class="material-symbols-rounded">favorite</span>${station.votes}</span>` : ''}
+                            ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
                         </div>
                     </div>
                 </div>
@@ -360,7 +488,7 @@ class RadioPlayer {
                         <span class="material-symbols-rounded">play_arrow</span>
                     </button>
                     <button class="remove-btn">
-                        <span class="material-symbols-rounded">close</span>
+                        <span class="material-symbols-rounded">delete</span>
                     </button>
                 </div>
             </div>
@@ -482,6 +610,356 @@ class RadioPlayer {
 
 // Initialize the radio player
 const radioPlayer = new RadioPlayer();
+
+// Username management
+const usernameInput = document.getElementById('username-input');
+const saveUsernameBtn = document.getElementById('save-username');
+const STORAGE_KEY_USERNAME = 'radio-username';
+
+// List of random usernames
+const randomUsernames = [
+    'Lunar Pond', 'Green Wombat', 'Cosmic Fox', 'Electric Panda', 'Mystic River',
+    'Solar Bear', 'Ocean Wave', 'Mountain Peak', 'Desert Wind', 'Forest Sprite',
+    'Starlight', 'Moonbeam', 'Thunder Cloud', 'Rainbow Bridge', 'Crystal Lake'
+];
+
+// Comprehensive list of offensive words and phrases
+const offensiveWords = [
+    // Common profanity
+    'fuck', 'shit', 'asshole', 'bitch', 'cunt', 'dick', 'pussy', 'bastard', 'whore', 'slut',
+    // Racial slurs
+    'nigger', 'nigga', 'chink', 'spic', 'kike', 'gook', 'wetback', 'coon', 'jap', 'raghead',
+    // Homophobic slurs
+    'fag', 'faggot', 'dyke', 'queer', 'tranny', 'shemale', 'homo', 'lesbo',
+    // Religious slurs
+    'christ killer', 'jew', 'muzzie', 'towelhead', 'infidel',
+    // Disability slurs
+    'retard', 'retarded', 'cripple', 'spaz', 'retard', 'mongoloid',
+    // Body shaming
+    'fatso', 'lardass', 'ugly', 'pig', 'whale',
+    // Sexual content
+    'rape', 'rapist', 'pedo', 'pedophile', 'molest', 'molestor',
+    // Violence
+    'kill', 'murder', 'suicide', 'terrorist', 'bomb', 'shoot',
+    // Common variations and misspellings
+    'fuk', 'sh1t', 'b1tch', 'c0ck', 'p0rn', 'pr0n', 'f4g', 'n1gg3r',
+    // Common offensive phrases
+    'kill yourself', 'go die', 'eat shit', 'fuck off', 'suck dick',
+    // Common offensive abbreviations
+    'stfu', 'gtfo', 'kys', 'fml', 'wtf', 'omfg'
+];
+
+// Generate a random username
+function generateRandomUsername() {
+    const randomIndex = Math.floor(Math.random() * randomUsernames.length);
+    return randomUsernames[randomIndex];
+}
+
+// Validate username
+function validateUsername(username) {
+    // Check length
+    if (username.length < 3 || username.length > 20) {
+        return 'Username must be between 3 and 20 characters';
+    }
+
+    // Check for offensive words
+    const lowercaseUsername = username.toLowerCase();
+    for (const word of offensiveWords) {
+        if (lowercaseUsername.includes(word)) {
+            return 'Username contains inappropriate language';
+        }
+    }
+
+    // Check for valid characters
+    if (!/^[a-zA-Z0-9\s]+$/.test(username)) {
+        return 'Username can only contain letters, numbers, and spaces';
+    }
+
+    return null;
+}
+
+// Save username
+function saveUsername(username) {
+    localStorage.setItem(STORAGE_KEY_USERNAME, username);
+}
+
+// Load username
+function loadUsername() {
+    const savedUsername = localStorage.getItem(STORAGE_KEY_USERNAME);
+    if (savedUsername) {
+        return savedUsername;
+    }
+    const newUsername = generateRandomUsername();
+    saveUsername(newUsername);
+    return newUsername;
+}
+
+// Initialize username
+let currentUsername = loadUsername();
+usernameInput.value = currentUsername;
+
+// Handle username changes
+saveUsernameBtn.addEventListener('click', () => {
+    const newUsername = usernameInput.value.trim();
+    const error = validateUsername(newUsername);
+    
+    if (error) {
+        alert(error);
+        return;
+    }
+    
+    currentUsername = newUsername;
+    saveUsername(currentUsername);
+    alert('Username saved successfully!');
+});
+
+// QR Code functionality
+const qrModal = document.getElementById('qr-modal');
+const scannerModal = document.getElementById('scanner-modal');
+const shareQrBtn = document.getElementById('share-qr');
+const scanQrBtn = document.getElementById('scan-qr');
+const closeQrBtn = document.getElementById('close-qr');
+const closeScannerBtn = document.getElementById('close-scanner');
+const qrCodeContainer = document.getElementById('qr-code');
+const scannerContainer = document.getElementById('scanner-container');
+
+// Load QR code libraries
+function loadScript(src) {
+    return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = src;
+        script.onload = () => {
+            console.log(`Successfully loaded script: ${src}`);
+            resolve();
+        };
+        script.onerror = (error) => {
+            console.error(`Failed to load script: ${src}`, error);
+            reject(new Error(`Failed to load script: ${src}`));
+        };
+        document.head.appendChild(script);
+    });
+}
+
+// Initialize QR code functionality
+let qrcodeReady = false;
+let scannerReady = false;
+
+// Try loading from multiple CDNs
+const qrcodeUrls = [
+    'https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js',
+    'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js'
+];
+
+const scannerUrls = [
+    'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
+    'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
+];
+
+async function loadLibraries() {
+    let qrcodeLoaded = false;
+    let scannerLoaded = false;
+
+    // Try loading QR code library from multiple sources
+    for (const url of qrcodeUrls) {
+        try {
+            await loadScript(url);
+            qrcodeLoaded = true;
+            console.log('QR code library loaded successfully');
+            break;
+        } catch (error) {
+            console.warn(`Failed to load QR code library from ${url}, trying next source...`);
+        }
+    }
+
+    // Try loading scanner library from multiple sources
+    for (const url of scannerUrls) {
+        try {
+            await loadScript(url);
+            scannerLoaded = true;
+            console.log('Scanner library loaded successfully');
+            break;
+        } catch (error) {
+            console.warn(`Failed to load scanner library from ${url}, trying next source...`);
+        }
+    }
+
+    if (!qrcodeLoaded || !scannerLoaded) {
+        throw new Error('Failed to load required QR code libraries. Please check your internet connection and try refreshing the page.');
+    }
+
+    qrcodeReady = true;
+    scannerReady = true;
+}
+
+loadLibraries()
+    .then(() => {
+        console.log('All QR code libraries loaded successfully');
+    })
+    .catch(error => {
+        console.error('Error loading QR code libraries:', error);
+        alert('Error loading QR code functionality. Please check your internet connection and try refreshing the page.');
+    });
+
+// Handle QR code sharing
+shareQrBtn.addEventListener('click', () => {
+    if (!qrcodeReady) {
+        alert('QR code functionality is still loading. Please try again in a moment.');
+        return;
+    }
+
+    if (!radioPlayer || !radioPlayer.stations || radioPlayer.stations.length === 0) {
+        alert('No stations to share.');
+        return;
+    }
+
+    try {
+        const data = {
+            stations: radioPlayer.stations,
+            version: '1.0',
+            username: currentUsername
+        };
+        
+        const dataStr = JSON.stringify(data);
+        
+        // Clear any existing QR code
+        qrCodeContainer.innerHTML = '';
+        
+        // Create new QR code
+        new QRCode(qrCodeContainer, {
+            text: dataStr,
+            width: 256,
+            height: 256,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.H
+        });
+        
+        qrModal.classList.remove('hidden');
+    } catch (error) {
+        console.error('Error preparing data for QR code:', error);
+        alert('Error preparing data for QR code. Please try again.');
+    }
+});
+
+// Handle QR code scanning
+let html5QrcodeScanner = null;
+
+scanQrBtn.addEventListener('click', () => {
+    if (!scannerReady) {
+        alert('QR scanner is still loading. Please try again in a moment.');
+        return;
+    }
+
+    scannerModal.classList.remove('hidden');
+    
+    if (!html5QrcodeScanner) {
+        html5QrcodeScanner = new Html5QrcodeScanner(
+            "scanner-container",
+            { fps: 10, qrbox: { width: 250, height: 250 } },
+            false
+        );
+        
+        html5QrcodeScanner.render((decodedText, decodedResult) => {
+            try {
+                const data = JSON.parse(decodedText);
+                
+                // Validate imported data
+                if (!data || !data.stations || !Array.isArray(data.stations)) {
+                    throw new Error('Invalid data format');
+                }
+                
+                if (data.stations.length === 0) {
+                    alert('No stations found in the QR code.');
+                    return;
+                }
+
+                const sharedUsername = data.username || 'Unknown User';
+                const listName = `${sharedUsername}'s Radio`;
+                
+                // Show import options
+                const importOption = prompt(
+                    `Found ${data.stations.length} stations from ${sharedUsername}.\n\n` +
+                    `Choose an import option:\n` +
+                    `1. Merge with existing stations\n` +
+                    `2. Replace existing stations\n` +
+                    `3. Add as a separate list (${listName})\n\n` +
+                    `Enter 1, 2, or 3:`
+                );
+
+                if (!importOption) return;
+
+                switch (importOption) {
+                    case '1':
+                        // Merge stations, avoiding duplicates
+                        const existingUrls = radioPlayer.stations.map(s => s.url);
+                        for (const station of data.stations) {
+                            if (!existingUrls.includes(station.url)) {
+                                radioPlayer.stations.push(station);
+                                existingUrls.push(station.url);
+                            }
+                        }
+                        break;
+                    
+                    case '2':
+                        // Replace existing stations
+                        radioPlayer.stations = data.stations;
+                        break;
+                    
+                    case '3':
+                        // Add as separate list
+                        const newList = {
+                            name: listName,
+                            stations: data.stations
+                        };
+                        
+                        // Load existing lists
+                        let stationLists = JSON.parse(localStorage.getItem('radio-station-lists') || '[]');
+                        
+                        // Add new list
+                        stationLists.push(newList);
+                        
+                        // Save lists
+                        localStorage.setItem('radio-station-lists', JSON.stringify(stationLists));
+                        
+                        // Update UI to show the new list
+                        radioPlayer.displayStationLists();
+                        break;
+                    
+                    default:
+                        alert('Invalid option selected');
+                        return;
+                }
+                
+                // Save and display the new stations
+                radioPlayer.saveStations();
+                radioPlayer.displayStations();
+                
+                alert(`Import successful! You now have ${radioPlayer.stations.length} stations.`);
+                
+                // Stop scanner and close modal
+                html5QrcodeScanner.clear();
+                scannerModal.classList.add('hidden');
+            } catch (error) {
+                console.error('Error parsing QR code data:', error);
+                alert('Error parsing QR code data. The QR code may be invalid or corrupted.');
+            }
+        });
+    }
+});
+
+// Close QR modal
+closeQrBtn.addEventListener('click', () => {
+    qrModal.classList.add('hidden');
+    qrCodeContainer.innerHTML = '';
+});
+
+// Close scanner modal
+closeScannerBtn.addEventListener('click', () => {
+    scannerModal.classList.add('hidden');
+    if (html5QrcodeScanner) {
+        html5QrcodeScanner.clear();
+    }
+});
 
 // Debug: Check localStorage on page load
 window.addEventListener('load', () => {
@@ -751,4 +1229,18 @@ clearInputBtn.addEventListener('click', clearSearchInput);
 clearResultsBtn.addEventListener('click', clearSearchResults);
 
 // Initialize clear input button state
-toggleClearInputButton(); 
+toggleClearInputButton();
+
+// Update the player bar HTML structure
+playerBar.innerHTML = `
+    <div class="now-playing">
+        <div class="current-details">
+            <h3 id="station-name">Select a station</h3>
+        </div>
+        <div class="player-controls">
+            <button class="control-btn play-btn" id="play-pause">
+                <span class="material-symbols-rounded">play_arrow</span>
+            </button>
+        </div>
+    </div>
+`; 

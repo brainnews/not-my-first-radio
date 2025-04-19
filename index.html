@@ -13,7 +13,7 @@
             <div class="header-top">
                 <h1>Not my first radio.</h1>
                 <button id="settings-btn" class="settings-btn">
-                    <span class="material-symbols-rounded">settings</span>
+                    <span class="material-symbols-rounded">menu</span>
                 </button>
             </div>
             <div class="search-container">
@@ -75,45 +75,82 @@
                 </button>
             </div>
             
-            <div class="settings-section">
-                <h3>Theme</h3>
-                <div class="theme-selector">
-                    <button class="theme-btn" data-theme="light">
-                        <span class="material-symbols-rounded">light_mode</span>
-                        <span>Light</span>
-                    </button>
-                    <button class="theme-btn" data-theme="dark">
-                        <span class="material-symbols-rounded">dark_mode</span>
-                        <span>Dark</span>
-                    </button>
-                    <button class="theme-btn" data-theme="system">
-                        <span class="material-symbols-rounded">devices</span>
-                        <span>System</span>
-                    </button>
-                </div>
-            </div>
-            
-            <div class="settings-section">
-                <h3>Data Management</h3>
-                <div class="data-management">
-                    <button id="export-data" class="settings-action-btn">
-                        <span class="material-symbols-rounded">download</span>
-                        <span>Export Stations</span>
-                    </button>
-                    <div class="import-container">
-                        <label for="import-file" class="settings-action-btn">
-                            <span class="material-symbols-rounded">upload</span>
-                            <span>Import Stations</span>
-                        </label>
-                        <input type="file" id="import-file" accept=".json" class="hidden">
+            <div class="settings-content">
+                <div class="settings-section">
+                    <h3>Profile</h3>
+                    <div class="username-section">
+                        <label for="username-input">Your Username</label>
+                        <div class="username-input-wrapper">
+                            <input type="text" id="username-input" class="username-input">
+                            <button id="save-username" class="save-username-btn">
+                                <span class="material-symbols-rounded">save</span>
+                            </button>
+                        </div>
+                        <p class="username-hint">This name will be used when sharing your stations</p>
                     </div>
-                    <button id="clear-stations" class="settings-action-btn danger">
+                </div>
+
+                <div class="settings-section">
+                    <h3>Data Management</h3>
+                    <button id="export-data" class="settings-btn">
+                        <span class="material-symbols-rounded">download</span>
+                        Export Stations
+                    </button>
+                    <button id="share-qr" class="settings-btn">
+                        <span class="material-symbols-rounded">qr_code</span>
+                        Share via QR Code
+                    </button>
+                    <button id="scan-qr" class="settings-btn">
+                        <span class="material-symbols-rounded">qr_code_scanner</span>
+                        Scan QR Code
+                    </button>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="import-file" accept=".json" style="display: none;">
+                        <label for="import-file" class="settings-btn">
+                            <span class="material-symbols-rounded">upload</span>
+                            Import Stations
+                        </label>
+                    </div>
+                    <button id="clear-stations" class="settings-btn danger">
                         <span class="material-symbols-rounded">delete</span>
-                        <span>Clear All Stations</span>
+                        Clear All Stations
                     </button>
                 </div>
             </div>
         </div>
+
+        <!-- QR Code Modal -->
+        <div id="qr-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Share Your Stations</h2>
+                    <button id="close-qr" class="close-modal-btn">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="qr-code"></div>
+                    <p class="qr-instructions">Scan this QR code to import these stations on another device</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- QR Scanner Modal -->
+        <div id="scanner-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Scan QR Code</h2>
+                    <button id="close-scanner" class="close-modal-btn">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div id="scanner-container"></div>
+                    <p class="scanner-instructions">Point your camera at a QR code to import stations</p>
+                </div>
+            </div>
+        </div>
+
         <div id="settings-overlay" class="settings-overlay hidden"></div>
     </div>
     <script src="app.js"></script>
