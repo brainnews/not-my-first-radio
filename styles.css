@@ -523,15 +523,14 @@ input[type="range"] {
     position: fixed;
     top: 0;
     right: 0;
-    width: 320px;
+    width: 100%;
+    max-width: 400px;
     height: 100vh;
-    background: var(--bg-secondary);
-    padding: 1.5rem;
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-    overflow-y: auto;
+    background: var(--surface);
+    box-shadow: var(--shadow);
     transform: translateX(100%);
     transition: transform 0.3s ease;
+    z-index: 1000;
 }
 
 .settings-panel.visible {
@@ -1267,4 +1266,16 @@ input[type="range"] {
 
 .stop-btn .material-symbols-rounded {
     font-size: 24px;
+}
+
+/* Modals and alerts should be above settings panel */
+.confirmation-modal,
+.notification-container {
+    z-index: 1100;
+}
+
+/* QR modal and scanner modal should also be above settings */
+.qr-modal,
+.scanner-modal {
+    z-index: 1100;
 } 

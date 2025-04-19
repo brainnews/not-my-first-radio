@@ -824,46 +824,124 @@ loadLibraries()
         alert('Error loading QR code functionality. Please check your internet connection and try refreshing the page.');
     });
 
-// Handle QR code sharing
-shareQrBtn.addEventListener('click', () => {
-    if (!qrcodeReady) {
-        showNotification('QR code functionality is still loading. Please try again in a moment.', 'warning');
-        return;
-    }
-
-    if (!radioPlayer || !radioPlayer.stations || radioPlayer.stations.length === 0) {
-        showNotification('No stations to share.', 'warning');
-        return;
-    }
-
+// Define the scan success handler
+const onScanSuccess = async (decodedText, decodedResult) => {
     try {
-        // Only share UUIDs and username
-        const data = {
-            u: currentUsername, // username
-            i: radioPlayer.stations.map(station => station.stationuuid).filter(uuid => uuid) // station uuids
-        };
+        const data = JSON.parse(decodedText);
         
-        const dataStr = JSON.stringify(data);
+        // Validate imported data
+        if (!data || !data.i || !Array.isArray(data.i)) {
+            showNotification('Invalid QR code format.', 'error');
+            return;
+        }
         
-        // Clear any existing QR code
-        qrCodeContainer.innerHTML = '';
+        if (data.i.length === 0) {
+            showNotification('No stations found in the QR code.', 'warning');
+            return;
+        }
+
+        // Show loading notification
+        showNotification('Fetching station details...', 'success');
+
+        // Fetch full station details for each UUID
+        const stations = await Promise.all(data.i.map(async (uuid) => {
+            try {
+                const response = await fetch(`https://at1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
+                const apiStations = await response.json();
+                
+                if (apiStations && apiStations.length > 0) {
+                    return apiStations[0];
+                }
+                
+                // If not found in API, skip this station
+                return null;
+            } catch (error) {
+                console.warn('Error fetching station details:', error);
+                return null;
+            }
+        }));
+
+        // Filter out any failed lookups
+        const validStations = stations.filter(station => station !== null);
         
-        // Create new QR code
-        new QRCode(qrCodeContainer, {
-            text: dataStr,
-            width: 256,
-            height: 256,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.L
+        if (validStations.length === 0) {
+            showNotification('No valid stations found in the QR code.', 'error');
+            return;
+        }
+
+        const sharedUsername = data.u || 'Unknown User';
+        const listName = `${sharedUsername}'s Radio`;
+        
+        // Show import options
+        const importOption = await showConfirmationModal({
+            title: 'Import Stations',
+            message: `Found ${validStations.length} stations from ${sharedUsername}.\n\n` +
+            `Choose an import option:\n` +
+            `1. Merge with existing stations\n` +
+            `2. Replace existing stations\n` +
+            `3. Add as a separate list (${listName})\n\n` +
+            `Enter 1, 2, or 3:`,
+            confirmText: 'Import'
         });
+
+        if (importOption === null) return;
+
+        switch (importOption) {
+            case '1':
+                // Merge stations, avoiding duplicates
+                const existingUrls = radioPlayer.stations.map(s => s.url);
+                for (const station of validStations) {
+                    if (!existingUrls.includes(station.url)) {
+                        radioPlayer.stations.push(station);
+                        existingUrls.push(station.url);
+                    }
+                }
+                break;
+            
+            case '2':
+                // Replace existing stations
+                radioPlayer.stations = validStations;
+                break;
+            
+            case '3':
+                // Add as separate list
+                const newList = {
+                    name: listName,
+                    stations: validStations
+                };
+                
+                // Load existing lists
+                let stationLists = JSON.parse(localStorage.getItem('radio-station-lists') || '[]');
+                
+                // Add new list
+                stationLists.push(newList);
+                
+                // Save lists
+                localStorage.setItem('radio-station-lists', JSON.stringify(stationLists));
+                
+                // Update UI to show the new list
+                radioPlayer.displayStationLists();
+                break;
+            
+            default:
+                showNotification('Invalid option selected', 'error');
+                return;
+        }
         
-        qrModal.classList.remove('hidden');
+        // Save and display the new stations
+        radioPlayer.saveStations();
+        radioPlayer.displayStations();
+        
+        showNotification(`Import successful! You now have ${radioPlayer.stations.length} stations.`, 'success');
+        
+        // Stop scanner and close modal
+        html5QrcodeScanner.clear();
+        scannerModal.classList.add('hidden');
     } catch (error) {
-        console.error('Error preparing data for QR code:', error);
-        showNotification('Error preparing data for QR code. Please try again.', 'error');
+        console.error('Error parsing QR code data:', error);
+        showNotification('Error parsing QR code data. The QR code may be invalid or corrupted.', 'error');
     }
-});
+};
 
 // Handle QR code scanning
 let html5QrcodeScanner = null;
@@ -1391,122 +1469,3 @@ function showConfirmationModal(options) {
         confirmBtn.addEventListener('click', confirmHandler);
     });
 }
-
-// Define the scan success handler
-const onScanSuccess = async (decodedText, decodedResult) => {
-    try {
-        const data = JSON.parse(decodedText);
-        
-        // Validate imported data
-        if (!data || !data.i || !Array.isArray(data.i)) {
-            showNotification('Invalid QR code format.', 'error');
-            return;
-        }
-        
-        if (data.i.length === 0) {
-            showNotification('No stations found in the QR code.', 'warning');
-            return;
-        }
-
-        // Show loading notification
-        showNotification('Fetching station details...', 'success');
-
-        // Fetch full station details for each UUID
-        const stations = await Promise.all(data.i.map(async (uuid) => {
-            try {
-                const response = await fetch(`https://at1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
-                const apiStations = await response.json();
-                
-                if (apiStations && apiStations.length > 0) {
-                    return apiStations[0];
-                }
-                
-                // If not found in API, skip this station
-                return null;
-            } catch (error) {
-                console.warn('Error fetching station details:', error);
-                return null;
-            }
-        }));
-
-        // Filter out any failed lookups
-        const validStations = stations.filter(station => station !== null);
-        
-        if (validStations.length === 0) {
-            showNotification('No valid stations found in the QR code.', 'error');
-            return;
-        }
-
-        const sharedUsername = data.u || 'Unknown User';
-        const listName = `${sharedUsername}'s Radio`;
-        
-        // Show import options
-        const importOption = await showConfirmationModal({
-            title: 'Import Stations',
-            message: `Found ${validStations.length} stations from ${sharedUsername}.\n\n` +
-            `Choose an import option:\n` +
-            `1. Merge with existing stations\n` +
-            `2. Replace existing stations\n` +
-            `3. Add as a separate list (${listName})\n\n` +
-            `Enter 1, 2, or 3:`,
-            confirmText: 'Import'
-        });
-
-        if (importOption === null) return;
-
-        switch (importOption) {
-            case '1':
-                // Merge stations, avoiding duplicates
-                const existingUrls = radioPlayer.stations.map(s => s.url);
-                for (const station of validStations) {
-                    if (!existingUrls.includes(station.url)) {
-                        radioPlayer.stations.push(station);
-                        existingUrls.push(station.url);
-                    }
-                }
-                break;
-            
-            case '2':
-                // Replace existing stations
-                radioPlayer.stations = validStations;
-                break;
-            
-            case '3':
-                // Add as separate list
-                const newList = {
-                    name: listName,
-                    stations: validStations
-                };
-                
-                // Load existing lists
-                let stationLists = JSON.parse(localStorage.getItem('radio-station-lists') || '[]');
-                
-                // Add new list
-                stationLists.push(newList);
-                
-                // Save lists
-                localStorage.setItem('radio-station-lists', JSON.stringify(stationLists));
-                
-                // Update UI to show the new list
-                radioPlayer.displayStationLists();
-                break;
-            
-            default:
-                showNotification('Invalid option selected', 'error');
-                return;
-        }
-        
-        // Save and display the new stations
-        radioPlayer.saveStations();
-        radioPlayer.displayStations();
-        
-        showNotification(`Import successful! You now have ${radioPlayer.stations.length} stations.`, 'success');
-        
-        // Stop scanner and close modal
-        html5QrcodeScanner.clear();
-        scannerModal.classList.add('hidden');
-    } catch (error) {
-        console.error('Error parsing QR code data:', error);
-        showNotification('Error parsing QR code data. The QR code may be invalid or corrupted.', 'error');
-    }
-};
