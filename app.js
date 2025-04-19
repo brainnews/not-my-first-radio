@@ -813,10 +813,15 @@ shareQrBtn.addEventListener('click', () => {
     }
 
     try {
+        // Only share essential station information
+        const simplifiedStations = radioPlayer.stations.map(station => ({
+            url: station.url,
+            name: station.name // Keep name for quick reference
+        }));
+        
         const data = {
-            stations: radioPlayer.stations,
-            version: '1.0',
-            username: currentUsername
+            stations: simplifiedStations,
+            version: '1.0'
         };
         
         const dataStr = JSON.stringify(data);
@@ -831,7 +836,7 @@ shareQrBtn.addEventListener('click', () => {
             height: 256,
             colorDark: '#000000',
             colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.H
+            correctLevel: QRCode.CorrectLevel.L // Lower error correction for simpler QR code
         });
         
         qrModal.classList.remove('hidden');
@@ -859,7 +864,7 @@ scanQrBtn.addEventListener('click', () => {
             false
         );
         
-        html5QrcodeScanner.render((decodedText, decodedResult) => {
+        html5QrcodeScanner.render(async (decodedText, decodedResult) => {
             try {
                 const data = JSON.parse(decodedText);
                 
@@ -873,12 +878,45 @@ scanQrBtn.addEventListener('click', () => {
                     return;
                 }
 
+                // Fetch full station details for each URL
+                const fullStations = await Promise.all(data.stations.map(async (simplifiedStation) => {
+                    try {
+                        // Try to find the station in the Radio Browser API
+                        const response = await fetch(`https://at1.api.radio-browser.info/json/stations/byurl/${encodeURIComponent(simplifiedStation.url)}`);
+                        const stations = await response.json();
+                        
+                        if (stations && stations.length > 0) {
+                            // Use the first matching station's full details
+                            return stations[0];
+                        }
+                        
+                        // If not found in API, use the simplified data
+                        return {
+                            name: simplifiedStation.name,
+                            url: simplifiedStation.url,
+                            tags: 'Unknown',
+                            bitrate: 'Unknown',
+                            countrycode: 'Unknown'
+                        };
+                    } catch (error) {
+                        console.warn('Error fetching station details:', error);
+                        // Fall back to simplified data if API call fails
+                        return {
+                            name: simplifiedStation.name,
+                            url: simplifiedStation.url,
+                            tags: 'Unknown',
+                            bitrate: 'Unknown',
+                            countrycode: 'Unknown'
+                        };
+                    }
+                }));
+
                 const sharedUsername = data.username || 'Unknown User';
                 const listName = `${sharedUsername}'s Radio`;
                 
                 // Show import options
                 const importOption = prompt(
-                    `Found ${data.stations.length} stations from ${sharedUsername}.\n\n` +
+                    `Found ${fullStations.length} stations from ${sharedUsername}.\n\n` +
                     `Choose an import option:\n` +
                     `1. Merge with existing stations\n` +
                     `2. Replace existing stations\n` +
@@ -892,7 +930,7 @@ scanQrBtn.addEventListener('click', () => {
                     case '1':
                         // Merge stations, avoiding duplicates
                         const existingUrls = radioPlayer.stations.map(s => s.url);
-                        for (const station of data.stations) {
+                        for (const station of fullStations) {
                             if (!existingUrls.includes(station.url)) {
                                 radioPlayer.stations.push(station);
                                 existingUrls.push(station.url);
@@ -902,14 +940,14 @@ scanQrBtn.addEventListener('click', () => {
                     
                     case '2':
                         // Replace existing stations
-                        radioPlayer.stations = data.stations;
+                        radioPlayer.stations = fullStations;
                         break;
                     
                     case '3':
                         // Add as separate list
                         const newList = {
                             name: listName,
-                            stations: data.stations
+                            stations: fullStations
                         };
                         
                         // Load existing lists
