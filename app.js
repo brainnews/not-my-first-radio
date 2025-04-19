@@ -388,9 +388,14 @@ class RadioPlayer {
                     </div>
                 </div>
                 <div class="station-controls">
-                    <button class="play-btn">
-                        <span class="material-symbols-rounded">play_arrow</span>
-                    </button>
+                    ${this.currentStation && this.currentStation.url === station.url && this.isPlaying ? 
+                        `<button class="stop-btn">
+                            <span class="material-symbols-rounded">stop</span>
+                        </button>` : 
+                        `<button class="play-btn">
+                            <span class="material-symbols-rounded">play_arrow</span>
+                        </button>`
+                    }
                     <button class="remove-btn">
                         <span class="material-symbols-rounded">delete</span>
                     </button>
@@ -405,14 +410,27 @@ class RadioPlayer {
         document.querySelectorAll('.station-card').forEach(card => {
             const url = card.dataset.url;
             
-            // Play button
-            card.querySelector('.play-btn').addEventListener('click', (e) => {
-                e.stopPropagation();
-                const station = this.stations.find(s => s.url === url);
-                if (station) {
-                    this.playStation(station);
-                }
-            });
+            // Play or stop button
+            const playControl = card.querySelector('.play-btn, .stop-btn');
+            if (playControl) {
+                playControl.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const station = this.stations.find(s => s.url === url);
+                    if (station) {
+                        if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
+                            // If clicking the stop button of the currently playing station
+                            this.audio.pause();
+                            this.isPlaying = false;
+                            this.currentStation = null;
+                            this.updateUI();
+                            this.displayStations();
+                        } else {
+                            // If clicking the play button
+                            this.playStation(station);
+                        }
+                    }
+                });
+            }
 
             // Remove button
             card.querySelector('.remove-btn').addEventListener('click', async (e) => {
@@ -460,6 +478,7 @@ class RadioPlayer {
             .then(() => {
                 this.isPlaying = true;
                 this.updateUI();
+                this.displayStations(); // Refresh the stations list
             })
             .catch(error => {
                 console.error('Error playing station:', error);
@@ -481,6 +500,7 @@ class RadioPlayer {
                 .then(() => {
                     this.isPlaying = true;
                     this.updateUI();
+                    this.displayStations(); // Refresh the stations list
                 })
                 .catch(error => {
                     console.error('Error playing station:', error);
@@ -489,6 +509,7 @@ class RadioPlayer {
         }
         this.isPlaying = !this.isPlaying;
         this.updateUI();
+        this.displayStations(); // Refresh the stations list
     }
 
     setVolume(value) {
@@ -502,31 +523,49 @@ class RadioPlayer {
 
     updateUI() {
         const currentFavicon = document.getElementById('current-favicon');
+        const stationName = document.getElementById('station-name');
+        const stationDetails = document.getElementById('station-details');
+        const playPauseIcon = document.getElementById('play-pause').querySelector('.material-symbols-rounded');
         
         if (this.currentStation) {
-            this.stationName.textContent = this.currentStation.name;
-            this.stationDetails.textContent = this.currentStation.tags || 'No tags available';
-            const playPauseIcon = this.playPauseBtn.querySelector('.material-symbols-rounded');
+            // Update station name
+            stationName.textContent = this.currentStation.name;
+            
+            // Update station details (bitrate, country, etc.)
+            const details = [];
+            if (this.currentStation.bitrate) {
+                details.push(`${this.currentStation.bitrate}kbps`);
+            }
+            if (this.currentStation.countrycode) {
+                details.push(this.currentStation.countrycode);
+            }
+            if (this.currentStation.tags) {
+                details.push(this.currentStation.tags.split(',').slice(0, 2).join(', '));
+            }
+            stationDetails.textContent = details.join(' • ') || 'No details available';
+            
+            // Update favicon
+            if (this.currentStation.favicon) {
+                currentFavicon.src = this.currentStation.favicon;
+                currentFavicon.style.display = 'block';
+                currentFavicon.onerror = () => {
+                    currentFavicon.style.display = 'none';
+                };
+            } else {
+                currentFavicon.style.display = 'none';
+            }
+            
+            // Update play/pause icon
             if (playPauseIcon) {
                 playPauseIcon.textContent = this.isPlaying ? 'pause' : 'play_arrow';
             }
-            
-            // Update favicon in player
-            if (currentFavicon) {
-                if (this.currentStation.favicon) {
-                    currentFavicon.src = this.currentStation.favicon;
-                    currentFavicon.style.display = 'block';
-                } else {
-                    currentFavicon.style.display = 'none';
-                }
-            }
         } else {
             // Reset UI when no station is selected
-            this.stationName.textContent = 'Select a station';
-            this.stationDetails.textContent = '';
-            if (currentFavicon) {
-                currentFavicon.style.display = 'none';
-                currentFavicon.src = '';
+            stationName.textContent = 'Select a station';
+            stationDetails.textContent = '';
+            currentFavicon.style.display = 'none';
+            if (playPauseIcon) {
+                playPauseIcon.textContent = 'play_arrow';
             }
         }
     }

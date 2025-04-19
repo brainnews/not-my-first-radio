@@ -1226,4 +1226,45 @@ input[type="range"] {
 
 .scanner-controls .material-symbols-rounded {
     font-size: 24px;
+}
+
+.playing-indicator {
+    color: #4CAF50;
+    font-size: 24px;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.6;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+
+.stop-btn {
+    color: #f44336;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.stop-btn:hover {
+    background-color: rgba(244, 67, 54, 0.1);
+}
+
+.stop-btn .material-symbols-rounded {
+    font-size: 24px;
 } 
