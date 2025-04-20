@@ -101,16 +101,26 @@
             
             <div class="settings-content">
                 <div class="settings-section">
-                    <h3>Profile</h3>
+                    <h3>Sharing</h3>
+                    <button id="share-qr" class="settings-btn">
+                        <span class="material-symbols-rounded">qr_code</span>
+                        Share your QR Code
+                    </button>
+                    <button id="scan-qr" class="settings-btn">
+                        <span class="material-symbols-rounded">qr_code_scanner</span>
+                        Scan a QR Code
+                    </button>
+                </div>
+                <div class="settings-section">
+                    <h3>Username</h3>
                     <div class="username-section">
-                        <label for="username-input">Your Username</label>
+                        <p class="username-hint">This name will be used when sharing your stations with other people.</p>
                         <div class="username-input-wrapper">
                             <input type="text" id="username-input" class="username-input">
                             <button id="save-username" class="save-username-btn">
-                                <span class="material-symbols-rounded">save</span>
+                                Save
                             </button>
                         </div>
-                        <p class="username-hint">This name will be used when sharing your stations</p>
                     </div>
                 </div>
 
@@ -119,14 +129,6 @@
                     <button id="export-data" class="settings-btn">
                         <span class="material-symbols-rounded">download</span>
                         Export Stations
-                    </button>
-                    <button id="share-qr" class="settings-btn">
-                        <span class="material-symbols-rounded">qr_code</span>
-                        Share via QR Code
-                    </button>
-                    <button id="scan-qr" class="settings-btn">
-                        <span class="material-symbols-rounded">qr_code_scanner</span>
-                        Scan QR Code
                     </button>
                     <div class="file-input-wrapper">
                         <input type="file" id="import-file" accept=".json" style="display: none;">

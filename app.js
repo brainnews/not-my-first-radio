@@ -818,11 +818,66 @@ async function loadLibraries() {
 loadLibraries()
     .then(() => {
         console.log('All QR code libraries loaded successfully');
+        
+        // Remove any existing event listener first
+        const newCloseQrBtn = document.getElementById('close-qr');
+        const oldCloseQrBtn = closeQrBtn;
+        if (oldCloseQrBtn) {
+            oldCloseQrBtn.removeEventListener('click', () => {});
+        }
+        
+        // Add new event listener
+        newCloseQrBtn.addEventListener('click', () => {
+            qrModal.classList.add('hidden');
+            // Clear the QR code when closing
+            qrCodeContainer.innerHTML = '';
+        });
     })
     .catch(error => {
         console.error('Error loading QR code libraries:', error);
         alert('Error loading QR code functionality. Please check your internet connection and try refreshing the page.');
     });
+
+// Handle QR code sharing
+shareQrBtn.addEventListener('click', () => {
+    if (!qrcodeReady) {
+        showNotification('QR code functionality is still loading. Please try again in a moment.', 'warning');
+        return;
+    }
+
+    if (!radioPlayer || !radioPlayer.stations || radioPlayer.stations.length === 0) {
+        showNotification('No stations to share.', 'warning');
+        return;
+    }
+
+    try {
+        // Only share UUIDs and username
+        const data = {
+            u: currentUsername, // username
+            i: radioPlayer.stations.map(station => station.stationuuid).filter(uuid => uuid) // station uuids
+        };
+        
+        const dataStr = JSON.stringify(data);
+        
+        // Clear any existing QR code
+        qrCodeContainer.innerHTML = '';
+        
+        // Create new QR code
+        new QRCode(qrCodeContainer, {
+            text: dataStr,
+            width: 256,
+            height: 256,
+            colorDark: '#000000',
+            colorLight: '#ffffff',
+            correctLevel: QRCode.CorrectLevel.L
+        });
+        
+        qrModal.classList.remove('hidden');
+    } catch (error) {
+        console.error('Error preparing data for QR code:', error);
+        showNotification('Error preparing data for QR code. Please try again.', 'error');
+    }
+});
 
 // Define the scan success handler
 const onScanSuccess = async (decodedText, decodedResult) => {
