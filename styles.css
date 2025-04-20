@@ -871,11 +871,13 @@ input[type="range"] {
 }
 
 .station-lists {
-    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
 }
 
 .station-list {
-    margin-bottom: 2rem;
     background: var(--bg-secondary);
     border-radius: 8px;
     overflow: hidden;
@@ -896,44 +898,36 @@ input[type="range"] {
     color: var(--text-primary);
 }
 
-.remove-list-btn {
+.list-control-btn {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     cursor: pointer;
     padding: 0.5rem;
     border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
-.remove-list-btn:hover {
+.list-control-btn:hover {
     background: var(--bg-hover);
-    color: var(--error-color);
 }
 
-.station-list .stations-grid {
+.list-stations {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
     padding: 1rem;
 }
 
-.station-list .station-card {
+.list-stations .station-card {
     background: var(--bg-primary);
     margin-bottom: 0.5rem;
 }
 
-.station-list .station-card:last-child {
+.list-stations .station-card:last-child {
     margin-bottom: 0;
-}
-
-.station-list .add-to-main-btn {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    color: var(--text-primary);
-    padding: 0.5rem;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.station-list .add-to-main-btn:hover {
-    background: var(--bg-hover);
 }
 
 /* Add success animation styles */
@@ -1307,4 +1301,111 @@ input[type="range"] {
 .qr-modal,
 .scanner-modal {
     z-index: 1100;
+}
+
+/* QR Import Modal */
+.qr-import-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.qr-import-modal.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.qr-import-content {
+    background: var(--bg-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    transform: translateY(-20px);
+    transition: transform 0.3s ease;
+}
+
+.qr-import-modal.visible .qr-import-content {
+    transform: translateY(0);
+}
+
+.qr-import-header {
+    margin-bottom: 1rem;
+}
+
+.qr-import-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: var(--text-primary);
+}
+
+.qr-import-body {
+    margin-bottom: 1.5rem;
+    color: var(--text-secondary);
+}
+
+.qr-import-message {
+    margin: 0;
+    line-height: 1.5;
+}
+
+.qr-import-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.qr-import-btn {
+    padding: 0.75rem 1rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    font-size: 0.875rem;
+    transition: background-color 0.3s ease;
+    text-align: left;
+}
+
+.qr-import-btn.merge {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.qr-import-btn.replace {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.qr-import-btn.new-list {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+}
+
+.qr-import-btn.cancel {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border-color);
+}
+
+.qr-import-btn:hover {
+    opacity: 0.9;
+}
+
+.qr-import-btn.cancel:hover {
+    background: var(--bg-hover);
+}
+
+/* Scanner Modal */
+#scanner-modal {
+    z-index: 1000;
 } 

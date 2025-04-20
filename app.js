@@ -187,11 +187,39 @@ clearStationsBtn.addEventListener('click', async () => {
         return;
     }
     
-    const confirmed = await showConfirmationModal({
-        title: 'Clear All Stations',
-        message: `Are you sure you want to remove all ${radioPlayer.stations.length} stations? This action cannot be undone.`,
-        confirmText: 'Clear All',
-        danger: true
+    const modal = document.querySelector('.confirmation-modal');
+    const content = modal.querySelector('.confirmation-content');
+    const header = content.querySelector('.confirmation-header h3');
+    const body = content.querySelector('.confirmation-body');
+    const cancelBtn = content.querySelector('.confirmation-btn.cancel');
+    const confirmBtn = content.querySelector('.confirmation-btn.confirm');
+    
+    // Set modal content
+    header.textContent = 'Clear All Stations';
+    body.textContent = `Are you sure you want to remove all ${radioPlayer.stations.length} stations? This action cannot be undone.`;
+    confirmBtn.textContent = 'Clear All';
+    confirmBtn.className = 'confirmation-btn confirm danger';
+    
+    // Show modal
+    modal.classList.add('visible');
+    
+    // Return a promise that resolves with the user's choice
+    const confirmed = await new Promise((resolve) => {
+        const handleChoice = (choice) => {
+            modal.classList.remove('visible');
+            resolve(choice);
+            
+            // Clean up event listeners
+            cancelBtn.removeEventListener('click', cancelHandler);
+            confirmBtn.removeEventListener('click', confirmHandler);
+        };
+        
+        const cancelHandler = () => handleChoice(false);
+        const confirmHandler = () => handleChoice(true);
+        
+        // Add event listeners
+        cancelBtn.addEventListener('click', cancelHandler);
+        confirmBtn.addEventListener('click', confirmHandler);
     });
     
     if (confirmed) {
@@ -312,6 +340,7 @@ class RadioPlayer {
         this.stations = this.loadStations();
         this.isPlaying = false;
         this.isEditMode = false;
+        this.stationLists = this.loadStationLists();
 
         // DOM elements
         this.playPauseBtn = document.getElementById('play-pause');
@@ -326,8 +355,33 @@ class RadioPlayer {
         this.audio.addEventListener('ended', () => this.handleStreamEnd());
         this.editBtn.addEventListener('click', () => this.toggleEditMode());
 
-        // Display initial stations
+        // Add event listener for clear shared stations button
+        document.getElementById('clear-shared-stations').addEventListener('click', async () => {
+            if (!this.stationLists || this.stationLists.length === 0) {
+                showNotification('No shared stations to clear.', 'warning');
+                return;
+            }
+            
+            const confirmed = await showConfirmationModal({
+                title: 'Clear All Shared Stations',
+                message: `Are you sure you want to remove all ${this.stationLists.length} shared station lists? This action cannot be undone.`,
+                confirmText: 'Clear All',
+                danger: true
+            });
+            
+            if (confirmed) {
+                // Clear all shared station lists
+                this.stationLists = [];
+                this.saveStationLists();
+                this.displayStationLists();
+                
+                showNotification('All shared stations have been removed.', 'success');
+            }
+        });
+
+        // Display initial stations and station lists
         this.displayStations();
+        this.displayStationLists();
     }
 
     // Load stations from localStorage
@@ -361,7 +415,7 @@ class RadioPlayer {
         }
     }
 
-    // Display station lists
+    // Display stations in the UI
     displayStations() {
         if (this.stations.length === 0) {
             this.stationsContainer.innerHTML = '<p class="no-stations">No stations added yet. Search for stations above to add them to your list.</p>';
@@ -406,7 +460,9 @@ class RadioPlayer {
     }
 
     addStationEventListeners() {
-        document.querySelectorAll('.station-card').forEach(card => {
+        // Add event listeners to main stations
+        const mainStationCards = this.stationsContainer.querySelectorAll('.station-card');
+        mainStationCards.forEach(card => {
             const url = card.dataset.url;
             
             // Play or stop button
@@ -432,22 +488,42 @@ class RadioPlayer {
             }
 
             // Remove button
-            card.querySelector('.remove-btn').addEventListener('click', async (e) => {
-                e.stopPropagation();
-                const station = this.stations.find(s => s.url === url);
-                if (!station) return;
+            const removeBtn = card.querySelector('.remove-btn');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const station = this.stations.find(s => s.url === url);
+                    if (!station) return;
 
-                const confirmed = await showConfirmationModal({
-                    title: 'Remove Station',
-                    message: `Are you sure you want to remove ${station.name} from your list?`,
-                    confirmText: 'Remove',
-                    danger: true
+                    const confirmed = await showConfirmationModal({
+                        title: 'Remove Station',
+                        message: `Are you sure you want to remove ${station.name} from your list?`,
+                        confirmText: 'Remove',
+                        danger: true
+                    });
+
+                    if (confirmed) {
+                        this.removeStation(url);
+                    }
                 });
+            }
+        });
 
-                if (confirmed) {
-                    this.removeStation(url);
-                }
-            });
+        // Add event listeners to list stations
+        const listStationCards = document.querySelectorAll('.list-stations .station-card');
+        listStationCards.forEach(card => {
+            const playBtn = card.querySelector('.play-btn');
+            if (playBtn) {
+                playBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const stationName = card.querySelector('h3').textContent;
+                    const station = this.stationLists.flatMap(list => list.stations)
+                        .find(s => s.name === stationName);
+                    if (station) {
+                        this.playStation(station);
+                    }
+                });
+            }
         });
     }
 
@@ -614,6 +690,122 @@ class RadioPlayer {
             console.error('Error removing station:', error);
             showNotification('Error removing station. Please try again.', 'error');
         }
+    }
+
+    // Load station lists from localStorage
+    loadStationLists() {
+        try {
+            const savedLists = localStorage.getItem('radio-station-lists');
+            return savedLists ? JSON.parse(savedLists) : [];
+        } catch (error) {
+            console.error('Error loading station lists:', error);
+            return [];
+        }
+    }
+
+    // Save station lists to localStorage
+    saveStationLists() {
+        try {
+            localStorage.setItem('radio-station-lists', JSON.stringify(this.stationLists));
+        } catch (error) {
+            console.error('Error saving station lists:', error);
+        }
+    }
+
+    // Display station lists in the UI
+    displayStationLists() {
+        const savedStationsSection = document.querySelector('.saved-stations');
+        const listsContainer = document.createElement('div');
+        listsContainer.className = 'station-lists';
+
+        this.stationLists.forEach((list, index) => {
+            const listElement = document.createElement('div');
+            listElement.className = 'station-list';
+            listElement.innerHTML = `
+                <div class="list-header">
+                    <h3>${list.name}</h3>
+                </div>
+                <div class="list-stations"></div>
+            `;
+
+            const stationsContainer = listElement.querySelector('.list-stations');
+            list.stations.forEach(station => {
+                const stationElement = document.createElement('div');
+                stationElement.className = 'station-card';
+                stationElement.innerHTML = `
+                    <div class="station-info">
+                        <div class="station-favicon">
+                            ${station.favicon ? 
+                                `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<span class=\\'material-symbols-rounded\\'>radio</span>'">` : 
+                                `<span class="material-symbols-rounded">radio</span>`
+                            }
+                        </div>
+                        <div class="station-details">
+                            <h3>${station.name}</h3>
+                            <div class="station-meta">
+                                ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
+                                ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
+                                ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="station-controls">
+                        <button class="play-btn">
+                            <span class="material-symbols-rounded">play_arrow</span>
+                        </button>
+                        <button class="remove-btn">
+                            <span class="material-symbols-rounded">delete</span>
+                        </button>
+                    </div>
+                `;
+
+                // Add event listener for play button
+                const playBtn = stationElement.querySelector('.play-btn');
+                playBtn.addEventListener('click', () => {
+                    this.playStation(station);
+                });
+
+                // Add event listener for remove button
+                const removeBtn = stationElement.querySelector('.remove-btn');
+                removeBtn.addEventListener('click', async () => {
+                    const confirmed = await showConfirmationModal({
+                        title: 'Remove Station',
+                        message: `Are you sure you want to remove ${station.name} from this list?`,
+                        confirmText: 'Remove',
+                        danger: true
+                    });
+
+                    if (confirmed) {
+                        // Remove the station from the list
+                        list.stations = list.stations.filter(s => s.url !== station.url);
+                        
+                        // If this was the last station in the list, remove the entire list
+                        if (list.stations.length === 0) {
+                            this.stationLists = this.stationLists.filter(l => l.name !== list.name);
+                        }
+                        
+                        // Save and update the display
+                        this.saveStationLists();
+                        this.displayStationLists();
+                        
+                        showNotification('Station removed successfully.', 'success');
+                    }
+                });
+
+                stationsContainer.appendChild(stationElement);
+            });
+
+            listsContainer.appendChild(listElement);
+        });
+
+        // Remove existing lists container if it exists
+        const existingLists = savedStationsSection.querySelector('.station-lists');
+        if (existingLists) {
+            existingLists.remove();
+        }
+
+        // Add the new lists container
+        savedStationsSection.appendChild(listsContainer);
     }
 }
 
@@ -879,9 +1071,54 @@ shareQrBtn.addEventListener('click', () => {
     }
 });
 
-// Define the scan success handler
+// Function to show QR import options
+function showQrImportOptions(options) {
+    const modal = document.querySelector('.qr-import-modal');
+    const content = modal.querySelector('.qr-import-content');
+    const header = content.querySelector('.qr-import-header h3');
+    const message = content.querySelector('.qr-import-message');
+    const mergeBtn = content.querySelector('.qr-import-btn.merge');
+    const newListBtn = content.querySelector('.qr-import-btn.new-list');
+    const cancelBtn = content.querySelector('.qr-import-btn.cancel');
+    
+    // Set modal content
+    header.textContent = options.title || 'Import Stations';
+    message.textContent = options.message || '';
+    
+    // Show modal
+    modal.classList.add('visible');
+    
+    // Return a promise that resolves with the user's choice
+    return new Promise((resolve) => {
+        const handleChoice = (choice) => {
+            modal.classList.remove('visible');
+            resolve(choice);
+            
+            // Clean up event listeners
+            mergeBtn.removeEventListener('click', mergeHandler);
+            newListBtn.removeEventListener('click', newListHandler);
+            cancelBtn.removeEventListener('click', cancelHandler);
+        };
+        
+        const mergeHandler = () => handleChoice('1');
+        const newListHandler = () => handleChoice('3');
+        const cancelHandler = () => handleChoice(null);
+        
+        mergeBtn.addEventListener('click', mergeHandler);
+        newListBtn.addEventListener('click', newListHandler);
+        cancelBtn.addEventListener('click', cancelHandler);
+    });
+}
+
+// Update the scan success handler to use the new modal
 const onScanSuccess = async (decodedText, decodedResult) => {
     try {
+        // Stop the scanner immediately after successful scan
+        if (html5QrcodeScanner) {
+            html5QrcodeScanner.clear();
+            html5QrcodeScanner = null;
+        }
+
         const data = JSON.parse(decodedText);
         
         // Validate imported data
@@ -927,16 +1164,10 @@ const onScanSuccess = async (decodedText, decodedResult) => {
         const sharedUsername = data.u || 'Unknown User';
         const listName = `${sharedUsername}'s Radio`;
         
-        // Show import options
-        const importOption = await showConfirmationModal({
+        // Show import options using the new modal
+        const importOption = await showQrImportOptions({
             title: 'Import Stations',
-            message: `Found ${validStations.length} stations from ${sharedUsername}.\n\n` +
-            `Choose an import option:\n` +
-            `1. Merge with existing stations\n` +
-            `2. Replace existing stations\n` +
-            `3. Add as a separate list (${listName})\n\n` +
-            `Enter 1, 2, or 3:`,
-            confirmText: 'Import'
+            message: `Found ${validStations.length} stations from ${sharedUsername}.`
         });
 
         if (importOption === null) return;
@@ -953,11 +1184,6 @@ const onScanSuccess = async (decodedText, decodedResult) => {
                 }
                 break;
             
-            case '2':
-                // Replace existing stations
-                radioPlayer.stations = validStations;
-                break;
-            
             case '3':
                 // Add as separate list
                 const newList = {
@@ -965,22 +1191,15 @@ const onScanSuccess = async (decodedText, decodedResult) => {
                     stations: validStations
                 };
                 
-                // Load existing lists
-                let stationLists = JSON.parse(localStorage.getItem('radio-station-lists') || '[]');
-                
-                // Add new list
-                stationLists.push(newList);
+                // Add new list to the player's lists
+                radioPlayer.stationLists.push(newList);
                 
                 // Save lists
-                localStorage.setItem('radio-station-lists', JSON.stringify(stationLists));
+                radioPlayer.saveStationLists();
                 
                 // Update UI to show the new list
                 radioPlayer.displayStationLists();
                 break;
-            
-            default:
-                showNotification('Invalid option selected', 'error');
-                return;
         }
         
         // Save and display the new stations
@@ -989,8 +1208,7 @@ const onScanSuccess = async (decodedText, decodedResult) => {
         
         showNotification(`Import successful! You now have ${radioPlayer.stations.length} stations.`, 'success');
         
-        // Stop scanner and close modal
-        html5QrcodeScanner.clear();
+        // Close scanner modal
         scannerModal.classList.add('hidden');
     } catch (error) {
         console.error('Error parsing QR code data:', error);

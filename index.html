@@ -28,6 +28,23 @@
             </div>
         </div>
 
+        <!-- Add QR import options modal -->
+        <div class="qr-import-modal">
+            <div class="qr-import-content">
+                <div class="qr-import-header">
+                    <h3>Import Stations</h3>
+                </div>
+                <div class="qr-import-body">
+                    <p class="qr-import-message"></p>
+                </div>
+                <div class="qr-import-actions">
+                    <button class="qr-import-btn merge">Merge with existing stations</button>
+                    <button class="qr-import-btn new-list">Add as separate list</button>
+                    <button class="qr-import-btn cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+
         <header>
             <div class="header-top">
                 <h1>Not my first radio.</h1>
@@ -140,6 +157,10 @@
                     <button id="clear-stations" class="settings-btn danger">
                         <span class="material-symbols-rounded">delete</span>
                         Clear All Stations
+                    </button>
+                    <button id="clear-shared-stations" class="settings-btn danger">
+                        <span class="material-symbols-rounded">delete</span>
+                        Clear All Shared Stations
                     </button>
                 </div>
             </div>
