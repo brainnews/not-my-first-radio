@@ -494,6 +494,14 @@ class RadioPlayer {
         this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
         this.audio.addEventListener('ended', () => this.handleStreamEnd());
         this.editBtn.addEventListener('click', () => this.toggleEditMode());
+        
+        // Set up the play/pause button listener directly in the constructor
+        if (this.playPauseBtn) {
+            this.playPauseBtn.addEventListener('click', () => {
+                console.log('Play/pause button clicked from constructor');
+                this.togglePlay();
+            });
+        }
 
         // Add event listener for clear shared stations button
         document.getElementById('clear-shared-stations').addEventListener('click', async () => {
@@ -914,8 +922,10 @@ class RadioPlayer {
         const currentFavicon = document.getElementById('current-favicon');
         const stationName = document.getElementById('station-name');
         const stationDetails = document.getElementById('station-details');
-        const playPauseBtn = document.getElementById('play-pause');
-        const playPauseIcon = playPauseBtn ? playPauseBtn.querySelector('.material-symbols-rounded') : null;
+        
+        // Always refresh the button reference to ensure we have the latest one
+        this.playPauseBtn = document.getElementById('play-pause');
+        const playPauseIcon = this.playPauseBtn ? this.playPauseBtn.querySelector('.material-symbols-rounded') : null;
         const stationInfo = document.querySelector('.station-info');
         
         // Remove any existing default icon first to prevent duplication
@@ -981,6 +991,7 @@ class RadioPlayer {
             // Update play/pause icon
             if (playPauseIcon) {
                 playPauseIcon.textContent = this.isPlaying ? 'pause' : 'play_arrow';
+                console.log('Updated play/pause icon to:', playPauseIcon.textContent);
             }
         } else {
             // Reset UI when no station is selected
@@ -1163,15 +1174,6 @@ class RadioPlayer {
 
 // Initialize the radio player
 const radioPlayer = new RadioPlayer();
-
-// Set up play/pause button event listener
-const playPauseBtn = document.getElementById('play-pause');
-if (playPauseBtn) {
-    playPauseBtn.addEventListener('click', () => {
-        console.log('Play/pause button clicked'); // Debug log
-        radioPlayer.togglePlay();
-    });
-}
 
 // Debug: Check localStorage on page load
 window.addEventListener('load', () => {
@@ -2003,25 +2005,6 @@ clearResultsBtn.addEventListener('click', clearSearchResults);
 
 // Initialize clear input button state
 toggleClearInputButton();
-
-// Update the player bar HTML structure
-const playerBar = document.querySelector('.player-bar');
-playerBar.innerHTML = `
-    <div class="now-playing">
-        <div class="station-info">
-            <img id="current-favicon" src="" alt="" class="current-favicon" style="display: none;">
-            <div class="current-details">
-                <h3 id="station-name">Select a station</h3>
-                <p id="station-details"></p>
-            </div>
-        </div>
-        <div class="player-controls">
-            <button id="play-pause" class="control-btn">
-                <span class="material-symbols-rounded">play_arrow</span>
-            </button>
-        </div>
-    </div>
-`;
 
 // Notification system
 function showNotification(message, type = 'success', duration = 3000) {
