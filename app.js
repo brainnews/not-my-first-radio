@@ -791,30 +791,81 @@ class RadioPlayer {
             return;
         }
 
-        // If currently playing, stop it first
-        if (this.isPlaying) {
+        // If this is the same station that's currently playing, toggle playback
+        if (this.currentStation && this.currentStation.url === station.url && this.isPlaying) {
             this.audio.pause();
+            this.isPlaying = false;
+            this.currentStation = null;
+            this.updateUI();
+            return;
         }
 
-        // Set the new station
-        this.currentStation = station;
-        this.audio.src = streamUrl;
-        
-        this.audio.play()
-            .then(() => {
-                this.isPlaying = true;
-                this.updateUI();
-            })
-            .catch(error => {
-                console.error('Error playing station:', error);
-                this.isPlaying = false;
-                if (error.name === 'NotSupportedError') {
-                    this.stationDetails.textContent = 'Error: Stream format not supported';
-                } else {
-                    this.stationDetails.textContent = 'Error playing station. Please try another one.';
+        // If currently playing, stop it first and wait a moment
+        if (this.isPlaying) {
+            // First pause and remove the audio completely
+            this.audio.pause();
+            this.audio.removeAttribute('src');
+            this.audio.load(); // Important to clear the current audio pipeline
+            
+            this.isPlaying = false;
+            
+            // Set the new station data now for immediate UI update
+            this.currentStation = station;
+            this.updateUI();
+            
+            // Create a completely new audio element to avoid conflicts
+            this.audio = new Audio();
+            
+            // Wait a moment before starting the new audio to ensure complete clearance
+            setTimeout(() => {
+                this.audio.src = streamUrl;
+                
+                // Add event listeners before playing
+                const playPromise = this.audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise
+                        .then(() => {
+                            this.isPlaying = true;
+                            this.updateUI();
+                        })
+                        .catch(error => {
+                            console.error('Error playing station:', error);
+                            this.isPlaying = false;
+                            if (error.name === 'NotSupportedError') {
+                                this.stationDetails.textContent = 'Error: Stream format not supported';
+                            } else {
+                                this.stationDetails.textContent = 'Error playing station. Please try another one.';
+                            }
+                            this.updateUI();
+                        });
                 }
-                this.updateUI();
-            });
+            }, 200); // Slightly longer delay to ensure complete clearance
+        } else {
+            // No audio currently playing, can start immediately
+            this.currentStation = station;
+            this.audio.src = streamUrl;
+            
+            const playPromise = this.audio.play();
+            
+            if (playPromise !== undefined) {
+                playPromise
+                    .then(() => {
+                        this.isPlaying = true;
+                        this.updateUI();
+                    })
+                    .catch(error => {
+                        console.error('Error playing station:', error);
+                        this.isPlaying = false;
+                        if (error.name === 'NotSupportedError') {
+                            this.stationDetails.textContent = 'Error: Stream format not supported';
+                        } else {
+                            this.stationDetails.textContent = 'Error playing station. Please try another one.';
+                        }
+                        this.updateUI();
+                    });
+            }
+        }
     }
 
     togglePlay() {
@@ -1469,7 +1520,7 @@ const onScanSuccess = async (decodedText, decodedResult) => {
         }
 
         const sharedUsername = data.u || 'Unknown User';
-        const listName = `${sharedUsername}'s Radio`;
+        const listName = `${sharedUsername}'s radio`;
         
         // Show import options using the new modal
         const importOption = await showQrImportOptions({
@@ -1960,6 +2011,7 @@ clearResultsBtn.addEventListener('click', clearSearchResults);
 toggleClearInputButton();
 
 // Update the player bar HTML structure
+const playerBar = document.querySelector('.player-bar');
 playerBar.innerHTML = `
     <div class="now-playing">
         <div class="station-info">

@@ -947,10 +947,6 @@ input[type="range"] {
     margin-bottom: 0;
 }
 
-.list-stations .station-card:first-child {
-    border-top: none;
-}
-
 .list-stations .station-card:last-child {
     margin-bottom: 0;
 }
