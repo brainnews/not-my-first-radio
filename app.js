@@ -915,7 +915,14 @@ class RadioPlayer {
         const stationName = document.getElementById('station-name');
         const stationDetails = document.getElementById('station-details');
         const playPauseBtn = document.getElementById('play-pause');
-        const playPauseIcon = playPauseBtn.querySelector('.material-symbols-rounded');
+        const playPauseIcon = playPauseBtn ? playPauseBtn.querySelector('.material-symbols-rounded') : null;
+        const stationInfo = document.querySelector('.station-info');
+        
+        // Remove any existing default icon first to prevent duplication
+        const existingDefaultIcon = document.querySelector('.default-favicon');
+        if (existingDefaultIcon) {
+            existingDefaultIcon.remove();
+        }
         
         if (this.currentStation) {
             // Update station name
@@ -941,40 +948,33 @@ class RadioPlayer {
                 currentFavicon.onerror = () => {
                     // If favicon fails to load, show a default icon
                     currentFavicon.style.display = 'none';
-                    const stationInfo = document.querySelector('.station-info');
                     
-                    // Check if we already added a default icon
-                    let defaultIcon = stationInfo.querySelector('.default-favicon');
-                    if (!defaultIcon) {
-                        defaultIcon = document.createElement('span');
+                    if (stationInfo) {
+                        // Add default icon
+                        const defaultIcon = document.createElement('span');
                         defaultIcon.className = 'material-symbols-rounded default-favicon';
                         defaultIcon.textContent = 'radio';
                         defaultIcon.style.fontSize = '24px';
                         defaultIcon.style.marginRight = '10px';
-                        stationInfo.insertBefore(defaultIcon, currentFavicon.nextSibling);
+                        
+                        // Find the right spot to insert it
+                        stationInfo.prepend(defaultIcon);
                     }
                 };
-                
-                // Remove any default icon if we have a valid favicon
-                const defaultIcon = document.querySelector('.default-favicon');
-                if (defaultIcon) {
-                    defaultIcon.remove();
-                }
             } else {
                 // No favicon available, show default icon
                 currentFavicon.style.display = 'none';
                 
-                const stationInfo = document.querySelector('.station-info');
-                
-                // Check if we already added a default icon
-                let defaultIcon = stationInfo.querySelector('.default-favicon');
-                if (!defaultIcon) {
-                    defaultIcon = document.createElement('span');
+                if (stationInfo) {
+                    // Add default icon
+                    const defaultIcon = document.createElement('span');
                     defaultIcon.className = 'material-symbols-rounded default-favicon';
                     defaultIcon.textContent = 'radio';
                     defaultIcon.style.fontSize = '24px';
                     defaultIcon.style.marginRight = '10px';
-                    stationInfo.insertBefore(defaultIcon, currentFavicon.nextSibling);
+                    
+                    // Find the right spot to insert it
+                    stationInfo.prepend(defaultIcon);
                 }
             }
             
@@ -987,12 +987,6 @@ class RadioPlayer {
             stationName.textContent = 'Select a station';
             stationDetails.textContent = '';
             currentFavicon.style.display = 'none';
-            
-            // Remove default icon if it exists
-            const defaultIcon = document.querySelector('.default-favicon');
-            if (defaultIcon) {
-                defaultIcon.remove();
-            }
             
             if (playPauseIcon) {
                 playPauseIcon.textContent = 'play_arrow';
