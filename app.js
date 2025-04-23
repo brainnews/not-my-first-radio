@@ -180,6 +180,146 @@ importFileInput.addEventListener('change', async (event) => {
     reader.readAsText(file);
 });
 
+// Handle QR code image upload
+const qrUploadInput = document.getElementById('qr-upload');
+qrUploadInput.addEventListener('change', async (event) => {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    try {
+        // Create an image element to load the file
+        const img = new Image();
+        const imageUrl = URL.createObjectURL(file);
+        
+        img.onload = async () => {
+            try {
+                // Create a canvas to process the image
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                ctx.drawImage(img, 0, 0);
+                
+                // Get the image data
+                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                
+                // Use jsQR to decode the QR code
+                const code = jsQR(imageData.data, imageData.width, imageData.height, {
+                    inversionAttempts: "dontInvert",
+                });
+                
+                if (code) {
+                    // Process the QR code data
+                    try {
+                        // First try parsing as JSON
+                        let data;
+                        try {
+                            data = JSON.parse(code.data);
+                        } catch (parseError) {
+                            // If not JSON, use the raw string
+                            console.log("QR code is not in JSON format, using raw data:", code.data);
+                            data = { stations: [{ url: code.data, name: "Scanned Station" }] };
+                        }
+                        
+                        // Validate imported data
+                        if (!data) {
+                            showNotification('Invalid QR code format.', 'error');
+                            return;
+                        }
+                        
+                        // Handle different data formats
+                        let stations = [];
+                        
+                        if (data.stations && Array.isArray(data.stations)) {
+                            stations = data.stations;
+                        } else if (data.u && data.i && Array.isArray(data.i)) {
+                            // This is the sharing format with UUIDs
+                            showNotification('Processing station data from QR code...', 'success');
+                            
+                            // Use the existing QR code handler for this format
+                            await onScanSuccess(code.data, null);
+                            return;
+                        } else {
+                            showNotification('Unrecognized QR code format.', 'error');
+                            return;
+                        }
+                        
+                        if (stations.length === 0) {
+                            showNotification('No stations found in the QR code.', 'warning');
+                            return;
+                        }
+                        
+                        // Show import options
+                        const importOption = await showQrImportOptions({
+                            title: 'Import Stations',
+                            message: `Found ${stations.length} stations in the QR code.`,
+                            confirmText: 'Import',
+                            danger: false
+                        });
+                        
+                        if (importOption === null) return;
+                        
+                        if (importOption === '1') {
+                            // Merge stations, avoiding duplicates
+                            const existingUrls = radioPlayer.stations.map(s => s.url);
+                            for (const station of stations) {
+                                if (!existingUrls.includes(station.url)) {
+                                    radioPlayer.stations.push(station);
+                                    existingUrls.push(station.url);
+                                }
+                            }
+                        } else if (importOption === '3') {
+                            // Add as separate list
+                            const newList = {
+                                name: 'Scanned Stations',
+                                stations: stations
+                            };
+                            
+                            // Add new list to the player's lists
+                            radioPlayer.stationLists.push(newList);
+                            
+                            // Save lists
+                            radioPlayer.saveStationLists();
+                            
+                            // Update UI to show the new list
+                            radioPlayer.displayStationLists();
+                        }
+                        
+                        // Save and display the new stations
+                        radioPlayer.saveStations();
+                        radioPlayer.displayStations();
+                        
+                        showNotification(`Import successful! You now have ${radioPlayer.stations.length} stations.`, 'success');
+                    } catch (error) {
+                        console.error('Error processing QR code data:', error);
+                        showNotification('Error processing QR code. The code may be invalid or corrupted.', 'error');
+                    }
+                } else {
+                    showNotification('No QR code found in the image.', 'error');
+                }
+            } catch (error) {
+                console.error('Error processing image:', error);
+                showNotification('Error processing image. Please try again.', 'error');
+            } finally {
+                URL.revokeObjectURL(imageUrl);
+            }
+        };
+        
+        img.onerror = () => {
+            showNotification('Error loading image. Please try again.', 'error');
+            URL.revokeObjectURL(imageUrl);
+        };
+        
+        img.src = imageUrl;
+    } catch (error) {
+        console.error('Error handling QR code upload:', error);
+        showNotification('Error uploading QR code. Please try again.', 'error');
+    }
+    
+    // Reset the file input
+    event.target.value = '';
+});
+
 // Handle clear all stations
 clearStationsBtn.addEventListener('click', async () => {
     if (!radioPlayer || !radioPlayer.stations || radioPlayer.stations.length === 0) {
@@ -465,6 +605,26 @@ class RadioPlayer {
         mainStationCards.forEach(card => {
             const url = card.dataset.url;
             
+            // Make the entire card clickable to play/stop
+            card.addEventListener('click', (e) => {
+                // Don't trigger if we clicked on the remove button
+                if (e.target.closest('.remove-btn')) return;
+                
+                const station = this.stations.find(s => s.url === url);
+                if (station) {
+                    if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
+                        // If clicking the currently playing station
+                        this.audio.pause();
+                        this.isPlaying = false;
+                        this.currentStation = null;
+                        this.updateUI();
+                    } else {
+                        // If clicking a different station
+                        this.playStation(station);
+                    }
+                }
+            });
+
             // Play or stop button
             const playControl = card.querySelector('.play-btn, .stop-btn');
             if (playControl) {
@@ -478,7 +638,6 @@ class RadioPlayer {
                             this.isPlaying = false;
                             this.currentStation = null;
                             this.updateUI();
-                            this.displayStations();
                         } else {
                             // If clicking the play button
                             this.playStation(station);
@@ -512,21 +671,106 @@ class RadioPlayer {
         // Add event listeners to list stations
         const listStationCards = document.querySelectorAll('.list-stations .station-card');
         listStationCards.forEach(card => {
-            const playBtn = card.querySelector('.play-btn');
-            if (playBtn) {
-                playBtn.addEventListener('click', (e) => {
+            const url = card.dataset.url;
+            
+            // Make the entire card clickable to play
+            card.addEventListener('click', (e) => {
+                // Don't trigger if we clicked on the remove button
+                if (e.target.closest('.remove-btn')) return;
+                
+                // Find the station in the shared lists by URL
+                let foundStation = null;
+                for (const list of this.stationLists) {
+                    foundStation = list.stations.find(s => s.url === url);
+                    if (foundStation) break;
+                }
+                
+                if (foundStation) {
+                    if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
+                        // If clicking the currently playing station
+                        this.audio.pause();
+                        this.isPlaying = false;
+                        this.currentStation = null;
+                        this.updateUI();
+                    } else {
+                        // If clicking a different station
+                        this.playStation(foundStation);
+                    }
+                }
+            });
+            
+            // Play or stop button
+            const playControl = card.querySelector('.play-btn, .stop-btn');
+            if (playControl) {
+                playControl.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    
+                    // Find the station in the shared lists by URL
+                    let foundStation = null;
+                    for (const list of this.stationLists) {
+                        foundStation = list.stations.find(s => s.url === url);
+                        if (foundStation) break;
+                    }
+                    
+                    if (foundStation) {
+                        if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
+                            // If clicking the stop button of the currently playing station
+                            this.audio.pause();
+                            this.isPlaying = false;
+                            this.currentStation = null;
+                            this.updateUI();
+                        } else {
+                            // Play the station
+                            this.playStation(foundStation);
+                        }
+                    }
+                });
+            }
+            
+            // Remove button
+            const removeBtn = card.querySelector('.remove-btn');
+            if (removeBtn) {
+                removeBtn.addEventListener('click', async (e) => {
+                    e.stopPropagation();
+                    const listItem = card.closest('.station-list');
+                    const listIndex = listItem.querySelector('.list-control-btn').dataset.listIndex;
+                    const list = this.stationLists[listIndex];
+                    
+                    if (!list) return;
+                    
                     const stationName = card.querySelector('h3').textContent;
-                    const station = this.stationLists.flatMap(list => list.stations)
-                        .find(s => s.name === stationName);
-                    if (station) {
-                        this.playStation(station);
+                    const station = list.stations.find(s => s.name === stationName && s.url === url);
+                    
+                    if (!station) return;
+                    
+                    const confirmed = await showConfirmationModal({
+                        title: 'Remove Station',
+                        message: `Are you sure you want to remove ${station.name} from this list?`,
+                        confirmText: 'Remove',
+                        danger: true
+                    });
+                    
+                    if (confirmed) {
+                        // Remove the station from the list
+                        list.stations = list.stations.filter(s => s.url !== station.url);
+                        
+                        // If this was the last station in the list, remove the entire list
+                        if (list.stations.length === 0) {
+                            this.stationLists.splice(listIndex, 1);
+                        }
+                        
+                        // Save and update the display
+                        this.saveStationLists();
+                        this.displayStationLists();
+                        
+                        showNotification('Station removed successfully.', 'success');
                     }
                 });
             }
         });
     }
 
+    // Play a station
     playStation(station) {
         if (!station) {
             console.error('No station provided');
@@ -547,21 +791,29 @@ class RadioPlayer {
             return;
         }
 
+        // If currently playing, stop it first
+        if (this.isPlaying) {
+            this.audio.pause();
+        }
+
+        // Set the new station
         this.currentStation = station;
         this.audio.src = streamUrl;
+        
         this.audio.play()
             .then(() => {
                 this.isPlaying = true;
                 this.updateUI();
-                this.displayStations(); // Refresh the stations list
             })
             .catch(error => {
                 console.error('Error playing station:', error);
+                this.isPlaying = false;
                 if (error.name === 'NotSupportedError') {
                     this.stationDetails.textContent = 'Error: Stream format not supported';
                 } else {
                     this.stationDetails.textContent = 'Error playing station. Please try another one.';
                 }
+                this.updateUI();
             });
     }
 
@@ -636,10 +888,43 @@ class RadioPlayer {
                 currentFavicon.src = this.currentStation.favicon;
                 currentFavicon.style.display = 'block';
                 currentFavicon.onerror = () => {
+                    // If favicon fails to load, show a default icon
                     currentFavicon.style.display = 'none';
+                    const stationInfo = document.querySelector('.station-info');
+                    
+                    // Check if we already added a default icon
+                    let defaultIcon = stationInfo.querySelector('.default-favicon');
+                    if (!defaultIcon) {
+                        defaultIcon = document.createElement('span');
+                        defaultIcon.className = 'material-symbols-rounded default-favicon';
+                        defaultIcon.textContent = 'radio';
+                        defaultIcon.style.fontSize = '24px';
+                        defaultIcon.style.marginRight = '10px';
+                        stationInfo.insertBefore(defaultIcon, currentFavicon.nextSibling);
+                    }
                 };
+                
+                // Remove any default icon if we have a valid favicon
+                const defaultIcon = document.querySelector('.default-favicon');
+                if (defaultIcon) {
+                    defaultIcon.remove();
+                }
             } else {
+                // No favicon available, show default icon
                 currentFavicon.style.display = 'none';
+                
+                const stationInfo = document.querySelector('.station-info');
+                
+                // Check if we already added a default icon
+                let defaultIcon = stationInfo.querySelector('.default-favicon');
+                if (!defaultIcon) {
+                    defaultIcon = document.createElement('span');
+                    defaultIcon.className = 'material-symbols-rounded default-favicon';
+                    defaultIcon.textContent = 'radio';
+                    defaultIcon.style.fontSize = '24px';
+                    defaultIcon.style.marginRight = '10px';
+                    stationInfo.insertBefore(defaultIcon, currentFavicon.nextSibling);
+                }
             }
             
             // Update play/pause icon
@@ -651,10 +936,21 @@ class RadioPlayer {
             stationName.textContent = 'Select a station';
             stationDetails.textContent = '';
             currentFavicon.style.display = 'none';
+            
+            // Remove default icon if it exists
+            const defaultIcon = document.querySelector('.default-favicon');
+            if (defaultIcon) {
+                defaultIcon.remove();
+            }
+            
             if (playPauseIcon) {
                 playPauseIcon.textContent = 'play_arrow';
             }
         }
+        
+        // Update station cards to reflect current playing state
+        this.displayStations();
+        this.displayStationLists();
     }
 
     // Add toggleEditMode method
@@ -715,6 +1011,18 @@ class RadioPlayer {
     // Display station lists in the UI
     displayStationLists() {
         const savedStationsSection = document.querySelector('.saved-stations');
+        
+        // Remove existing lists container if it exists
+        const existingLists = savedStationsSection.querySelector('.station-lists');
+        if (existingLists) {
+            existingLists.remove();
+        }
+        
+        // If no station lists, return early
+        if (!this.stationLists || this.stationLists.length === 0) {
+            return;
+        }
+        
         const listsContainer = document.createElement('div');
         listsContainer.className = 'station-lists';
 
@@ -723,89 +1031,88 @@ class RadioPlayer {
             listElement.className = 'station-list';
             listElement.innerHTML = `
                 <div class="list-header">
-                    <h3>${list.name}</h3>
+                    <h3>${list.name || 'Shared Stations'}</h3>
+                    <button class="edit-btn list-control-btn" data-list-index="${index}">
+                        <span class="material-symbols-rounded">edit</span>
+                    </button>
                 </div>
                 <div class="list-stations"></div>
             `;
 
             const stationsContainer = listElement.querySelector('.list-stations');
-            list.stations.forEach(station => {
-                const stationElement = document.createElement('div');
-                stationElement.className = 'station-card';
-                stationElement.innerHTML = `
-                    <div class="station-info">
-                        <div class="station-favicon">
-                            ${station.favicon ? 
-                                `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<span class=\\'material-symbols-rounded\\'>radio</span>'">` : 
-                                `<span class="material-symbols-rounded">radio</span>`
-                            }
-                        </div>
-                        <div class="station-details">
-                            <h3>${station.name}</h3>
-                            <div class="station-meta">
-                                ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
-                                ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
-                                ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
+            
+            if (!list.stations || list.stations.length === 0) {
+                stationsContainer.innerHTML = '<p class="no-stations">No stations in this list.</p>';
+            } else {
+                list.stations.forEach(station => {
+                    // Check if this station is the currently playing one
+                    const isCurrentlyPlaying = this.currentStation && 
+                                             this.isPlaying && 
+                                             this.currentStation.url === station.url;
+                    
+                    const stationElement = document.createElement('div');
+                    stationElement.className = 'station-card';
+                    stationElement.dataset.url = station.url;
+                    stationElement.innerHTML = `
+                        <div class="station-info">
+                            <div class="station-favicon">
+                                ${station.favicon ? 
+                                    `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<span class=\\'material-symbols-rounded\\'>radio</span>'">` : 
+                                    `<span class="material-symbols-rounded">radio</span>`
+                                }
+                            </div>
+                            <div class="station-details">
+                                <h3>${station.name}</h3>
+                                <div class="station-meta">
+                                    ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
+                                    ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
+                                    ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="station-controls">
-                        <button class="play-btn">
-                            <span class="material-symbols-rounded">play_arrow</span>
-                        </button>
-                        <button class="remove-btn">
-                            <span class="material-symbols-rounded">delete</span>
-                        </button>
-                    </div>
-                `;
+                        <div class="station-controls">
+                            ${isCurrentlyPlaying ? 
+                                `<button class="stop-btn">
+                                    <span class="material-symbols-rounded">stop</span>
+                                </button>` : 
+                                `<button class="play-btn">
+                                    <span class="material-symbols-rounded">play_arrow</span>
+                                </button>`
+                            }
+                            <button class="remove-btn">
+                                <span class="material-symbols-rounded">delete</span>
+                            </button>
+                        </div>
+                    `;
 
-                // Add event listener for play button
-                const playBtn = stationElement.querySelector('.play-btn');
-                playBtn.addEventListener('click', () => {
-                    this.playStation(station);
+                    stationsContainer.appendChild(stationElement);
                 });
-
-                // Add event listener for remove button
-                const removeBtn = stationElement.querySelector('.remove-btn');
-                removeBtn.addEventListener('click', async () => {
-                    const confirmed = await showConfirmationModal({
-                        title: 'Remove Station',
-                        message: `Are you sure you want to remove ${station.name} from this list?`,
-                        confirmText: 'Remove',
-                        danger: true
-                    });
-
-                    if (confirmed) {
-                        // Remove the station from the list
-                        list.stations = list.stations.filter(s => s.url !== station.url);
-                        
-                        // If this was the last station in the list, remove the entire list
-                        if (list.stations.length === 0) {
-                            this.stationLists = this.stationLists.filter(l => l.name !== list.name);
-                        }
-                        
-                        // Save and update the display
-                        this.saveStationLists();
-                        this.displayStationLists();
-                        
-                        showNotification('Station removed successfully.', 'success');
-                    }
-                });
-
-                stationsContainer.appendChild(stationElement);
-            });
+            }
 
             listsContainer.appendChild(listElement);
         });
 
-        // Remove existing lists container if it exists
-        const existingLists = savedStationsSection.querySelector('.station-lists');
-        if (existingLists) {
-            existingLists.remove();
-        }
-
         // Add the new lists container
         savedStationsSection.appendChild(listsContainer);
+        
+        // Add event listeners for station cards
+        this.addStationEventListeners();
+        
+        // Add event listeners for list edit buttons
+        document.querySelectorAll('.list-control-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const listIndex = btn.dataset.listIndex;
+                const list = this.stationLists[listIndex];
+                if (!list) return;
+                
+                const listElement = btn.closest('.station-list');
+                const stationsContainer = listElement.querySelector('.list-stations');
+                
+                // Toggle edit mode for this list
+                stationsContainer.classList.toggle('edit-mode');
+                btn.classList.toggle('active');
+            });
+        });
     }
 }
 

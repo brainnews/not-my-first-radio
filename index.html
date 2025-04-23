@@ -88,7 +88,7 @@
 
         <footer class="player-bar">
             <div class="now-playing">
-                <div class="station-info">
+                <div class="station-info" style="padding-left: 0.25rem;">
                     <img id="current-favicon" src="" alt="" class="current-favicon" style="display: none;">
                     <div class="current-details">
                         <h3 id="station-name">Select a station</h3>
@@ -121,12 +121,19 @@
                     <h3>Sharing</h3>
                     <button id="share-qr" class="settings-btn">
                         <span class="material-symbols-rounded">qr_code</span>
-                        Share your QR Code
+                        Share your QR code
                     </button>
                     <button id="scan-qr" class="settings-btn">
                         <span class="material-symbols-rounded">qr_code_scanner</span>
-                        Scan a QR Code
+                        Scan a QR code
                     </button>
+                    <div id="upload-qr" class="file-input-wrapper settings-btn">
+                        <input type="file" id="qr-upload" accept="image/*" style="display: none;">
+                        <label for="qr-upload">
+                            <span class="material-symbols-rounded">upload</span>
+                            Upload QR code
+                        </label>
+                    </div>
                 </div>
                 <div class="settings-section">
                     <h3>Username</h3>
@@ -203,6 +210,7 @@
 
         <div id="settings-overlay" class="settings-overlay hidden"></div>
     </div>
+    <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script src="app.js"></script>
 </body>
 </html> 
