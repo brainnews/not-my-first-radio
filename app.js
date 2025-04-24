@@ -573,7 +573,27 @@ class RadioPlayer {
     // Display stations in the UI
     displayStations() {
         if (this.stations.length === 0) {
-            this.stationsContainer.innerHTML = '<p class="no-stations">No stations added yet. Search for stations above to add them to your list.</p>';
+            this.stationsContainer.innerHTML = `
+                <div class="empty-state">
+                    <p class="no-stations">No stations added yet. Search for stations above to add them to your list.</p>
+                    <button class="settings-btn" id="empty-state-settings">
+                        Or open <span class="material-symbols-rounded">settings</span>Settings to add stations by QR code or import from a file.
+                    </button>
+                </div>
+            `;
+            
+            // Add event listener to the new settings button
+            const emptyStateSettingsBtn = document.getElementById('empty-state-settings');
+            if (emptyStateSettingsBtn) {
+                emptyStateSettingsBtn.addEventListener('click', () => {
+                    settingsPanel.classList.remove('hidden');
+                    settingsOverlay.classList.remove('hidden');
+                    setTimeout(() => {
+                        settingsPanel.classList.add('visible');
+                        settingsOverlay.classList.add('visible');
+                    }, 10);
+                });
+            }
             return;
         }
 
