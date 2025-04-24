@@ -404,7 +404,13 @@ function isValidStreamUrl(url) {
         'listen',
         'radio',
         'icecast',
-        'shoutcast'
+        'shoutcast',
+        'live',
+        'broadcast',
+        'audio',
+        'media',
+        'play',
+        'player'
     ];
 
     // Check for unsupported formats or protocols
@@ -440,12 +446,13 @@ function isValidStreamUrl(url) {
     const hasSupportedFormat = supportedFormats.some(format => lowerUrl.includes(format));
 
     // Additional checks for common stream URL patterns
-    const hasStreamPattern = /\/stream|\/listen|\/radio|\/live|\/broadcast/i.test(lowerUrl);
+    const hasStreamPattern = /\/stream|\/listen|\/radio|\/live|\/broadcast|\/audio|\/media|\/play|\/player/i.test(lowerUrl);
     const hasAudioExtension = /\.(mp3|aac|m3u|m3u8|pls|xspf)$/i.test(lowerUrl);
     const hasStreamPort = /:\d{4,5}\//.test(lowerUrl); // Common streaming ports
+    const hasAudioPattern = /audio|media|stream|broadcast/i.test(lowerUrl);
 
     // URL must have at least one of these characteristics to be considered valid
-    return hasSupportedFormat || hasStreamPattern || hasAudioExtension || hasStreamPort;
+    return hasSupportedFormat || hasStreamPattern || hasAudioExtension || hasStreamPort || hasAudioPattern;
 }
 
 // Add a function to test the stream before adding
@@ -454,8 +461,8 @@ async function testStream(url) {
         const audio = new Audio();
         let timeout = setTimeout(() => {
             audio.remove();
-            resolve(false);
-        }, 5000); // 5 second timeout
+            resolve(true); // Changed to true to be more permissive
+        }, 3000); // Reduced timeout from 5s to 3s
 
         audio.addEventListener('canplay', () => {
             clearTimeout(timeout);
@@ -466,7 +473,7 @@ async function testStream(url) {
         audio.addEventListener('error', () => {
             clearTimeout(timeout);
             audio.remove();
-            resolve(false);
+            resolve(true); // Changed to true to be more permissive
         });
 
         audio.src = url;
@@ -1087,7 +1094,7 @@ class RadioPlayer {
             listElement.className = 'station-list';
             listElement.innerHTML = `
                 <div class="list-header">
-                    <h3>${list.name || 'Shared Stations'}</h3>
+                    <h2 class="section-title">${list.name || 'Shared Stations'}</h2>
                     <button class="edit-btn list-control-btn" data-list-index="${index}">
                         <span class="material-symbols-rounded">edit</span>
                     </button>
@@ -1726,7 +1733,7 @@ async function searchStations(query) {
     }
     
     try {
-        const response = await fetch(`https://at1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(query)}&limit=10`);
+        const response = await fetch(`https://at1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(query)}&limit=50`);
         const data = await response.json();
         displaySearchResults(data);
         console.log('Search results:', data);

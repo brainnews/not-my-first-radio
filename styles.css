@@ -145,24 +145,15 @@ main {
     cursor: pointer;
     display: flex;
     align-items: center;
+    border-radius: 4px;
     @media (max-width: 768px) {
         padding: 6px;
     }
     gap: 1rem;
-    border-bottom: 1px solid var(--border-color);
-    border-left: 1px solid var(--border-color);
-    border-right: 1px solid var(--border-color);
     padding: 1rem;
 }
 .station-card:hover, .search-result-card:hover {
     background: var(--bg-secondary);
-}
-.station-card:first-child, .search-result-card:first-child {
-    border-top: 1px solid var(--border-color);
-    border-radius: 8px 8px 0 0;
-}
-.station-card:last-child, .search-result-card:last-child {
-    border-radius: 0 0 8px 8px;
 }
 
 .station-favicon {
@@ -912,20 +903,6 @@ input[type="range"] {
     overflow: hidden;
 }
 
-.list-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 0 1rem 0;
-    margin-bottom: 0.5rem;
-}
-
-.list-header h3 {
-    margin: 0;
-    font-size: 1.125rem;
-    color: var(--text-secondary);
-}
-
 .list-control-btn {
     background: transparent;
     border: none;
@@ -940,20 +917,6 @@ input[type="range"] {
 
 .list-control-btn:hover {
     background: var(--bg-hover);
-}
-
-.list-stations {
-    display: flex;
-    flex-direction: column;
-}
-
-.list-stations .station-card {
-    border-bottom: 1px solid var(--border-color);
-    margin-bottom: 0;
-}
-
-.list-stations .station-card:last-child {
-    margin-bottom: 0;
 }
 
 /* Add success animation styles */
@@ -1183,11 +1146,14 @@ input[type="range"] {
     opacity: 0.9;
 }
 
-.section-header {
+.section-header, .list-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
+    width: 100%;
+    padding: 0 0 1rem 0.75rem;
 }
 
 .edit-btn {
