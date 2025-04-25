@@ -624,6 +624,9 @@ class RadioPlayer {
                             <span class="material-symbols-rounded">play_arrow</span>
                         </button>`
                     }
+                    <button class="share-btn" data-station="${JSON.stringify(station).replace(/"/g, '&quot;')}">
+                        <span class="material-symbols-rounded">share</span>
+                    </button>
                     <button class="remove-btn">
                         <span class="material-symbols-rounded">delete</span>
                     </button>
@@ -642,8 +645,8 @@ class RadioPlayer {
             
             // Make the entire card clickable to play/stop
             card.addEventListener('click', (e) => {
-                // Don't trigger if we clicked on the remove button
-                if (e.target.closest('.remove-btn')) return;
+                // Don't trigger if we clicked on the remove button or share button
+                if (e.target.closest('.remove-btn') || e.target.closest('.share-btn')) return;
                 
                 const station = this.stations.find(s => s.url === url);
                 if (station) {
@@ -681,6 +684,32 @@ class RadioPlayer {
                 });
             }
 
+            // Share button
+            const shareBtn = card.querySelector('.share-btn');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const stationJson = shareBtn.dataset.station.replace(/&quot;/g, '"');
+                    const station = JSON.parse(stationJson);
+                    
+                    // Create sharing data
+                    const shareData = {
+                        u: currentUsername,
+                        i: [station.stationuuid]
+                    };
+                    
+                    // Create sharing URL
+                    const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
+                    
+                    // Copy to clipboard
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        showNotification('Station sharing link copied to clipboard!', 'success');
+                    }).catch(() => {
+                        showNotification('Failed to copy link. Please try again.', 'error');
+                    });
+                });
+            }
+
             // Remove button
             const removeBtn = card.querySelector('.remove-btn');
             if (removeBtn) {
@@ -710,8 +739,8 @@ class RadioPlayer {
             
             // Make the entire card clickable to play
             card.addEventListener('click', (e) => {
-                // Don't trigger if we clicked on the remove button
-                if (e.target.closest('.remove-btn')) return;
+                // Don't trigger if we clicked on the remove button or share button
+                if (e.target.closest('.remove-btn') || e.target.closest('.share-btn')) return;
                 
                 // Find the station in the shared lists by URL
                 let foundStation = null;
@@ -759,6 +788,32 @@ class RadioPlayer {
                             this.playStation(foundStation);
                         }
                     }
+                });
+            }
+
+            // Share button
+            const shareBtn = card.querySelector('.share-btn');
+            if (shareBtn) {
+                shareBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const stationJson = shareBtn.dataset.station.replace(/&quot;/g, '"');
+                    const station = JSON.parse(stationJson);
+                    
+                    // Create sharing data
+                    const shareData = {
+                        u: currentUsername,
+                        i: [station.stationuuid]
+                    };
+                    
+                    // Create sharing URL
+                    const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
+                    
+                    // Copy to clipboard
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        showNotification('Station sharing link copied to clipboard!', 'success');
+                    }).catch(() => {
+                        showNotification('Failed to copy link. Please try again.', 'error');
+                    });
                 });
             }
             
@@ -1206,6 +1261,84 @@ const radioPlayer = new RadioPlayer();
 window.addEventListener('load', () => {
     // Ensure stations are displayed after page load
     radioPlayer.displayStations();
+    
+    // Check for shared station in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    const shareParam = urlParams.get('share');
+    
+    if (shareParam) {
+        try {
+            const shareData = JSON.parse(decodeURIComponent(shareParam));
+            
+            // Validate shared data
+            if (!shareData || !shareData.i || !Array.isArray(shareData.i) || shareData.i.length === 0) {
+                showNotification('Invalid sharing link.', 'error');
+                return;
+            }
+            
+            // Show loading notification
+            showNotification('Fetching shared station...', 'success');
+            
+            // Fetch station details
+            fetch(`https://at1.api.radio-browser.info/json/stations/byuuid/${shareData.i[0]}`)
+                .then(response => response.json())
+                .then(stations => {
+                    if (stations && stations.length > 0) {
+                        const station = stations[0];
+                        const sharedUsername = shareData.u || 'Unknown User';
+                        
+                        // Show import options
+                        showQrImportOptions({
+                            title: 'Import Shared Station',
+                            message: `Found station "${station.name}" shared by ${sharedUsername}.`
+                        }).then(importOption => {
+                            if (importOption === null) return;
+                            
+                            switch (importOption) {
+                                case '1':
+                                    // Merge station, avoiding duplicates
+                                    const existingUrls = radioPlayer.stations.map(s => s.url);
+                                    if (!existingUrls.includes(station.url)) {
+                                        radioPlayer.stations.push(station);
+                                        radioPlayer.saveStations();
+                                        radioPlayer.displayStations();
+                                        showNotification('Station added successfully!', 'success');
+                                    } else {
+                                        showNotification('Station already exists in your list.', 'warning');
+                                    }
+                                    break;
+                                
+                                case '3':
+                                    // Add as separate list
+                                    const newList = {
+                                        name: `${sharedUsername}'s Shared Station`,
+                                        stations: [station]
+                                    };
+                                    
+                                    radioPlayer.stationLists.push(newList);
+                                    radioPlayer.saveStationLists();
+                                    radioPlayer.displayStationLists();
+                                    showNotification('Station added as a new list!', 'success');
+                                    break;
+                            }
+                        });
+                    } else {
+                        showNotification('Shared station not found.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching shared station:', error);
+                    showNotification('Error fetching shared station. Please try again.', 'error');
+                });
+            
+            // Remove the share parameter from URL
+            const newUrl = window.location.pathname;
+            window.history.replaceState({}, document.title, newUrl);
+        } catch (error) {
+            console.error('Error parsing shared data:', error);
+            showNotification('Invalid sharing link.', 'error');
+        }
+    }
 });
 
 // Username management

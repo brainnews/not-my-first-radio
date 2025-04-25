@@ -203,6 +203,9 @@ main {
     display: flex;
     flex-direction: column;
     gap: 0;
+    @media (max-width: 768px) {
+        max-width: 190px;
+    }
 }
 
 .station-details h3 {
@@ -476,9 +479,11 @@ input[type="range"] {
 
 @media (max-width: 768px) {
     .app-container {
+        padding: 0rem;
+    }
+    .header-top, .search-container {
         padding: 1rem;
     }
-
     .player-bar {
         padding: 1rem;
     }
@@ -1156,7 +1161,7 @@ input[type="range"] {
     margin-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
     width: 100%;
-    padding: 0 0 1rem 0.75rem;
+    padding: 0 0 1rem 1rem;
 }
 
 .edit-btn {
@@ -1442,5 +1447,87 @@ input[type="range"] {
 
 .empty-state .settings-btn .material-symbols-rounded {
     font-size: 1.25rem;
+}
+
+.share-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.share-btn:hover {
+    background: var(--border-color);
+}
+
+.share-btn .material-symbols-rounded {
+    font-size: 1.25rem;
+}
+
+/* Hide share button in edit mode */
+.edit-mode .share-btn {
+    display: none;
+}
+
+.station-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.station-controls button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: none;
+    border-radius: 4px;
+    background: transparent;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+/* Hide play/pause and share buttons by default on desktop */
+@media (min-width: 769px) {
+    .station-controls .play-btn,
+    .station-controls .stop-btn,
+    .station-controls .share-btn {
+        opacity: 0;
+        transition: opacity 0.2s ease, background-color 0.2s ease;
+    }
+
+    .station-card:hover .station-controls .play-btn,
+    .station-card:hover .station-controls .stop-btn,
+    .station-card:hover .station-controls .share-btn {
+        opacity: 1;
+    }
+}
+
+/* Always show remove button */
+.station-controls .remove-btn {
+    display: none;
+}
+
+.edit-mode .station-controls .remove-btn {
+    display: flex;
+}
+
+/* Keep all buttons visible on mobile */
+@media (max-width: 768px) {
+    .station-controls .play-btn,
+    .station-controls .stop-btn,
+    .station-controls .share-btn {
+        opacity: 1;
+    }
 }
 
