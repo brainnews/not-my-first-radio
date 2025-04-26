@@ -548,12 +548,10 @@ class RadioPlayer {
         this.stationName = document.getElementById('station-name');
         this.stationDetails = document.getElementById('station-details');
         this.stationsContainer = document.getElementById('stations');
-        this.editBtn = document.getElementById('edit-stations');
 
         // Event listeners
         this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
         this.audio.addEventListener('ended', () => this.handleStreamEnd());
-        this.editBtn.addEventListener('click', () => this.toggleEditMode());
         
         // Set up the play/pause button listener directly in the constructor
         if (this.playPauseBtn) {
