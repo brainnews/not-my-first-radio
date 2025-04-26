@@ -488,6 +488,7 @@ class RadioPlayer {
         this.isPlaying = false;
         this.isEditMode = false;
         this.stationLists = this.loadStationLists();
+        this.volume = 50; // Initialize volume to 50%
 
         // DOM elements
         this.playPauseBtn = document.getElementById('play-pause');
@@ -862,137 +863,44 @@ class RadioPlayer {
 
     // Play a station
     playStation(station) {
-        if (!station) {
-            console.error('No station provided');
-            return;
-        }
-
-        // Validate URL first
-        if (!isValidStreamUrl(station.url)) {
-            showNotification('This station\'s stream URL is not supported. Please try another station.', 'error');
-            return;
-        }
-
-        // Ensure we have a valid URL
-        const streamUrl = station.url;
-        if (!streamUrl) {
-            console.error('No stream URL found for station:', station.name);
-            this.stationDetails.textContent = 'Error: No stream URL available';
-            return;
-        }
-
-        // If this is the same station that's currently playing, toggle playback
-        if (this.currentStation && this.currentStation.url === station.url && this.isPlaying) {
+        if (this.audio) {
             this.audio.pause();
-            this.isPlaying = false;
-            this.currentStation = null;
-            this.updateUI();
-            return;
+            this.audio.src = '';
         }
 
-        // If currently playing, stop it first and wait a moment
-        if (this.isPlaying) {
-            // First pause and remove the audio completely
-            this.audio.pause();
-            this.audio.removeAttribute('src');
-            this.audio.load(); // Important to clear the current audio pipeline
-            
-            this.isPlaying = false;
-            
-            // Set the new station data now for immediate UI update
-            this.currentStation = station;
-            this.updateUI();
-            
-            // Create a completely new audio element to avoid conflicts
-            this.audio = new Audio();
-            
-            // Wait a moment before starting the new audio to ensure complete clearance
-            setTimeout(() => {
-                this.audio.src = streamUrl;
-                
-                // Add event listeners before playing
-                const playPromise = this.audio.play();
-                
-                if (playPromise !== undefined) {
-                    playPromise
-                        .then(() => {
-                            this.isPlaying = true;
-                            this.updateUI();
-                        })
-                        .catch(error => {
-                            console.error('Error playing station:', error);
-                            this.isPlaying = false;
-                            if (error.name === 'NotSupportedError') {
-                                this.stationDetails.textContent = 'Error: Stream format not supported';
-                            } else {
-                                this.stationDetails.textContent = 'Error playing station. Please try another one.';
-                            }
-                            this.updateUI();
-                        });
-                }
-            }, 200); // Slightly longer delay to ensure complete clearance
-        } else {
-            // No audio currently playing, can start immediately
-            this.currentStation = station;
-            this.audio.src = streamUrl;
-            
-            const playPromise = this.audio.play();
-            
-            if (playPromise !== undefined) {
-                playPromise
-                    .then(() => {
-                        this.isPlaying = true;
-                        this.updateUI();
-                    })
-                    .catch(error => {
-                        console.error('Error playing station:', error);
-                        this.isPlaying = false;
-                        if (error.name === 'NotSupportedError') {
-                            this.stationDetails.textContent = 'Error: Stream format not supported';
-                        } else {
-                            this.stationDetails.textContent = 'Error playing station. Please try another one.';
-                        }
-                        this.updateUI();
-                    });
-            }
-        }
+        this.audio = new Audio(station.url);
+        this.audio.volume = this.volume / 100; // Use the class volume property
+        this.audio.play();
+        this.currentStation = station;
+        this.isPlaying = true;
+
+        // Show the player bar
+        document.querySelector('.player-bar').classList.add('active');
+
+        // Update UI
+        this.updateUI();
     }
 
     togglePlay() {
-        if (!this.currentStation) {
-            // If no station is selected, ensure audio is stopped
-            this.audio.pause();
-            this.isPlaying = false;
-            this.updateUI();
-            this.displayStations();
-            return;
-        }
-
-        // Toggle the playing state first
-        this.isPlaying = !this.isPlaying;
+        if (!this.currentStation) return;
 
         if (this.isPlaying) {
-            this.audio.play()
-                .then(() => {
-                    this.updateUI();
-                    this.displayStations();
-                })
-                .catch(error => {
-                    console.error('Error playing station:', error);
-                    this.isPlaying = false; // Reset the state if play failed
-                    this.stationDetails.textContent = 'Error playing station. Please try another one.';
-                    this.updateUI();
-                    this.displayStations();
-                });
-        } else {
             this.audio.pause();
-            this.updateUI();
-            this.displayStations();
+            this.isPlaying = false;
+        } else {
+            this.audio.play();
+            this.isPlaying = true;
         }
+
+        // Update UI
+        this.updateUI();
     }
 
     setVolume(value) {
-        this.audio.volume = value / 100;
+        this.volume = parseInt(value, 10); // Store the volume value
+        if (this.audio) {
+            this.audio.volume = this.volume / 100;
+        }
     }
 
     handleStreamEnd() {
