@@ -53,6 +53,58 @@ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', e =
 // Initialize theme
 setInitialTheme();
 
+// Logo animation handling
+const logoContainer = document.querySelector('.logo-container');
+const animations = [
+    'animate-glitch-horizontal',
+    'animate-glitch-vertical',
+    'animate-glitch-diagonal',
+    'animate-glitch-color',
+    'animate-rainbow'
+];
+
+// Function to add row indices to SVG rectangles
+function addRowIndices() {
+    const rects = logoContainer.querySelectorAll('rect');
+    rects.forEach(rect => {
+        const y = parseInt(rect.getAttribute('y'));
+        rect.style.setProperty('--row-index', y);
+    });
+}
+
+// Function to apply random animation
+function applyRandomAnimation() {
+    // Remove any existing animation classes
+    animations.forEach(anim => logoContainer.classList.remove(anim));
+    
+    // Select random animation
+    const randomAnim = animations[Math.floor(Math.random() * animations.length)];
+    console.log(randomAnim);
+    
+    // Apply the animation
+    logoContainer.classList.add(randomAnim);
+    
+    // After animation completes, prepare for hover
+    setTimeout(() => {
+        // Reset the animation state
+        logoContainer.style.animation = 'none';
+        logoContainer.offsetHeight; // Trigger reflow
+        logoContainer.style.animation = null;
+        
+        // Add a class to indicate animation is ready for hover
+        logoContainer.classList.add('animation-ready');
+    }, 2000);
+}
+
+// Add row indices and apply random animation on page load
+window.addEventListener('load', () => {
+    addRowIndices();
+    applyRandomAnimation();
+});
+
+// Apply random animation on hover
+logoContainer.addEventListener('mouseenter', applyRandomAnimation);
+
 // Settings panel functionality
 const settingsBtn = document.getElementById('settings-btn');
 const settingsPanel = document.getElementById('settings-panel');
@@ -599,7 +651,7 @@ class RadioPlayer {
         }
 
         this.stationsContainer.innerHTML = this.stations.map(station => `
-            <div class="station-card" data-url="${station.url}">
+            <div class="station-card${this.currentStation && this.currentStation.url === station.url && this.isPlaying ? ' playing' : ''}" data-url="${station.url}">
                 <div class="station-info">
                     <div class="station-favicon">
                         ${station.favicon ? 
@@ -608,12 +660,18 @@ class RadioPlayer {
                         }
                     </div>
                     <div class="station-details">
-                        <h3>${station.name}</h3>
+                        <div class="station-name-container">
+                            <h3>${station.name}</h3>
+                            <div class="now-playing-icon">
+                                <span class="material-symbols-sharp">equalizer</span>
+                            </div>
+                        </div>
                         <div class="station-meta">
                             ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
                             ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
                             ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
                         </div>
+                        ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
                     </div>
                 </div>
                 <div class="station-controls">
@@ -625,45 +683,49 @@ class RadioPlayer {
                             <span class="material-symbols-rounded">play_arrow</span>
                         </button>`
                     }
-                    <button class="share-btn" data-station="${JSON.stringify(station).replace(/"/g, '&quot;')}">
-                        <span class="material-symbols-rounded">share</span>
+                    <button class="more-btn" title="More actions">
+                        <span class="material-symbols-rounded">more_vert</span>
                     </button>
-                    <button class="remove-btn">
-                        <span class="material-symbols-rounded">delete</span>
-                    </button>
+                    <div class="station-menu hidden">
+                        <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
+                        <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
+                        <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
+                    </div>
                 </div>
             </div>
         `).join('');
 
-        this.addStationEventListeners();
+        this.addMainStationEventListeners();
     }
 
-    addStationEventListeners() {
+    addMainStationEventListeners() {
         // Add event listeners to main stations
         const mainStationCards = this.stationsContainer.querySelectorAll('.station-card');
         mainStationCards.forEach(card => {
             const url = card.dataset.url;
-            
-            // Make the entire card clickable to play/stop
             card.addEventListener('click', (e) => {
-                // Don't trigger if we clicked on the remove button or share button
-                if (e.target.closest('.remove-btn') || e.target.closest('.share-btn')) return;
-                
+                if (
+                    e.target.closest('.remove-btn') ||
+                    e.target.closest('.share-btn') ||
+                    e.target.closest('.more-btn') ||
+                    e.target.closest('.station-menu') ||
+                    e.target.classList.contains('note-input') ||
+                    e.target.closest('.note-input') ||
+                    e.target.classList.contains('note-actions') ||
+                    e.target.closest('.note-actions')
+                ) return;
                 const station = this.stations.find(s => s.url === url);
                 if (station) {
                     if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
-                        // If clicking the currently playing station
                         this.audio.pause();
                         this.isPlaying = false;
                         this.currentStation = null;
                         this.updateUI();
                     } else {
-                        // If clicking a different station
                         this.playStation(station);
                     }
                 }
             });
-
             // Play or stop button
             const playControl = card.querySelector('.play-btn, .stop-btn');
             if (playControl) {
@@ -672,213 +734,203 @@ class RadioPlayer {
                     const station = this.stations.find(s => s.url === url);
                     if (station) {
                         if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
-                            // If clicking the stop button of the currently playing station
                             this.audio.pause();
                             this.isPlaying = false;
                             this.currentStation = null;
                             this.updateUI();
                         } else {
-                            // If clicking the play button
                             this.playStation(station);
                         }
                     }
                 });
             }
-
-            // Share button
-            const shareBtn = card.querySelector('.share-btn');
-            if (shareBtn) {
-                shareBtn.addEventListener('click', (e) => {
+            // More menu logic
+            const moreBtn = card.querySelector('.more-btn');
+            const menu = card.querySelector('.station-menu');
+            if (moreBtn && menu) {
+                moreBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const stationJson = shareBtn.dataset.station.replace(/&quot;/g, '"');
-                    const station = JSON.parse(stationJson);
-                    
-                    // Create sharing data
-                    const shareData = {
-                        u: currentUsername,
-                        i: [station.stationuuid]
-                    };
-                    
-                    // Create sharing URL
-                    const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
-                    
-                    // Copy to clipboard
-                    navigator.clipboard.writeText(shareUrl).then(() => {
-                        showNotification('Station sharing link copied to clipboard!', 'success');
-                    }).catch(() => {
-                        showNotification('Failed to copy link. Please try again.', 'error');
-                    });
+                    document.querySelectorAll('.station-menu').forEach(m => m.classList.add('hidden'));
+                    menu.classList.toggle('hidden');
                 });
             }
-
-            // Remove button
-            const removeBtn = card.querySelector('.remove-btn');
-            if (removeBtn) {
-                removeBtn.addEventListener('click', async (e) => {
-                    e.stopPropagation();
-                    const station = this.stations.find(s => s.url === url);
-                    if (!station) return;
-
-                    const confirmed = await showConfirmationModal({
-                        title: 'Remove Station',
-                        message: `Are you sure you want to remove ${station.name} from your list?`,
-                        confirmText: 'Remove',
-                        danger: true
-                    });
-
-                    if (confirmed) {
-                        this.removeStation(url);
-                    }
-                });
-            }
+            document.addEventListener('click', (e) => {
+                if (!card.contains(e.target)) menu.classList.add('hidden');
+            });
+            menu.querySelector('.menu-share').addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                const station = this.stations.find(s => s.url === url);
+                if (station) this.shareStation(station);
+            });
+            menu.querySelector('.menu-edit-note').addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                this.showEditNoteUI(card, url);
+            });
+            menu.querySelector('.menu-delete').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                const station = this.stations.find(s => s.url === url);
+                if (station) await this.confirmAndRemoveStation(url, station.name);
+            });
         });
+    }
 
-        // Add event listeners to list stations
+    addSharedStationEventListeners() {
+        // Add event listeners to shared/list stations
         const listStationCards = document.querySelectorAll('.list-stations .station-card');
         listStationCards.forEach(card => {
             const url = card.dataset.url;
-            
-            // Make the entire card clickable to play
             card.addEventListener('click', (e) => {
-                // Don't trigger if we clicked on the remove button or share button
-                if (e.target.closest('.remove-btn') || e.target.closest('.share-btn')) return;
-                
-                // Find the station in the shared lists by URL
+                if (
+                    e.target.closest('.remove-btn') ||
+                    e.target.closest('.share-btn') ||
+                    e.target.closest('.more-btn') ||
+                    e.target.closest('.station-menu') ||
+                    e.target.classList.contains('note-input') ||
+                    e.target.closest('.note-input') ||
+                    e.target.classList.contains('note-actions') ||
+                    e.target.closest('.note-actions')
+                ) return;
                 let foundStation = null;
                 for (const list of this.stationLists) {
                     foundStation = list.stations.find(s => s.url === url);
                     if (foundStation) break;
                 }
-                
                 if (foundStation) {
                     if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
-                        // If clicking the currently playing station
                         this.audio.pause();
                         this.isPlaying = false;
                         this.currentStation = null;
                         this.updateUI();
                     } else {
-                        // If clicking a different station
                         this.playStation(foundStation);
                     }
                 }
             });
-            
             // Play or stop button
             const playControl = card.querySelector('.play-btn, .stop-btn');
             if (playControl) {
                 playControl.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    
-                    // Find the station in the shared lists by URL
                     let foundStation = null;
                     for (const list of this.stationLists) {
                         foundStation = list.stations.find(s => s.url === url);
                         if (foundStation) break;
                     }
-                    
                     if (foundStation) {
                         if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
-                            // If clicking the stop button of the currently playing station
                             this.audio.pause();
                             this.isPlaying = false;
                             this.currentStation = null;
                             this.updateUI();
                         } else {
-                            // Play the station
                             this.playStation(foundStation);
                         }
                     }
                 });
             }
-
-            // Share button
-            const shareBtn = card.querySelector('.share-btn');
-            if (shareBtn) {
-                shareBtn.addEventListener('click', (e) => {
+            // More menu logic
+            const moreBtn = card.querySelector('.more-btn');
+            const menu = card.querySelector('.station-menu');
+            if (moreBtn && menu) {
+                moreBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const stationJson = shareBtn.dataset.station.replace(/&quot;/g, '"');
-                    const station = JSON.parse(stationJson);
-                    
-                    // Create sharing data
-                    const shareData = {
-                        u: currentUsername,
-                        i: [station.stationuuid]
-                    };
-                    
-                    // Create sharing URL
-                    const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
-                    
-                    // Copy to clipboard
-                    navigator.clipboard.writeText(shareUrl).then(() => {
-                        showNotification('Station sharing link copied to clipboard!', 'success');
-                    }).catch(() => {
-                        showNotification('Failed to copy link. Please try again.', 'error');
-                    });
+                    document.querySelectorAll('.station-menu').forEach(m => m.classList.add('hidden'));
+                    menu.classList.toggle('hidden');
                 });
             }
-            
-            // Remove button
-            const removeBtn = card.querySelector('.remove-btn');
-            if (removeBtn) {
-                removeBtn.addEventListener('click', async (e) => {
+            document.addEventListener('click', (e) => {
+                if (!card.contains(e.target)) menu.classList.add('hidden');
+            });
+            menu.querySelector('.menu-share').addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                let foundStation = null;
+                for (const list of this.stationLists) {
+                    foundStation = list.stations.find(s => s.url === url);
+                    if (foundStation) break;
+                }
+                if (foundStation) this.shareStation(foundStation);
+            });
+            menu.querySelector('.menu-edit-note').addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                this.showEditNoteUI(card, url);
+            });
+            const moveBtn = menu.querySelector('.menu-move');
+            if (moveBtn) {
+                moveBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    const listItem = card.closest('.station-list');
-                    const listIndex = listItem.querySelector('.list-control-btn').dataset.listIndex;
-                    const list = this.stationLists[listIndex];
-                    
-                    if (!list) return;
-                    
-                    const stationName = card.querySelector('h3').textContent;
-                    const station = list.stations.find(s => s.name === stationName && s.url === url);
-                    
-                    if (!station) return;
-                    
-                    const confirmed = await showConfirmationModal({
-                        title: 'Remove Station',
-                        message: `Are you sure you want to remove ${station.name} from this list?`,
-                        confirmText: 'Remove',
-                        danger: true
-                    });
-                    
-                    if (confirmed) {
-                        // Remove the station from the list
-                        list.stations = list.stations.filter(s => s.url !== station.url);
-                        
-                        // If this was the last station in the list, remove the entire list
-                        if (list.stations.length === 0) {
-                            this.stationLists.splice(listIndex, 1);
-                        }
-                        
-                        // Save and update the display
-                        this.saveStationLists();
-                        this.displayStationLists();
-                        
-                        showNotification('Station removed successfully.', 'success');
-                    }
+                    menu.classList.add('hidden');
+                    this.moveStationToUserList(url);
                 });
             }
+            menu.querySelector('.menu-delete').addEventListener('click', async (e) => {
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                let foundStation = null;
+                for (const list of this.stationLists) {
+                    foundStation = list.stations.find(s => s.url === url);
+                    if (foundStation) break;
+                }
+                if (foundStation) await this.confirmAndRemoveStation(url, foundStation.name);
+            });
         });
     }
 
     // Play a station
     playStation(station) {
+        // Clean up old audio event listeners if any
         if (this.audio) {
+            this.audio.onerror = null;
+            this.audio.onended = null;
             this.audio.pause();
             this.audio.src = '';
         }
 
         this.audio = new Audio(station.url);
-        this.audio.volume = this.volume / 100; // Use the class volume property
-        this.audio.play();
-        this.currentStation = station;
-        this.isPlaying = true;
+        this.audio.volume = this.volume / 100;
 
-        // Show the player bar
-        document.querySelector('.player-bar').classList.add('active');
+        // Add error handling for the audio element
+        this.audio.onerror = (error) => {
+            // Only show notification if not an AbortError
+            if (error && error.target && error.target.error && error.target.error.name === 'AbortError') {
+                // Ignore AbortError
+                return;
+            }
+            console.error('Error playing station:', error);
+            this.isPlaying = false;
+            this.currentStation = null;
+            showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
+            this.updateUI();
+        };
 
-        // Update UI
-        this.updateUI();
+        // Try to play the station
+        const playPromise = this.audio.play();
+
+        if (playPromise !== undefined) {
+            playPromise
+                .then(() => {
+                    this.currentStation = station;
+                    this.isPlaying = true;
+                    document.querySelector('.player-bar').classList.add('active');
+                    this.updateUI();
+                })
+                .catch(error => {
+                    // Only show notification if not an AbortError
+                    if (error && error.name === 'AbortError') {
+                        // Ignore AbortError
+                        return;
+                    }
+                    console.error('Error playing station:', error);
+                    this.isPlaying = false;
+                    this.currentStation = null;
+                    showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
+                    this.updateUI();
+                });
+        }
     }
 
     togglePlay() {
@@ -1097,7 +1149,7 @@ class RadioPlayer {
                                              this.currentStation.url === station.url;
                     
                     const stationElement = document.createElement('div');
-                    stationElement.className = 'station-card';
+                    stationElement.className = 'station-card' + (isCurrentlyPlaying ? ' playing' : '');
                     stationElement.dataset.url = station.url;
                     stationElement.innerHTML = `
                         <div class="station-info">
@@ -1108,12 +1160,18 @@ class RadioPlayer {
                                 }
                             </div>
                             <div class="station-details">
-                                <h3>${station.name}</h3>
+                                <div class="station-name-container">
+                                    <h3>${station.name}</h3>
+                                    <div class="now-playing-icon">
+                                        <span class="material-symbols-sharp">equalizer</span>
+                                    </div>
+                                </div>
                                 <div class="station-meta">
                                     ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
                                     ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
                                     ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
                                 </div>
+                                ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
                             </div>
                         </div>
                         <div class="station-controls">
@@ -1125,9 +1183,15 @@ class RadioPlayer {
                                     <span class="material-symbols-rounded">play_arrow</span>
                                 </button>`
                             }
-                            <button class="remove-btn">
-                                <span class="material-symbols-rounded">delete</span>
+                            <button class="more-btn" title="More actions">
+                                <span class="material-symbols-rounded">more_vert</span>
                             </button>
+                            <div class="station-menu hidden">
+                                <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
+                                <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
+                                <button class="menu-move"><span class="material-symbols-rounded">playlist_add</span> Add to your radio</button>
+                                <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
+                            </div>
                         </div>
                     `;
 
@@ -1140,9 +1204,7 @@ class RadioPlayer {
 
         // Add the new lists container
         savedStationsSection.appendChild(listsContainer);
-        
-        // Add event listeners for station cards
-        this.addStationEventListeners();
+        this.addSharedStationEventListeners();
         
         // Add event listeners for list edit buttons
         document.querySelectorAll('.list-control-btn').forEach(btn => {
@@ -1159,6 +1221,30 @@ class RadioPlayer {
                 btn.classList.toggle('active');
             });
         });
+    }
+
+    moveStationToUserList(url) {
+        // Find the station in the shared lists
+        let foundStation = null;
+        for (const list of this.stationLists) {
+            foundStation = list.stations.find(s => s.url === url);
+            if (foundStation) break;
+        }
+        if (!foundStation) {
+            showNotification('Station not found in shared lists.', 'error');
+            return;
+        }
+        // Check for duplicates in user's own list
+        const exists = this.stations.some(s => s.url === foundStation.url);
+        if (exists) {
+            showNotification('Station already exists in your list.', 'warning');
+            return;
+        }
+        // Add to user's own list
+        this.stations.push(foundStation);
+        this.saveStations();
+        this.displayStations();
+        showNotification('Station moved to your list!', 'success');
     }
 }
 
@@ -2221,3 +2307,87 @@ function showConfirmationModal(options) {
         confirmBtn.addEventListener('click', confirmHandler);
     });
 }
+
+// Add these as prototype methods or standalone functions after the class
+RadioPlayer.prototype.shareStation = function(station) {
+    const shareData = {
+        u: currentUsername,
+        i: [station.stationuuid],
+        note: station.note || ''
+    };
+    const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
+    navigator.clipboard.writeText(shareUrl).then(() => {
+        showNotification('Station sharing link copied to clipboard!', 'success');
+    }).catch(() => {
+        showNotification('Failed to copy link. Please try again.', 'error');
+    });
+};
+
+RadioPlayer.prototype.showEditNoteUI = function(card, url) {
+    const station = this.stations.find(s => s.url === url);
+    if (!station) return;
+    let noteDiv = card.querySelector('.station-note');
+    if (!noteDiv) {
+        noteDiv = document.createElement('div');
+        noteDiv.className = 'station-note';
+        card.querySelector('.station-details').appendChild(noteDiv);
+    }
+    noteDiv.innerHTML = `<input maxlength="100" class="note-input" type="text" value="${station.note ? station.note.replace(/"/g, '&quot;') : ''}">
+        <div class="note-actions">
+            <button class="save-note-btn">Save</button>
+            <button class="cancel-note-btn">Cancel</button>
+        </div>`;
+    const input = noteDiv.querySelector('.note-input');
+    input.focus();
+    input.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            station.note = input.value.slice(0, 100);
+            this.saveStations();
+            this.displayStations();
+        }
+    });
+    noteDiv.querySelector('.save-note-btn').onclick = () => {
+        station.note = input.value.slice(0, 100);
+        this.saveStations();
+        this.displayStations();
+    };
+    noteDiv.querySelector('.cancel-note-btn').onclick = () => {
+        this.displayStations();
+    };
+};
+
+RadioPlayer.prototype.confirmAndRemoveStation = async function(url, name) {
+    const confirmed = await showConfirmationModal({
+        title: 'Remove Station',
+        message: `Are you sure you want to remove ${name} from your list?`,
+        confirmText: 'Remove',
+        danger: true
+    });
+    if (confirmed) {
+        this.removeStation(url);
+    }
+};
+
+RadioPlayer.prototype.moveStationToUserList = function(url) {
+    // Find the station in the shared lists
+    let foundStation = null;
+    for (const list of this.stationLists) {
+        foundStation = list.stations.find(s => s.url === url);
+        if (foundStation) break;
+    }
+    if (!foundStation) {
+        showNotification('Station not found in shared lists.', 'error');
+        return;
+    }
+    // Check for duplicates in user's own list
+    const exists = this.stations.some(s => s.url === foundStation.url);
+    if (exists) {
+        showNotification('Station already exists in your list.', 'warning');
+        return;
+    }
+    // Add to user's own list
+    this.stations.push(foundStation);
+    this.saveStations();
+    this.displayStations();
+    showNotification('Station moved to your list!', 'success');
+};
