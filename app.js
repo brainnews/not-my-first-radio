@@ -1290,7 +1290,8 @@ window.addEventListener('load', () => {
                         // Show import options
                         showQrImportOptions({
                             title: 'Import Shared Station',
-                            message: `Found station "${station.name}" shared by ${sharedUsername}.`
+                            message: `Found station "${station.name}" shared by ${sharedUsername}.`,
+                            station: station // Pass the station object for preview
                         }).then(importOption => {
                             if (importOption === null) return;
                             
@@ -1599,12 +1600,86 @@ function showQrImportOptions(options) {
     header.textContent = options.title || 'Import Stations';
     message.textContent = options.message || '';
     
+    // Add preview button if station is provided
+    if (options.station) {
+        const previewBtn = document.createElement('button');
+        previewBtn.className = 'qr-import-btn preview';
+        previewBtn.innerHTML = `
+            <span class="material-symbols-rounded">play_arrow</span>
+            Preview Station
+        `;
+        
+        // Insert preview button before merge button
+        mergeBtn.parentNode.insertBefore(previewBtn, mergeBtn);
+        
+        // Add preview functionality
+        previewBtn.addEventListener('click', () => {
+            // Stop any currently playing preview
+            if (previewAudio) {
+                previewAudio.pause();
+                previewAudio = null;
+            }
+            
+            // Create new audio element for preview
+            previewAudio = new Audio(options.station.url);
+            previewAudio.volume = 0.5;
+            
+            // Update button state
+            const icon = previewBtn.querySelector('.material-symbols-rounded');
+            
+            // Toggle play/pause
+            if (icon.textContent === 'play_arrow') {
+                // Play
+                previewAudio.play()
+                    .then(() => {
+                        icon.textContent = 'stop';
+                    })
+                    .catch(error => {
+                        console.error('Error playing preview:', error);
+                        icon.textContent = 'play_arrow';
+                        
+                        if (error.name === 'NotSupportedError') {
+                            showNotification('This station\'s stream is not supported.', 'error');
+                        } else {
+                            showNotification('Error playing preview. The station might be unavailable.', 'error');
+                        }
+                    });
+            } else {
+                // Pause
+                previewAudio.pause();
+                icon.textContent = 'play_arrow';
+            }
+            
+            // Add event listener for when preview ends
+            previewAudio.addEventListener('ended', () => {
+                previewAudio = null;
+                icon.textContent = 'play_arrow';
+            });
+            
+            // Add event listener for when audio is paused
+            previewAudio.addEventListener('pause', () => {
+                icon.textContent = 'play_arrow';
+            });
+            
+            // Add event listener for when audio is playing
+            previewAudio.addEventListener('play', () => {
+                icon.textContent = 'stop';
+            });
+        });
+    }
+    
     // Show modal
     modal.classList.add('visible');
     
     // Return a promise that resolves with the user's choice
     return new Promise((resolve) => {
         const handleChoice = (choice) => {
+            // Stop any playing preview when closing
+            if (previewAudio) {
+                previewAudio.pause();
+                previewAudio = null;
+            }
+            
             modal.classList.remove('visible');
             resolve(choice);
             

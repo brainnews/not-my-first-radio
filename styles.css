@@ -1406,6 +1406,24 @@ input[type="range"] {
     background: var(--bg-hover);
 }
 
+.qr-import-btn.preview {
+    background: var(--bg-secondary);
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.qr-import-btn.preview:hover {
+    background: var(--border-color);
+}
+
+.qr-import-btn.preview .material-symbols-rounded {
+    font-size: 1.25rem;
+}
+
 /* Scanner Modal */
 #scanner-modal {
     z-index: 1000;
