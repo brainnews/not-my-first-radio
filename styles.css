@@ -34,7 +34,38 @@ body {
     color: var(--text-primary);
     line-height: 1.6;
 }
+a {
+    color: var(--text-primary);
+}
+a:hover {
+    color: var(--accent-color);
+}
+button {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+}
 
+.alert-banner {
+    background-color: var(--accent-color-30);
+    color: var(--text-primary);
+    padding: 1rem;
+    border-radius: 4px;
+    margin-bottom: 1rem;
+    z-index: 1000;
+    font-size: 0.875rem;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    @media (max-width: 768px) {
+        border-radius: 0;
+        margin-bottom: 0;
+    }
+}
+.alert-banner p {
+    margin-right: 1rem;
+}
 .app-container {
     min-height: 100vh;
     display: flex;
@@ -63,17 +94,10 @@ header h1 {
 
 .search-container {
     display: flex;
-    position: absolute;
-    top: 3.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 650px;
+    width: 100%;
+    padding: 1.5rem 3rem;
     @media (max-width: 768px) {
-        width: 100%;
-        position: relative;
-        top: 0;
-        left: 0;
-        transform: none;
+        padding: 1.5rem;
     }
 }
 
@@ -1606,7 +1630,6 @@ input[type="range"] {
 /* Logo container and base styles */
 .logo-container {
     width: 60px;
-    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;

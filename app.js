@@ -114,6 +114,22 @@ const exportDataBtn = document.getElementById('export-data');
 const importFileInput = document.getElementById('import-file');
 const clearStationsBtn = document.getElementById('clear-stations');
 
+// Alert banner functionality
+const alertBanner = document.querySelector('.alert-banner');
+const closeAlertBtn = document.getElementById('close-alert');
+
+// Close alert banner
+closeAlertBtn.addEventListener('click', () => {
+    alertBanner.classList.add('hidden');
+    localStorage.setItem('alert-banner-closed', 'true');
+});
+
+// Check if alert banner should be shown
+if (!localStorage.getItem('alert-banner-closed')) {
+    console.log('Alert banner should be shown');
+    alertBanner.classList.remove('hidden');
+}
+
 // Open settings panel
 settingsBtn.addEventListener('click', () => {
     settingsPanel.classList.remove('hidden');
