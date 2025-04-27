@@ -158,7 +158,7 @@ exportDataBtn.addEventListener('click', () => {
         
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'radio-stations.json';
+        a.download = currentUsername + '-radio.json';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -1128,9 +1128,6 @@ class RadioPlayer {
             listElement.innerHTML = `
                 <div class="list-header">
                     <h2 class="section-title">${list.name || 'Shared Stations'}</h2>
-                    <button class="edit-btn list-control-btn" data-list-index="${index}">
-                        <span class="material-symbols-rounded">edit</span>
-                    </button>
                 </div>
                 <div class="list-stations"></div>
             `;
@@ -1187,6 +1184,7 @@ class RadioPlayer {
                             <div class="station-menu hidden">
                                 <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
                                 <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
+                                <button class="menu-move"><span class="material-symbols-rounded">playlist_add</span> Move to My Stations</button>
                                 <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
                             </div>
                         </div>
@@ -1258,75 +1256,83 @@ window.addEventListener('load', () => {
     const shareParam = urlParams.get('share');
     
     if (shareParam) {
+        const importLoading = document.getElementById('import-loading-indicator');
+        if (importLoading) importLoading.style.display = 'flex';
         try {
             const shareData = JSON.parse(decodeURIComponent(shareParam));
             
             // Validate shared data
             if (!shareData || !shareData.i || !Array.isArray(shareData.i) || shareData.i.length === 0) {
+                if (importLoading) importLoading.style.display = 'none';
                 showNotification('Invalid sharing link.', 'error');
                 return;
             }
             
             // Show loading notification
-            showNotification('Fetching shared station...', 'success');
+            showNotification('Fetching shared stations...', 'success');
             
-            // Fetch station details
-            fetch(`https://at1.api.radio-browser.info/json/stations/byuuid/${shareData.i[0]}`)
-                .then(response => response.json())
-                .then(stations => {
-                    if (stations && stations.length > 0) {
-                        const station = stations[0];
-                        const sharedUsername = shareData.u || 'Unknown User';
-                        
-                        // Show import options
-                        showQrImportOptions({
-                            title: 'Import Shared Station',
-                            message: `Found station "${station.name}" shared by ${sharedUsername}.`,
-                            station: station // Pass the station object for preview
-                        }).then(importOption => {
-                            if (importOption === null) return;
-                            
-                            switch (importOption) {
-                                case '1':
-                                    // Merge station, avoiding duplicates
-                                    const existingUrls = radioPlayer.stations.map(s => s.url);
-                                    if (!existingUrls.includes(station.url)) {
-                                        radioPlayer.stations.push(station);
-                                        radioPlayer.saveStations();
-                                        radioPlayer.displayStations();
-                                        showNotification('Station added successfully!', 'success');
-                                    } else {
-                                        showNotification('Station already exists in your list.', 'warning');
-                                    }
-                                    break;
-                                
-                                case '3':
-                                    // Add as separate list
-                                    const newList = {
-                                        name: `${sharedUsername}'s Shared Station`,
-                                        stations: [station]
-                                    };
-                                    
-                                    radioPlayer.stationLists.push(newList);
-                                    radioPlayer.saveStationLists();
-                                    radioPlayer.displayStationLists();
-                                    showNotification('Station added as a new list!', 'success');
-                                    break;
+            // Fetch all station details in parallel
+            Promise.all(shareData.i.map(async (uuid) => {
+                try {
+                    const response = await fetch(`https://at1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
+                    const stations = await response.json();
+                    return stations && stations.length > 0 ? stations[0] : null;
+                } catch {
+                    return null;
+                }
+            })).then(stationObjs => {
+                if (importLoading) importLoading.style.display = 'none';
+                const validStations = stationObjs.filter(Boolean);
+                if (validStations.length === 0) {
+                    showNotification('No valid stations found in the sharing link.', 'error');
+                    return;
+                }
+                const sharedUsername = shareData.u || 'Unknown User';
+                showQrImportOptions({
+                    title: 'Import Shared Stations',
+                    message: `Found ${validStations.length} stations shared by ${sharedUsername}.`
+                }).then(importOption => {
+                    if (importOption === null) return;
+                    switch (importOption) {
+                        case '1':
+                            // Merge stations, avoiding duplicates
+                            const existingUrls = radioPlayer.stations.map(s => s.url);
+                            for (const station of validStations) {
+                                if (!existingUrls.includes(station.url)) {
+                                    radioPlayer.stations.push(station);
+                                    existingUrls.push(station.url);
+                                }
                             }
-                        });
-                    } else {
-                        showNotification('Shared station not found.', 'error');
+                            radioPlayer.saveStations();
+                            radioPlayer.displayStations();
+                            showNotification('Stations added successfully!', 'success');
+                            break;
+                        case '3':
+                            // Add as separate list
+                            const newList = {
+                                name: `${sharedUsername}'s Shared Stations`,
+                                stations: validStations
+                            };
+                            radioPlayer.stationLists.push(newList);
+                            radioPlayer.saveStationLists();
+                            radioPlayer.displayStationLists();
+                            showNotification('Stations added as a new list!', 'success');
+                            break;
                     }
-                })
-                .catch(error => {
-                    console.error('Error fetching shared station:', error);
-                    showNotification('Error fetching shared station. Please try again.', 'error');
+                }).catch(() => {
+                    if (importLoading) importLoading.style.display = 'none';
+                    showNotification('Error fetching shared stations.', 'error');
                 });
+            }).catch(() => {
+                if (importLoading) importLoading.style.display = 'none';
+                showNotification('Error fetching shared stations.', 'error');
+            });
             
             // Remove the share parameter from URL
             const newUrl = window.location.pathname;
             window.history.replaceState({}, document.title, newUrl);
         } catch (error) {
+            if (importLoading) importLoading.style.display = 'none';
             console.error('Error parsing shared data:', error);
             showNotification('Invalid sharing link.', 'error');
         }
@@ -1974,6 +1980,9 @@ async function displaySearchResults(stations) {
     // Show loading indicator
     searchResultsSection.classList.add('loading');
     searchResultsSection.classList.remove('hidden');
+    // Hide the section title and clear button while loading
+    sectionTitle.style.display = 'none';
+    if (clearResultsBtn) clearResultsBtn.style.display = 'none';
     
     // Create loading indicator HTML
     const loadingIndicator = document.createElement('div');
@@ -2006,6 +2015,9 @@ async function displaySearchResults(stations) {
     // Remove loading indicator
     loadingIndicator.remove();
     searchResultsSection.classList.remove('loading');
+    // Show the section title and clear button now that results are ready
+    sectionTitle.style.display = '';
+    if (clearResultsBtn) clearResultsBtn.style.display = '';
     
     // Update section title to show statistics
     const totalStations = stations.length;
@@ -2043,7 +2055,8 @@ async function displaySearchResults(stations) {
         };
         
         const safeStationJson = JSON.stringify(safeStation).replace(/"/g, '&quot;');
-        
+        // Fix: define isCurrentlyPlaying for this card
+        const isCurrentlyPlaying = radioPlayer.currentStation && radioPlayer.isPlaying && radioPlayer.currentStation.url === station.url;
         return `
             <div class="search-result-card">
                 <div class="station-info">
@@ -2064,22 +2077,12 @@ async function displaySearchResults(stations) {
                     </div>
                 </div>
                 <div class="station-controls">
-                    ${isCurrentlyPlaying ? 
-                        `<button class="stop-btn">
-                            <span class="material-symbols-rounded">stop</span>
-                        </button>` : 
-                        `<button class="play-btn">
-                            <span class="material-symbols-rounded">play_arrow</span>
-                        </button>`
-                    }
-                    <button class="more-btn" title="More actions">
-                        <span class="material-symbols-rounded">more_vert</span>
+                    <button class="preview-btn" data-url="${station.url}">
+                        <span class="material-symbols-rounded">play_arrow</span>
                     </button>
-                    <div class="station-menu hidden">
-                        <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
-                        <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
-                        <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
-                    </div>
+                    <button class="add-btn" data-station="${safeStationJson}">
+                        <span class="material-symbols-rounded">playlist_add</span>
+                    </button>
                 </div>
             </div>
         `;
@@ -2089,14 +2092,12 @@ async function displaySearchResults(stations) {
     document.querySelectorAll('.preview-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const url = btn.dataset.url;
-            previewStation(url);
-            
-            // Update button state
-            document.querySelectorAll('.preview-btn .material-symbols-rounded').forEach(icon => {
-                icon.textContent = 'play_arrow';
-            });
-            const icon = btn.querySelector('.material-symbols-rounded');
-            icon.textContent = icon.textContent === 'play_arrow' ? 'stop' : 'play_arrow';
+            if (radioPlayer.isPlaying && radioPlayer.currentStation && radioPlayer.currentStation.url === url) {
+                radioPlayer.togglePlay();
+                btn.querySelector('.material-symbols-rounded').textContent = 'play_arrow';
+            } else {
+                previewStation(url);
+            }
         });
     });
 
@@ -2397,3 +2398,29 @@ RadioPlayer.prototype.moveStationToUserList = function(url) {
     this.displayStations();
     showNotification('Station moved to your list!', 'success');
 };
+
+const shareUrlBtn = document.getElementById('share-url');
+if (shareUrlBtn) {
+    shareUrlBtn.addEventListener('click', () => {
+        if (!radioPlayer || !radioPlayer.stations || radioPlayer.stations.length === 0) {
+            showNotification('No stations to share.', 'warning');
+            return;
+        }
+        const uuids = radioPlayer.stations.map(station => station.stationuuid).filter(Boolean);
+        if (uuids.length === 0) {
+            showNotification('No stations with UUIDs to share.', 'warning');
+            return;
+        }
+        const shareData = {
+            u: currentUsername,
+            i: uuids,
+            name: 'My Stations'
+        };
+        const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
+        navigator.clipboard.writeText(shareUrl).then(() => {
+            showNotification('Shareable URL copied to clipboard!', 'success');
+        }).catch(() => {
+            showNotification('Failed to copy URL. Please try again.', 'error');
+        });
+    });
+}

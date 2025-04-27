@@ -21,12 +21,16 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <div id="import-loading-indicator" class="loading-indicator" style="display: none; position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); z-index: 2000; background: var(--bg-secondary); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 2rem 3rem;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Importing stations, please wait...</div>
+    </div>
     <div class="app-container">
         <!-- Add notification container -->
         <div class="notification-container"></div>
 
         <!-- Add confirmation modal -->
-        <div class="confirmation-modal">
+        <div class="confirmation-modal modal">
             <div class="confirmation-content">
                 <div class="confirmation-header">
                     <h3>Confirm Action</h3>
@@ -42,10 +46,10 @@
         </div>
 
         <!-- Add QR import options modal -->
-        <div class="qr-import-modal">
+        <div class="qr-import-modal modal">
             <div class="qr-import-content">
                 <div class="qr-import-header">
-                    <h3>Import Stations</h3>
+                    <h3>Import Stations from .JSON</h3>
                 </div>
                 <div class="qr-import-body">
                     <p class="qr-import-message"></p>
@@ -61,93 +65,98 @@
         <header>
             <div class="header-top">
                 <div class="logo-container">
-                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" shape-rendering="crispEdges">
-                        <g>
-                            <rect x="1" y="13" width="1" height="1" fill="white"/>
-                            <rect x="9" y="13" width="1" height="1" fill="white"/>
-                            <rect x="1" y="12" width="1" height="1" fill="white"/>
-                            <rect x="9" y="12" width="1" height="1" fill="white"/>
-                            <rect x="9" y="11" width="1" height="1" fill="white"/>
-                            <rect x="1" y="11" width="1" height="1" fill="white"/>
-                            <rect x="2" y="11" width="1" height="1" fill="white"/>
-                            <rect x="10" y="11" width="1" height="1" fill="white"/>
-                            <rect x="3" y="11" width="1" height="1" fill="white"/>
-                            <rect x="11" y="11" width="1" height="1" fill="white"/>
-                            <rect x="4" y="11" width="1" height="1" fill="white"/>
-                            <rect x="12" y="11" width="1" height="1" fill="white"/>
-                            <rect x="13" y="11" width="1" height="1" fill="white"/>
-                            <rect x="13" y="13" width="1" height="1" fill="white"/>
-                            <rect x="12" y="12" width="1" height="1" fill="white"/>
-                            <rect x="1" y="10" width="1" height="1" fill="white"/>
-                            <rect x="9" y="10" width="1" height="1" fill="white"/>
-                            <rect x="1" y="7" width="1" height="1" fill="white"/>
-                            <rect x="9" y="7" width="1" height="1" fill="white"/>
-                            <rect x="7" y="7" width="1" height="1" fill="white"/>
-                            <rect x="7" y="8" width="1" height="1" fill="white"/>
-                            <rect x="7" y="9" width="1" height="1" fill="white"/>
-                            <rect x="7" y="10" width="1" height="1" fill="white"/>
-                            <rect x="7" y="11" width="1" height="1" fill="white"/>
-                            <rect x="7" y="12" width="1" height="1" fill="white"/>
-                            <rect x="7" y="13" width="1" height="1" fill="white"/>
-                            <rect x="7" y="14" width="1" height="1" fill="white"/>
-                            <rect x="7" y="6" width="1" height="1" fill="white"/>
-                            <rect x="7" y="5" width="1" height="1" fill="white"/>
-                            <rect x="7" y="4" width="1" height="1" fill="white"/>
-                            <rect x="7" y="3" width="1" height="1" fill="white"/>
-                            <rect x="7" y="2" width="1" height="1" fill="white"/>
-                            <rect x="7" y="1" width="1" height="1" fill="white"/>
-                            <rect x="7" width="1" height="1" fill="white"/>
-                            <rect x="2" y="7" width="1" height="1" fill="white"/>
-                            <rect x="10" y="7" width="1" height="1" fill="white"/>
-                            <rect x="3" y="7" width="1" height="1" fill="white"/>
-                            <rect x="11" y="7" width="1" height="1" fill="white"/>
-                            <rect x="4" y="7" width="1" height="1" fill="white"/>
-                            <rect x="12" y="7" width="1" height="1" fill="white"/>
-                            <rect x="5" y="7" width="1" height="1" fill="white"/>
-                            <rect x="13" y="7" width="1" height="1" fill="white"/>
-                            <rect x="1" y="9" width="1" height="1" fill="white"/>
-                            <rect x="9" y="9" width="1" height="1" fill="white"/>
-                            <rect y="7" width="1" height="1" fill="white"/>
-                            <rect x="1" y="5" width="1" height="1" fill="white"/>
-                            <rect x="5" y="5" width="1" height="1" fill="white"/>
-                            <rect x="9" y="5" width="1" height="1" fill="white"/>
-                            <rect x="13" y="5" width="1" height="1" fill="white"/>
-                            <rect x="1" y="4" width="1" height="1" fill="white"/>
-                            <rect x="5" y="4" width="1" height="1" fill="white"/>
-                            <rect x="9" y="4" width="1" height="1" fill="white"/>
-                            <rect x="13" y="4" width="1" height="1" fill="white"/>
-                            <rect x="1" y="3" width="1" height="1" fill="white"/>
-                            <rect x="5" y="3" width="1" height="1" fill="white"/>
-                            <rect x="9" y="3" width="1" height="1" fill="white"/>
-                            <rect x="13" y="3" width="1" height="1" fill="white"/>
-                            <rect x="5" y="2" width="1" height="1" fill="white"/>
-                            <rect x="9" y="2" width="1" height="1" fill="white"/>
-                            <rect x="13" y="2" width="1" height="1" fill="white"/>
-                            <rect x="1" y="1" width="1" height="1" fill="white"/>
-                            <rect x="5" y="1" width="1" height="1" fill="white"/>
-                            <rect x="9" y="1" width="1" height="1" fill="white"/>
-                            <rect x="13" y="1" width="1" height="1" fill="white"/>
-                            <rect x="1" y="2" width="1" height="1" fill="white"/>
-                            <rect x="2" y="2" width="1" height="1" fill="white"/>
-                            <rect x="3" y="3" width="1" height="1" fill="white"/>
-                            <rect x="10" y="2" width="1" height="1" fill="white"/>
-                            <rect x="12" y="2" width="1" height="1" fill="white"/>
-                            <rect x="11" y="3" width="1" height="1" fill="white"/>
-                            <rect x="4" y="4" width="1" height="1" fill="white"/>
-                            <rect x="6" y="7" width="1" height="1" fill="white"/>
-                            <rect x="14" y="7" width="1" height="1" fill="white"/>
-                            <rect x="8" y="7" width="1" height="1" fill="white"/>
-                            <rect x="2" y="9" width="1" height="1" fill="white"/>
-                            <rect x="10" y="9" width="1" height="1" fill="white"/>
-                            <rect x="10" y="9" width="1" height="1" fill="white"/>
-                            <rect x="11" y="9" width="1" height="1" fill="white"/>
-                            <rect x="3" y="9" width="1" height="1" fill="white"/>
-                            <rect x="12" y="9" width="1" height="1" fill="white"/>
-                            <rect x="4" y="9" width="1" height="1" fill="white"/>
-                            <rect x="5" y="9" width="1" height="1" fill="white"/>
-                            <rect x="13" y="10" width="1" height="1" fill="white"/>
+                    <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_38_373)">
+                        <rect x="1" y="13" width="1" height="1" fill="white"/>
+                        <rect x="9" y="13" width="1" height="1" fill="white"/>
+                        <rect x="1" y="12" width="1" height="1" fill="white"/>
+                        <rect x="9" y="12" width="1" height="1" fill="white"/>
+                        <rect x="9" y="11" width="1" height="1" fill="white"/>
+                        <rect x="1" y="11" width="1" height="1" fill="white"/>
+                        <rect x="2" y="11" width="1" height="1" fill="white"/>
+                        <rect x="10" y="11" width="1" height="1" fill="white"/>
+                        <rect x="3" y="11" width="1" height="1" fill="white"/>
+                        <rect x="11" y="11" width="1" height="1" fill="white"/>
+                        <rect x="4" y="11" width="1" height="1" fill="white"/>
+                        <rect x="12" y="11" width="1" height="1" fill="white"/>
+                        <rect x="13" y="11" width="1" height="1" fill="white"/>
+                        <rect x="13" y="13" width="1" height="1" fill="white"/>
+                        <rect x="12" y="12" width="1" height="1" fill="white"/>
+                        <rect x="1" y="10" width="1" height="1" fill="white"/>
+                        <rect x="9" y="10" width="1" height="1" fill="white"/>
+                        <rect x="1" y="7" width="1" height="1" fill="white"/>
+                        <rect x="9" y="7" width="1" height="1" fill="white"/>
+                        <rect x="7" y="7" width="1" height="1" fill="white"/>
+                        <rect x="7" y="8" width="1" height="1" fill="white"/>
+                        <rect x="7" y="9" width="1" height="1" fill="white"/>
+                        <rect x="7" y="10" width="1" height="1" fill="white"/>
+                        <rect x="7" y="11" width="1" height="1" fill="white"/>
+                        <rect x="7" y="12" width="1" height="1" fill="white"/>
+                        <rect x="7" y="13" width="1" height="1" fill="white"/>
+                        <rect x="7" y="14" width="1" height="1" fill="white"/>
+                        <rect x="7" y="6" width="1" height="1" fill="white"/>
+                        <rect x="7" y="5" width="1" height="1" fill="white"/>
+                        <rect x="7" y="4" width="1" height="1" fill="white"/>
+                        <rect x="7" y="3" width="1" height="1" fill="white"/>
+                        <rect x="7" y="2" width="1" height="1" fill="white"/>
+                        <rect x="7" y="1" width="1" height="1" fill="white"/>
+                        <rect x="7" width="1" height="1" fill="white"/>
+                        <rect x="2" y="7" width="1" height="1" fill="white"/>
+                        <rect x="10" y="7" width="1" height="1" fill="white"/>
+                        <rect x="3" y="7" width="1" height="1" fill="white"/>
+                        <rect x="11" y="7" width="1" height="1" fill="white"/>
+                        <rect x="4" y="7" width="1" height="1" fill="white"/>
+                        <rect x="12" y="7" width="1" height="1" fill="white"/>
+                        <rect x="5" y="7" width="1" height="1" fill="white"/>
+                        <rect x="13" y="7" width="1" height="1" fill="white"/>
+                        <rect x="1" y="9" width="1" height="1" fill="white"/>
+                        <rect x="9" y="9" width="1" height="1" fill="white"/>
+                        <rect y="7" width="1" height="1" fill="white"/>
+                        <rect x="1" y="5" width="1" height="1" fill="white"/>
+                        <rect x="5" y="5" width="1" height="1" fill="white"/>
+                        <rect x="9" y="5" width="1" height="1" fill="white"/>
+                        <rect x="13" y="5" width="1" height="1" fill="white"/>
+                        <rect x="1" y="4" width="1" height="1" fill="white"/>
+                        <rect x="5" y="4" width="1" height="1" fill="white"/>
+                        <rect x="9" y="4" width="1" height="1" fill="white"/>
+                        <rect x="13" y="4" width="1" height="1" fill="white"/>
+                        <rect x="1" y="3" width="1" height="1" fill="white"/>
+                        <rect x="5" y="3" width="1" height="1" fill="white"/>
+                        <rect x="9" y="3" width="1" height="1" fill="white"/>
+                        <rect x="13" y="3" width="1" height="1" fill="white"/>
+                        <rect x="5" y="2" width="1" height="1" fill="white"/>
+                        <rect x="9" y="2" width="1" height="1" fill="white"/>
+                        <rect x="13" y="2" width="1" height="1" fill="white"/>
+                        <rect x="1" y="1" width="1" height="1" fill="white"/>
+                        <rect x="5" y="1" width="1" height="1" fill="white"/>
+                        <rect x="9" y="1" width="1" height="1" fill="white"/>
+                        <rect x="13" y="1" width="1" height="1" fill="white"/>
+                        <rect x="1" y="2" width="1" height="1" fill="white"/>
+                        <rect x="2" y="2" width="1" height="1" fill="white"/>
+                        <rect x="3" y="3" width="1" height="1" fill="white"/>
+                        <rect x="10" y="2" width="1" height="1" fill="white"/>
+                        <rect x="12" y="2" width="1" height="1" fill="white"/>
+                        <rect x="11" y="3" width="1" height="1" fill="white"/>
+                        <rect x="4" y="4" width="1" height="1" fill="white"/>
+                        <rect x="6" y="7" width="1" height="1" fill="white"/>
+                        <rect x="14" y="7" width="1" height="1" fill="white"/>
+                        <rect x="8" y="7" width="1" height="1" fill="white"/>
+                        <rect x="2" y="9" width="1" height="1" fill="white"/>
+                        <rect x="10" y="9" width="1" height="1" fill="white"/>
+                        <rect x="10" y="9" width="1" height="1" fill="white"/>
+                        <rect x="11" y="9" width="1" height="1" fill="white"/>
+                        <rect x="3" y="9" width="1" height="1" fill="white"/>
+                        <rect x="12" y="9" width="1" height="1" fill="white"/>
+                        <rect x="4" y="9" width="1" height="1" fill="white"/>
+                        <rect x="5" y="9" width="1" height="1" fill="white"/>
+                        <rect x="13" y="10" width="1" height="1" fill="white"/>
                         </g>
-                    </svg>
+                        <defs>
+                        <clipPath id="clip0_38_373">
+                            <rect width="15" height="15" fill="white"/>
+                        </clipPath>
+                        </defs>
+                    </svg>    
                 </div>
                 <div class="search-container">
                     <div class="input-wrapper">
@@ -217,6 +226,10 @@
             <div class="settings-content">
                 <div class="settings-section">
                     <h3>Sharing</h3>
+                    <button id="share-url" class="settings-btn">
+                        <span class="material-symbols-rounded">share</span>
+                        Copy shareable URL
+                    </button>
                     <button id="share-qr" class="settings-btn">
                         <span class="material-symbols-rounded">qr_code</span>
                         Share your QR code
