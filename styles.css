@@ -439,8 +439,26 @@ input[type="range"] {
 
 /* Make QR code and scanner button icons larger */
 #share-qr .material-symbols-rounded,
-#scan-qr .material-symbols-rounded {
+#scan-qr .material-symbols-rounded,
+#upload-qr .material-symbols-rounded,
+#close-settings .material-symbols-rounded,
+#share-url .material-symbols-rounded {
     font-size: 1.925em;
+}
+
+#share-url, #scan-qr, #upload-qr, #share-qr {
+    padding: 0.5rem 1rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 1rem;
+    background: var(--accent-color-30);
+    transition: background 0.2s ease;
+}
+
+#share-url:hover, #scan-qr:hover, #upload-qr:hover, #share-qr:hover {
+    background: var(--accent-color);
 }
 
 /* Make close button icons larger */
@@ -574,39 +592,8 @@ input[type="range"] {
     font-weight: 500;
     font-size: 0.875rem;
 }
-
-.settings-btn#share-qr {
-    background: blue;
-    padding: 0.5rem 1rem;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.settings-btn#scan-qr {
-    background: green;
-    padding: 0.5rem 1rem;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.settings-btn#upload-qr {
-    background: purple;
-    padding: 0.5rem 1rem;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 .settings-btn#upload-qr label {
     cursor: pointer;
-}
-
-#share-qr, #scan-qr {
-    margin-bottom: 1rem;
 }
 
 .settings-btn:hover {
