@@ -1958,7 +1958,7 @@ async function searchStations(query) {
     }
     
     try {
-        const response = await fetch(`https://at1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(query)}&limit=50`);
+        const response = await fetch(`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(query)}&limit=50`);
         const data = await response.json();
         displaySearchResults(data);
         console.log('Search results:', data);
@@ -1966,8 +1966,20 @@ async function searchStations(query) {
         console.error('Error searching stations:', error);
         const searchResultsSection = document.getElementById('search-results');
         const resultsGrid = searchResultsSection.querySelector('.results-grid');
+        const sectionTitle = searchResultsSection.querySelector('.section-title');
+        
         searchResultsSection.classList.remove('hidden');
-        resultsGrid.innerHTML = '<p class="error-message">Error searching stations. Please try again.</p>';
+        sectionTitle.textContent = 'Error';
+        resultsGrid.innerHTML = `
+            <div class="error-state">
+                <span class="material-symbols-rounded error-icon">error_outline</span>
+                <p class="error-message">Unable to search stations. Please check your internet connection and try again.</p>
+                <button class="retry-btn" onclick="searchStations('${query}')">
+                    <span class="material-symbols-rounded">refresh</span>
+                    <span>Retry</span>
+                </button>
+            </div>
+        `;
     }
 }
 
