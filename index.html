@@ -27,7 +27,9 @@
     </div>
     <div class="app-container">
         <div class="alert-banner hidden">
-            <p>Not My First Radio is being built in public by <a href="https://www.milesgilbert.xyz" target="_blank">Miles Gilbert</a>, a solo, hobbyist developer. Some features may not work as expected. If you have any feedback, please <a href="https://github.com/brainnews/not-my-first-radio/issues" target="_blank">open an issue</a> on GitHub.</p>
+            <div class="alert-banner-content">
+                <p>Not My First Radio is being built like a garden: in public, at a pace befitting a solo/hobbyist developer, and with a general idea of what I want it to be while knowing that it will change over time. Some features may not work as expected. If you have any feedback, please <a href="https://github.com/brainnews/not-my-first-radio/issues" target="_blank">open an issue</a> on GitHub.</p>
+            </div>
             <button id="close-alert" class="close-alert-btn">
                 <span class="material-symbols-rounded">close</span>
             </button>
@@ -202,7 +204,9 @@
         <footer class="player-bar">
             <div class="now-playing">
                 <div class="station-info">
-                    <img id="current-favicon" src="" alt="" class="current-favicon" style="display: none;">
+                    <div id="current-favicon-container" class="current-favicon-container">
+                        <img id="current-favicon" src="" alt="" class="current-favicon" style="display: none;">
+                    </div>
                     <div class="current-details">
                         <h3 id="station-name">Select a station</h3>
                         <p id="station-details"></p>

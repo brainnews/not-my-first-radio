@@ -1,12 +1,4 @@
-// Austin coordinates (approximately downtown)
-const AUSTIN_COORDS = {
-    latitude: 30.2672,
-    longitude: -97.7431
-};
-
-// Radius in kilometers (approximately 50 miles)
-const RADIUS_KM = 80;
-
+const debug = true;
 // Theme handling
 const themeSwitcher = document.querySelector('.theme-switcher');
 const themeButtons = document.querySelectorAll('.theme-btn');
@@ -125,8 +117,11 @@ closeAlertBtn.addEventListener('click', () => {
 });
 
 // Check if alert banner should be shown
-if (!localStorage.getItem('alert-banner-closed')) {
-    console.log('Alert banner should be shown');
+if (!debug) {
+    if (!localStorage.getItem('alert-banner-closed')) {
+        alertBanner.classList.remove('hidden');
+    }
+} else {
     alertBanner.classList.remove('hidden');
 }
 
@@ -669,15 +664,86 @@ class RadioPlayer {
                 <div class="station-info">
                     <div class="station-favicon">
                         ${station.favicon ? 
-                            `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<span class=\\'material-symbols-rounded\\'>radio</span>'">` : 
-                            `<span class="material-symbols-rounded">radio</span>`
+                            `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<svg width=\\'16\\' height=\\'16\\' viewBox=\\'0 0 16 16\\' fill=\\'none\\' xmlns=\\'http://www.w3.org/2000/svg\\'><path d=\\'M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 13H10V12H12V10H13V13Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 8H12V9H11V10H9V6H13V8Z\\' fill=\\'#1500FF\\'/><path d=\\'M4 8H5V10H7V11H6V12H3V7H4V8Z\\' fill=\\'#FF0000\\'/><path d=\\'M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z\\' fill=\\'#0DFF00\\'/></svg>'">` : 
+                            `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z" fill="#D9D9D9"/><path d="M13 13H10V12H12V10H13V13Z" fill="#D9D9D9"/><path d="M13 8H12V9H11V10H9V6H13V8Z" fill="#1500FF"/><path d="M4 8H5V10H7V11H6V12H3V7H4V8Z" fill="#FF0000"/><path d="M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z" fill="#0DFF00"/></svg>`
                         }
                     </div>
                     <div class="station-details">
                         <div class="station-name-container">
                             <h3>${station.name}</h3>
                             <div class="now-playing-icon">
-                                <span class="material-symbols-sharp">equalizer</span>
+                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M3 14V15H1V14H3Z" fill="#00FFA2"/>
+                                    <path d="M6 14V15H4V14H6Z" fill="#00FFA2"/>
+                                    <path d="M9 14V15H7V14H9Z" fill="#00FFA2"/>
+                                    <path d="M12 14V15H10V14H12Z" fill="#00FFA2"/>
+                                    <path d="M15 14V15H13V14H15Z" fill="#00FFA2"/>
+                                    <path d="M3 13V14H1V13H3Z" fill="#00FFA2"/>
+                                    <path d="M6 13V14H4V13H6Z" fill="#00FFA2"/>
+                                    <path d="M9 13V14H7V13H9Z" fill="#00FFA2"/>
+                                    <path d="M12 13V14H10V13H12Z" fill="#00FFA2"/>
+                                    <path d="M15 13V14H13V13H15Z" fill="#00FFA2"/>
+                                    <path d="M6 12V13H4V12H6Z" fill="#00FFA2"/>
+                                    <path d="M3 12V13H1V12H3Z" fill="#00FFA2"/>
+                                    <path d="M9 12V13H7V12H9Z" fill="#00FFA2"/>
+                                    <path d="M12 12V13H10V12H12Z" fill="#00FFA2"/>
+                                    <path d="M15 12V13H13V12H15Z" fill="#00FFA2"/>
+                                    <path d="M6 11V12H4V11H6Z" fill="#00FFA2"/>
+                                    <path d="M3 11V12H1V11H3Z" fill="#00FFA2"/>
+                                    <path d="M12 11V12H10V11H12Z" fill="#00FFA2"/>
+                                    <path d="M9 11V12H7V11H9Z" fill="#00FFA2"/>
+                                    <path d="M15 11V12H13V11H15Z" fill="#00FFA2"/>
+                                    <path d="M3 10V11H1V10H3Z" fill="#00FFA2"/>
+                                    <path d="M6 10V11H4V10H6Z" fill="#00FFA2"/>
+                                    <path d="M9 10V11H7V10H9Z" fill="#00FFA2"/>
+                                    <path d="M15 10V11H13V10H15Z" fill="#00FFA2"/>
+                                    <path d="M12 10V11H10V10H12Z" fill="#00FFA2"/>
+                                    <path d="M3 9V10H1V9H3Z" fill="#00FFA2"/>
+                                    <path d="M6 9V10H4V9H6Z" fill="#00FFA2"/>
+                                    <path d="M12 9V10H10V9H12Z" fill="#00FFA2"/>
+                                    <path d="M9 9V10H7V9H9Z" fill="#00FFA2"/>
+                                    <path d="M15 9V10H13V9H15Z" fill="#00FFA2"/>
+                                    <path d="M6 8V9H4V8H6Z" fill="#00FFA2"/>
+                                    <path d="M3 8V9H1V8H3Z" fill="#00FFA2"/>
+                                    <path d="M12 8V9H10V8H12Z" fill="#00FFA2"/>
+                                    <path d="M9 8V9H7V8H9Z" fill="#00FFA2"/>
+                                    <path d="M15 8V9H13V8H15Z" fill="#00FFA2"/>
+                                    <path d="M6 7V8H4V7H6Z" fill="#00FFA2"/>
+                                    <path d="M3 7V8H1V7H3Z" fill="#00FFA2"/>
+                                    <path d="M12 7V8H10V7H12Z" fill="#00FFA2"/>
+                                    <path d="M9 7V8H7V7H9Z" fill="#00FFA2"/>
+                                    <path d="M15 7V8H13V7H15Z" fill="#00FFA2"/>
+                                    <path d="M3 6V7H1V6H3Z" fill="#00FFA2"/>
+                                    <path d="M6 6V7H4V6H6Z" fill="#00FFA2"/>
+                                    <path d="M9 6V7H7V6H9Z" fill="#00FFA2"/>
+                                    <path d="M15 6V7H13V6H15Z" fill="#00FFA2"/>
+                                    <path d="M12 6V7H10V6H12Z" fill="#00FFA2"/>
+                                    <path d="M3 5V6H1V5H3Z" fill="#00FFA2"/>
+                                    <path d="M6 5V6H4V5H6Z" fill="#00FFA2"/>
+                                    <path d="M9 5V6H7V5H9Z" fill="#00FFA2"/>
+                                    <path d="M12 5V6H10V5H12Z" fill="#00FFA2"/>
+                                    <path d="M15 5V6H13V5H15Z" fill="#00FFA2"/>
+                                    <path d="M6 4V5H4V4H6Z" fill="#00FFA2"/>
+                                    <path d="M3 4V5H1V4H3Z" fill="#00FFA2"/>
+                                    <path d="M9 4V5H7V4H9Z" fill="#00FFA2"/>
+                                    <path d="M15 4V5H13V4H15Z" fill="#00FFA2"/>
+                                    <path d="M12 4V5H10V4H12Z" fill="#00FFA2"/>
+                                    <path d="M6 3V4H4V3H6Z" fill="#00FFA2"/>
+                                    <path d="M3 3V4H1V3H3Z" fill="#00FFA2"/>
+                                    <path d="M12 3V4H10V3H12Z" fill="#00FFA2"/>
+                                    <path d="M9 3V4H7V3H9Z" fill="#00FFA2"/>
+                                    <path d="M15 3V4H13V3H15Z" fill="#00FFA2"/>
+                                    <path d="M6 2V3H4V2H6Z" fill="#00FFA2"/>
+                                    <path d="M3 2V3H1V2H3Z" fill="#00FFA2"/>
+                                    <path d="M12 2V3H10V2H12Z" fill="#00FFA2"/>
+                                    <path d="M9 2V3H7V2H9Z" fill="#00FFA2"/>
+                                    <path d="M15 2V3H13V2H15Z" fill="#00FFA2"/>
+                                    <path d="M15 1V2H13V1H15Z" fill="#9E66F2"/>
+                                    <path d="M12 1V2H10V1H12Z" fill="#9E66F2"/>
+                                    <path d="M9 1V2H7V1H9Z" fill="#9E66F2"/>
+                                    <path d="M6 1V2H4V1H6Z" fill="#9E66F2"/>
+                                    <path d="M3 1V2H1V1H3Z" fill="#9E66F2"/>
+                                </svg>
                             </div>
                         </div>
                         <div class="station-meta">
@@ -975,20 +1041,13 @@ class RadioPlayer {
     }
 
     updateUI() {
-        const currentFavicon = document.getElementById('current-favicon');
+        const currentFaviconContainer = document.getElementById('current-favicon-container');
         const stationName = document.getElementById('station-name');
         const stationDetails = document.getElementById('station-details');
         
         // Always refresh the button reference to ensure we have the latest one
         this.playPauseBtn = document.getElementById('play-pause');
         const playPauseIcon = this.playPauseBtn ? this.playPauseBtn.querySelector('.material-symbols-rounded') : null;
-        const stationInfo = document.querySelector('.station-info');
-        
-        // Remove any existing default icon first to prevent duplication
-        const existingDefaultIcon = document.querySelector('.default-favicon');
-        if (existingDefaultIcon) {
-            existingDefaultIcon.remove();
-        }
         
         if (this.currentStation) {
             // Update station name
@@ -1008,39 +1067,25 @@ class RadioPlayer {
             stationDetails.textContent = details.join(' • ') || 'No details available';
             
             // Update favicon
-            if (this.currentStation.favicon) {
-                currentFavicon.src = this.currentStation.favicon;
-                currentFavicon.style.display = 'block';
-                currentFavicon.onerror = () => {
-                    // If favicon fails to load, show a default icon
-                    currentFavicon.style.display = 'none';
-                    
-                    if (stationInfo) {
-                        // Add default icon
-                        const defaultIcon = document.createElement('span');
-                        defaultIcon.className = 'material-symbols-rounded default-favicon';
-                        defaultIcon.textContent = 'radio';
-                        defaultIcon.style.fontSize = '24px';
-                        defaultIcon.style.marginRight = '10px';
-                        
-                        // Find the right spot to insert it
-                        stationInfo.prepend(defaultIcon);
-                    }
-                };
-            } else {
-                // No favicon available, show default icon
-                currentFavicon.style.display = 'none';
+            if (currentFaviconContainer) {
+                // Clear the container
+                currentFaviconContainer.innerHTML = '';
                 
-                if (stationInfo) {
-                    // Add default icon
-                    const defaultIcon = document.createElement('span');
-                    defaultIcon.className = 'material-symbols-rounded default-favicon';
-                    defaultIcon.textContent = 'radio';
-                    defaultIcon.style.fontSize = '24px';
-                    defaultIcon.style.marginRight = '10px';
-                    
-                    // Find the right spot to insert it
-                    stationInfo.prepend(defaultIcon);
+                if (this.currentStation.favicon) {
+                    // Create new image element
+                    const img = document.createElement('img');
+                    img.id = 'current-favicon';
+                    img.className = 'current-favicon';
+                    img.src = this.currentStation.favicon;
+                    img.alt = `${this.currentStation.name} logo`;
+                    img.onerror = () => {
+                        // If favicon fails to load, show a default icon
+                        currentFaviconContainer.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z" fill="#D9D9D9"/><path d="M13 13H10V12H12V10H13V13Z" fill="#D9D9D9"/><path d="M13 8H12V9H11V10H9V6H13V8Z" fill="#1500FF"/><path d="M4 8H5V10H7V11H6V12H3V7H4V8Z" fill="#FF0000"/><path d="M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z" fill="#0DFF00"/></svg>`;
+                    };
+                    currentFaviconContainer.appendChild(img);
+                } else {
+                    // No favicon available, show default icon
+                    currentFaviconContainer.innerHTML = `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z" fill="#D9D9D9"/><path d="M13 13H10V12H12V10H13V13Z" fill="#D9D9D9"/><path d="M13 8H12V9H11V10H9V6H13V8Z" fill="#1500FF"/><path d="M4 8H5V10H7V11H6V12H3V7H4V8Z" fill="#FF0000"/><path d="M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z" fill="#0DFF00"/></svg>`;
                 }
             }
             
@@ -1053,7 +1098,9 @@ class RadioPlayer {
             // Reset UI when no station is selected
             stationName.textContent = 'Select a station';
             stationDetails.textContent = '';
-            currentFavicon.style.display = 'none';
+            if (currentFaviconContainer) {
+                currentFaviconContainer.innerHTML = '';
+            }
             
             if (playPauseIcon) {
                 playPauseIcon.textContent = 'play_arrow';
@@ -1166,15 +1213,86 @@ class RadioPlayer {
                         <div class="station-info">
                             <div class="station-favicon">
                                 ${station.favicon ? 
-                                    `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<span class=\\'material-symbols-rounded\\'>radio</span>'">` : 
-                                    `<span class="material-symbols-rounded">radio</span>`
+                                    `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<svg width=\\'16\\' height=\\'16\\' viewBox=\\'0 0 16 16\\' fill=\\'none\\' xmlns=\\'http://www.w3.org/2000/svg\\'><path d=\\'M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 13H10V12H12V10H13V13Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 8H12V9H11V10H9V6H13V8Z\\' fill=\\'#1500FF\\'/><path d=\\'M4 8H5V10H7V11H6V12H3V7H4V8Z\\' fill=\\'#FF0000\\'/><path d=\\'M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z\\' fill=\\'#0DFF00\\'/></svg>'">` : 
+                                    `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z" fill="#D9D9D9"/><path d="M13 13H10V12H12V10H13V13Z" fill="#D9D9D9"/><path d="M13 8H12V9H11V10H9V6H13V8Z" fill="#1500FF"/><path d="M4 8H5V10H7V11H6V12H3V7H4V8Z" fill="#FF0000"/><path d="M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z" fill="#0DFF00"/></svg>`
                                 }
                             </div>
                             <div class="station-details">
                                 <div class="station-name-container">
                                     <h3>${station.name}</h3>
                                     <div class="now-playing-icon">
-                                        <span class="material-symbols-sharp">equalizer</span>
+                                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                            <path d="M3 14V15H1V14H3Z" fill="#00FFA2"/>
+                                            <path d="M6 14V15H4V14H6Z" fill="#00FFA2"/>
+                                            <path d="M9 14V15H7V14H9Z" fill="#00FFA2"/>
+                                            <path d="M12 14V15H10V14H12Z" fill="#00FFA2"/>
+                                            <path d="M15 14V15H13V14H15Z" fill="#00FFA2"/>
+                                            <path d="M3 13V14H1V13H3Z" fill="#00FFA2"/>
+                                            <path d="M6 13V14H4V13H6Z" fill="#00FFA2"/>
+                                            <path d="M9 13V14H7V13H9Z" fill="#00FFA2"/>
+                                            <path d="M12 13V14H10V13H12Z" fill="#00FFA2"/>
+                                            <path d="M15 13V14H13V13H15Z" fill="#00FFA2"/>
+                                            <path d="M6 12V13H4V12H6Z" fill="#00FFA2"/>
+                                            <path d="M3 12V13H1V12H3Z" fill="#00FFA2"/>
+                                            <path d="M9 12V13H7V12H9Z" fill="#00FFA2"/>
+                                            <path d="M12 12V13H10V12H12Z" fill="#00FFA2"/>
+                                            <path d="M15 12V13H13V12H15Z" fill="#00FFA2"/>
+                                            <path d="M6 11V12H4V11H6Z" fill="#00FFA2"/>
+                                            <path d="M3 11V12H1V11H3Z" fill="#00FFA2"/>
+                                            <path d="M12 11V12H10V11H12Z" fill="#00FFA2"/>
+                                            <path d="M9 11V12H7V11H9Z" fill="#00FFA2"/>
+                                            <path d="M15 11V12H13V11H15Z" fill="#00FFA2"/>
+                                            <path d="M3 10V11H1V10H3Z" fill="#00FFA2"/>
+                                            <path d="M6 10V11H4V10H6Z" fill="#00FFA2"/>
+                                            <path d="M9 10V11H7V10H9Z" fill="#00FFA2"/>
+                                            <path d="M15 10V11H13V10H15Z" fill="#00FFA2"/>
+                                            <path d="M12 10V11H10V10H12Z" fill="#00FFA2"/>
+                                            <path d="M3 9V10H1V9H3Z" fill="#00FFA2"/>
+                                            <path d="M6 9V10H4V9H6Z" fill="#00FFA2"/>
+                                            <path d="M12 9V10H10V9H12Z" fill="#00FFA2"/>
+                                            <path d="M9 9V10H7V9H9Z" fill="#00FFA2"/>
+                                            <path d="M15 9V10H13V9H15Z" fill="#00FFA2"/>
+                                            <path d="M6 8V9H4V8H6Z" fill="#00FFA2"/>
+                                            <path d="M3 8V9H1V8H3Z" fill="#00FFA2"/>
+                                            <path d="M12 8V9H10V8H12Z" fill="#00FFA2"/>
+                                            <path d="M9 8V9H7V8H9Z" fill="#00FFA2"/>
+                                            <path d="M15 8V9H13V8H15Z" fill="#00FFA2"/>
+                                            <path d="M6 7V8H4V7H6Z" fill="#00FFA2"/>
+                                            <path d="M3 7V8H1V7H3Z" fill="#00FFA2"/>
+                                            <path d="M12 7V8H10V7H12Z" fill="#00FFA2"/>
+                                            <path d="M9 7V8H7V7H9Z" fill="#00FFA2"/>
+                                            <path d="M15 7V8H13V7H15Z" fill="#00FFA2"/>
+                                            <path d="M3 6V7H1V6H3Z" fill="#00FFA2"/>
+                                            <path d="M6 6V7H4V6H6Z" fill="#00FFA2"/>
+                                            <path d="M9 6V7H7V6H9Z" fill="#00FFA2"/>
+                                            <path d="M15 6V7H13V6H15Z" fill="#00FFA2"/>
+                                            <path d="M12 6V7H10V6H12Z" fill="#00FFA2"/>
+                                            <path d="M3 5V6H1V5H3Z" fill="#00FFA2"/>
+                                            <path d="M6 5V6H4V5H6Z" fill="#00FFA2"/>
+                                            <path d="M9 5V6H7V5H9Z" fill="#00FFA2"/>
+                                            <path d="M12 5V6H10V5H12Z" fill="#00FFA2"/>
+                                            <path d="M15 5V6H13V5H15Z" fill="#00FFA2"/>
+                                            <path d="M6 4V5H4V4H6Z" fill="#00FFA2"/>
+                                            <path d="M3 4V5H1V4H3Z" fill="#00FFA2"/>
+                                            <path d="M9 4V5H7V4H9Z" fill="#00FFA2"/>
+                                            <path d="M15 4V5H13V4H15Z" fill="#00FFA2"/>
+                                            <path d="M12 4V5H10V4H12Z" fill="#00FFA2"/>
+                                            <path d="M6 3V4H4V3H6Z" fill="#00FFA2"/>
+                                            <path d="M3 3V4H1V3H3Z" fill="#00FFA2"/>
+                                            <path d="M12 3V4H10V3H12Z" fill="#00FFA2"/>
+                                            <path d="M9 3V4H7V3H9Z" fill="#00FFA2"/>
+                                            <path d="M15 3V4H13V3H15Z" fill="#00FFA2"/>
+                                            <path d="M6 2V3H4V2H6Z" fill="#00FFA2"/>
+                                            <path d="M3 2V3H1V2H3Z" fill="#00FFA2"/>
+                                            <path d="M12 2V3H10V2H12Z" fill="#00FFA2"/>
+                                            <path d="M9 2V3H7V2H9Z" fill="#00FFA2"/>
+                                            <path d="M15 2V3H13V2H15Z" fill="#00FFA2"/>
+                                            <path d="M15 1V2H13V1H15Z" fill="#9E66F2"/>
+                                            <path d="M12 1V2H10V1H12Z" fill="#9E66F2"/>
+                                            <path d="M9 1V2H7V1H9Z" fill="#9E66F2"/>
+                                            <path d="M6 1V2H4V1H6Z" fill="#9E66F2"/>
+                                            <path d="M3 1V2H1V1H3Z" fill="#9E66F2"/>
+                                        </svg>
                                     </div>
                                 </div>
                                 <div class="station-meta">
@@ -1290,7 +1408,7 @@ window.addEventListener('load', () => {
             // Fetch all station details in parallel
             Promise.all(shareData.i.map(async (uuid) => {
                 try {
-                    const response = await fetch(`https://at1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
+                    const response = await fetch(`https://de1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
                     const stations = await response.json();
                     return stations && stations.length > 0 ? stations[0] : null;
                 } catch {
@@ -1740,7 +1858,7 @@ const onScanSuccess = async (decodedText, decodedResult) => {
         // Fetch full station details for each UUID
         const stations = await Promise.all(data.i.map(async (uuid) => {
             try {
-                const response = await fetch(`https://at1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
+                const response = await fetch(`https://de1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
                 const apiStations = await response.json();
                 
                 if (apiStations && apiStations.length > 0) {
@@ -2090,8 +2208,8 @@ async function displaySearchResults(stations) {
                 <div class="station-info">
                     <div class="station-favicon">
                         ${station.favicon ? 
-                            `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<span class=\\'material-symbols-rounded\\'>radio</span>'">` : 
-                            `<span class="material-symbols-rounded">radio</span>`
+                            `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<svg width=\\'16\\' height=\\'16\\' viewBox=\\'0 0 16 16\\' fill=\\'none\\' xmlns=\\'http://www.w3.org/2000/svg\\'><path d=\\'M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 13H10V12H12V10H13V13Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 8H12V9H11V10H9V6H13V8Z\\' fill=\\'#1500FF\\'/><path d=\\'M4 8H5V10H7V11H6V12H3V7H4V8Z\\' fill=\\'#FF0000\\'/><path d=\\'M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z\\' fill=\\'#0DFF00\\'/></svg>'">` : 
+                            `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z" fill="#D9D9D9"/><path d="M13 13H10V12H12V10H13V13Z" fill="#D9D9D9"/><path d="M13 8H12V9H11V10H9V6H13V8Z" fill="#1500FF"/><path d="M4 8H5V10H7V11H6V12H3V7H4V8Z" fill="#FF0000"/><path d="M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z" fill="#0DFF00"/></svg>`
                         }
                     </div>
                     <div class="station-details">
