@@ -158,7 +158,7 @@ main {
     cursor: pointer;
     display: flex;
     align-items: center;
-    border-radius: 4px;
+    border-radius: 10px;
     @media (max-width: 768px) {
         padding: 6px;
     }
@@ -166,7 +166,7 @@ main {
     padding: 1rem;
 }
 .station-card:hover, .search-result-card:hover {
-    background: var(--bg-secondary);
+    background: var(--accent-color-30);
 }
 .station-card .now-playing-icon {
     display: none;
@@ -188,7 +188,13 @@ main {
     align-items: center;
     gap: 0.5rem;
 }
-
+.station-card svg path {
+    filter: opacity(0.25);
+    transition: filter 0.2s ease;
+}
+.station-card:hover svg path {
+    filter: opacity(1);
+}
 .station-favicon {
     width: 48px;
     height: 48px;
@@ -202,7 +208,6 @@ main {
     border: 1px solid var(--border-color);
     margin-right: 0.5rem;
 }
-
 .station-favicon img {
     width: 100%;
     height: 100%;
@@ -528,9 +533,6 @@ input[type="range"] {
     }
     .header-top, .search-container {
         padding: 1rem;
-    }
-    .search-container {
-        padding-top: 0;
     }
     .player-bar {
         padding: 0.75rem;
@@ -1207,7 +1209,7 @@ input[type="range"] {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1rem;
-    border-bottom: 1px solid var(--border-color);
+    border-bottom: 1px dashed var(--accent-color-30);
     width: 100%;
     padding: 0 0 1rem 1rem;
 }
@@ -1610,6 +1612,12 @@ input[type="range"] {
     border: 4px solid var(--text-primary);
     transition: transform 0.3s ease;
     cursor: pointer;
+    @media (max-width: 768px) {
+        width: 44px;
+        height: auto;
+        border-width: 2px;
+        border-radius: 4px;
+    }
 }
 
 .logo-container svg {

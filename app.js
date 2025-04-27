@@ -665,9 +665,9 @@ class RadioPlayer {
                             </div>
                         </div>
                         <div class="station-meta">
-                            ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
-                            ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
-                            ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
+                            ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
+                            ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
+                            ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
                         </div>
                         ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
                     </div>
@@ -1165,9 +1165,9 @@ class RadioPlayer {
                                     </div>
                                 </div>
                                 <div class="station-meta">
-                                    ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
-                                    ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
-                                    ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
+                                    ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
+                                    ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
+                                    ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
                                 </div>
                                 ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
                             </div>
@@ -1187,7 +1187,6 @@ class RadioPlayer {
                             <div class="station-menu hidden">
                                 <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
                                 <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
-                                <button class="menu-move"><span class="material-symbols-rounded">playlist_add</span> Add to your radio</button>
                                 <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
                             </div>
                         </div>
@@ -2057,21 +2056,30 @@ async function displaySearchResults(stations) {
                     <div class="station-details">
                         <h3>${station.name}</h3>
                         <div class="station-meta">
-                            ${station.bitrate ? `<span><span class="material-symbols-rounded">radio</span>${station.bitrate}kbps</span>` : ''}
-                            ${station.countrycode ? `<span><span class="material-symbols-rounded">public</span>${station.countrycode}</span>` : ''}
-                            ${station.votes ? `<span><span class="material-symbols-rounded">local_fire_department</span>${station.votes}</span>` : ''}
+                            ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
+                            ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
+                            ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
                         </div>
-                        ${station.tags ? `<div class="tags">${station.tags.split(',').slice(0, 3).map(tag => 
-                            `<span class="tag">${tag.trim()}</span>`).join('')}</div>` : ''}
+                        ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
                     </div>
                 </div>
-                <div class="search-result-controls">
-                    <button class="preview-btn" data-url="${station.url}">
-                        <span class="material-symbols-rounded">play_arrow</span>
+                <div class="station-controls">
+                    ${isCurrentlyPlaying ? 
+                        `<button class="stop-btn">
+                            <span class="material-symbols-rounded">stop</span>
+                        </button>` : 
+                        `<button class="play-btn">
+                            <span class="material-symbols-rounded">play_arrow</span>
+                        </button>`
+                    }
+                    <button class="more-btn" title="More actions">
+                        <span class="material-symbols-rounded">more_vert</span>
                     </button>
-                    <button class="add-btn" data-station="${safeStationJson}">
-                        <span class="material-symbols-rounded">add</span>
-                    </button>
+                    <div class="station-menu hidden">
+                        <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
+                        <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
+                        <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
+                    </div>
                 </div>
             </div>
         `;
