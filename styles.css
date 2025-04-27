@@ -46,6 +46,9 @@ body {
 
 header {
     margin-bottom: 2rem;
+    @media (max-width: 768px) {
+        margin-bottom: 0rem;
+    }
 }
 
 h1 {
@@ -78,6 +81,8 @@ header h1 {
     position: relative;
     flex: 1;
     display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .search-icon {
@@ -98,6 +103,10 @@ header h1 {
     background: var(--bg-secondary);
     color: var(--text-primary);
     font-size: 1.1rem;
+    @media (max-width: 768px) {
+        height: 42px;
+        font-size: 0.875rem;
+    }
 }
 
 #search-input:focus {
@@ -521,8 +530,14 @@ input[type="range"] {
 .results-header {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     margin-bottom: 1rem;
+    padding: 1rem;
+}
+
+.results-header h2 {
+    font-size: 1rem;
+    font-weight: 600;
 }
 
 .clear-results-btn {
@@ -535,7 +550,8 @@ input[type="range"] {
     color: var(--text-secondary);
     padding: 0.55rem 0.825rem;
     cursor: pointer;
-    font-size: 0.9625rem;
+    font-size: 0.875rem;
+    border: 1px solid var(--border-color);
 }
 
 .clear-results-btn:hover {
@@ -1601,7 +1617,8 @@ input[type="range"] {
     transition: transform 0.3s ease;
     cursor: pointer;
     @media (max-width: 768px) {
-        width: 44px;
+        min-width: 30px;
+        max-width: 40px;
         height: auto;
         border-width: 2px;
         border-radius: 4px;
