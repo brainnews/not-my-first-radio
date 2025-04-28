@@ -111,9 +111,18 @@ const alertBanner = document.querySelector('.alert-banner');
 const closeAlertBtn = document.getElementById('close-alert');
 
 // Close alert banner
-closeAlertBtn.addEventListener('click', () => {
+const handleCloseAlert = (e) => {
+    e.preventDefault();
     alertBanner.classList.add('hidden');
     localStorage.setItem('alert-banner-closed', 'true');
+};
+closeAlertBtn.addEventListener('mousedown', handleCloseAlert);
+closeAlertBtn.addEventListener('touchstart', handleCloseAlert);
+closeAlertBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleCloseAlert(e);
+    }
 });
 
 // Check if alert banner should be shown
@@ -126,7 +135,8 @@ if (!debug) {
 }
 
 // Open settings panel
-settingsBtn.addEventListener('click', () => {
+const handleOpenSettings = (e) => {
+    e.preventDefault();
     settingsPanel.classList.remove('hidden');
     settingsOverlay.classList.remove('hidden');
     // Use setTimeout to ensure the transitions work properly
@@ -134,10 +144,19 @@ settingsBtn.addEventListener('click', () => {
         settingsPanel.classList.add('visible');
         settingsOverlay.classList.add('visible');
     }, 10);
+};
+settingsBtn.addEventListener('mousedown', handleOpenSettings);
+settingsBtn.addEventListener('touchstart', handleOpenSettings);
+settingsBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleOpenSettings(e);
+    }
 });
 
 // Close settings panel when clicking close button or overlay
-function closeSettingsPanel() {
+function closeSettingsPanel(e) {
+    if (e) e.preventDefault();
     settingsPanel.classList.remove('visible');
     settingsOverlay.classList.remove('visible');
     // Wait for transitions to complete before hiding
@@ -147,11 +166,21 @@ function closeSettingsPanel() {
     }, 300);
 }
 
-closeSettingsBtn.addEventListener('click', closeSettingsPanel);
-settingsOverlay.addEventListener('click', closeSettingsPanel);
+closeSettingsBtn.addEventListener('mousedown', closeSettingsPanel);
+closeSettingsBtn.addEventListener('touchstart', closeSettingsPanel);
+closeSettingsBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        closeSettingsPanel(e);
+    }
+});
+
+settingsOverlay.addEventListener('mousedown', closeSettingsPanel);
+settingsOverlay.addEventListener('touchstart', closeSettingsPanel);
 
 // Handle data export
-exportDataBtn.addEventListener('click', () => {
+const handleExportData = (e) => {
+    e.preventDefault();
     if (!radioPlayer || !radioPlayer.stations || radioPlayer.stations.length === 0) {
         showNotification('No stations to export.', 'warning');
         return;
@@ -179,6 +208,14 @@ exportDataBtn.addEventListener('click', () => {
     } catch (error) {
         console.error('Error exporting stations:', error);
         showNotification('Error exporting stations. Please try again.', 'error');
+    }
+};
+exportDataBtn.addEventListener('mousedown', handleExportData);
+exportDataBtn.addEventListener('touchstart', handleExportData);
+exportDataBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleExportData(e);
     }
 });
 
@@ -243,208 +280,58 @@ importFileInput.addEventListener('change', async (event) => {
     reader.readAsText(file);
 });
 
-// Handle QR code image upload
-const qrUploadInput = document.getElementById('qr-upload');
-qrUploadInput.addEventListener('change', async (event) => {
-    const file = event.target.files[0];
-    if (!file) return;
-    
-    try {
-        // Create an image element to load the file
-        const img = new Image();
-        const imageUrl = URL.createObjectURL(file);
-        
-        img.onload = async () => {
-            try {
-                // Create a canvas to process the image
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = img.width;
-                canvas.height = img.height;
-                ctx.drawImage(img, 0, 0);
-                
-                // Get the image data
-                const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-                
-                // Use jsQR to decode the QR code
-                const code = jsQR(imageData.data, imageData.width, imageData.height, {
-                    inversionAttempts: "dontInvert",
-                });
-                
-                if (code) {
-                    // Process the QR code data
-                    try {
-                        // First try parsing as JSON
-                        let data;
-                        try {
-                            data = JSON.parse(code.data);
-                        } catch (parseError) {
-                            // If not JSON, use the raw string
-                            console.log("QR code is not in JSON format, using raw data:", code.data);
-                            data = { stations: [{ url: code.data, name: "Scanned Station" }] };
-                        }
-                        
-                        // Validate imported data
-                        if (!data) {
-                            showNotification('Invalid QR code format.', 'error');
-                            return;
-                        }
-                        
-                        // Handle different data formats
-                        let stations = [];
-                        
-                        if (data.stations && Array.isArray(data.stations)) {
-                            stations = data.stations;
-                        } else if (data.u && data.i && Array.isArray(data.i)) {
-                            // This is the sharing format with UUIDs
-                            showNotification('Processing station data from QR code...', 'success');
-                            
-                            // Use the existing QR code handler for this format
-                            await onScanSuccess(code.data, null);
-                            return;
-                        } else {
-                            showNotification('Unrecognized QR code format.', 'error');
-                            return;
-                        }
-                        
-                        if (stations.length === 0) {
-                            showNotification('No stations found in the QR code.', 'warning');
-                            return;
-                        }
-                        
-                        // Show import options
-                        const importOption = await showQrImportOptions({
-                            title: 'Import Stations',
-                            message: `Found ${stations.length} stations in the QR code.`,
-                            confirmText: 'Import',
-                            danger: false
-                        });
-                        
-                        if (importOption === null) return;
-                        
-                        if (importOption === '1') {
-                            // Merge stations, avoiding duplicates
-                            const existingUrls = radioPlayer.stations.map(s => s.url);
-                            for (const station of stations) {
-                                if (!existingUrls.includes(station.url)) {
-                                    radioPlayer.stations.push(station);
-                                    existingUrls.push(station.url);
-                                }
-                            }
-                        } else if (importOption === '3') {
-                            // Add as separate list
-                            const newList = {
-                                name: 'Scanned Stations',
-                                stations: stations
-                            };
-                            
-                            // Add new list to the player's lists
-                            radioPlayer.stationLists.push(newList);
-                            
-                            // Save lists
-                            radioPlayer.saveStationLists();
-                            
-                            // Update UI to show the new list
-                            radioPlayer.displayStationLists();
-                        }
-                        
-                        // Save and display the new stations
-                        radioPlayer.saveStations();
-                        radioPlayer.displayStations();
-                        
-                        showNotification(`Import successful! You now have ${radioPlayer.stations.length} stations.`, 'success');
-                    } catch (error) {
-                        console.error('Error processing QR code data:', error);
-                        showNotification('Error processing QR code. The code may be invalid or corrupted.', 'error');
-                    }
-                } else {
-                    showNotification('No QR code found in the image.', 'error');
-                }
-            } catch (error) {
-                console.error('Error processing image:', error);
-                showNotification('Error processing image. Please try again.', 'error');
-            } finally {
-                URL.revokeObjectURL(imageUrl);
-            }
-        };
-        
-        img.onerror = () => {
-            showNotification('Error loading image. Please try again.', 'error');
-            URL.revokeObjectURL(imageUrl);
-        };
-        
-        img.src = imageUrl;
-    } catch (error) {
-        console.error('Error handling QR code upload:', error);
-        showNotification('Error uploading QR code. Please try again.', 'error');
-    }
-    
-    // Reset the file input
-    event.target.value = '';
-});
-
-// Handle clear all stations
-clearStationsBtn.addEventListener('click', async () => {
+// Handle clear stations
+const handleClearStations = async (e) => {
+    e.preventDefault();
     if (!radioPlayer || !radioPlayer.stations || radioPlayer.stations.length === 0) {
         showNotification('No stations to clear.', 'warning');
         return;
     }
     
-    const modal = document.querySelector('.confirmation-modal');
-    const content = modal.querySelector('.confirmation-content');
-    const header = content.querySelector('.confirmation-header h3');
-    const body = content.querySelector('.confirmation-body');
-    const cancelBtn = content.querySelector('.confirmation-btn.cancel');
-    const confirmBtn = content.querySelector('.confirmation-btn.confirm');
-    
-    // Set modal content
-    header.textContent = 'Clear All Stations';
-    body.textContent = `Are you sure you want to remove all ${radioPlayer.stations.length} stations? This action cannot be undone.`;
-    confirmBtn.textContent = 'Clear All';
-    confirmBtn.className = 'confirmation-btn confirm danger';
-    
-    // Show modal
-    modal.classList.add('visible');
-    
-    // Return a promise that resolves with the user's choice
-    const confirmed = await new Promise((resolve) => {
-        const handleChoice = (choice) => {
-            modal.classList.remove('visible');
-            resolve(choice);
-            
-            // Clean up event listeners
-            cancelBtn.removeEventListener('click', cancelHandler);
-            confirmBtn.removeEventListener('click', confirmHandler);
-        };
-        
-        const cancelHandler = () => handleChoice(false);
-        const confirmHandler = () => handleChoice(true);
-        
-        // Add event listeners
-        cancelBtn.addEventListener('click', cancelHandler);
-        confirmBtn.addEventListener('click', confirmHandler);
+    const confirmed = await showConfirmationModal({
+        title: 'Clear All Stations',
+        message: 'Are you sure you want to remove all stations? This action cannot be undone.',
+        confirmText: 'Clear All',
+        danger: true
     });
     
     if (confirmed) {
-        // If currently playing, stop playback
-        if (radioPlayer.isPlaying) {
-            radioPlayer.audio.pause();
-            radioPlayer.isPlaying = false;
-            radioPlayer.currentStation = null;
-            radioPlayer.updateUI();
-        }
-        
-        // Clear stations
         radioPlayer.stations = [];
         radioPlayer.saveStations();
         radioPlayer.displayStations();
-        
         showNotification('All stations have been removed.', 'success');
-        
-        // Close settings panel
-        closeSettingsPanel();
+    }
+};
+clearStationsBtn.addEventListener('mousedown', handleClearStations);
+clearStationsBtn.addEventListener('touchstart', handleClearStations);
+clearStationsBtn.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handleClearStations(e);
     }
 });
+
+// Handle empty state settings button
+const emptyStateSettingsBtn = document.getElementById('empty-state-settings');
+if (emptyStateSettingsBtn) {
+    const handleEmptyStateSettings = (e) => {
+        e.preventDefault();
+        settingsPanel.classList.remove('hidden');
+        settingsOverlay.classList.remove('hidden');
+        setTimeout(() => {
+            settingsPanel.classList.add('visible');
+            settingsOverlay.classList.add('visible');
+        }, 10);
+    };
+    emptyStateSettingsBtn.addEventListener('mousedown', handleEmptyStateSettings);
+    emptyStateSettingsBtn.addEventListener('touchstart', handleEmptyStateSettings);
+    emptyStateSettingsBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleEmptyStateSettings(e);
+        }
+    });
+}
 
 // Function to validate stream URL
 function isValidStreamUrl(url) {
@@ -564,37 +451,47 @@ class RadioPlayer {
         this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
         this.audio.addEventListener('ended', () => this.handleStreamEnd());
         
-        // Set up the play/pause button listener directly in the constructor
+        // Set up the play/pause button listener with click for proper audio playback
         if (this.playPauseBtn) {
             this.playPauseBtn.addEventListener('click', () => {
-                console.log('Play/pause button clicked from constructor');
+                console.log('Play/pause button clicked');
                 this.togglePlay();
             });
         }
 
         // Add event listener for clear shared stations button
-        document.getElementById('clear-shared-stations').addEventListener('click', async () => {
-            if (!this.stationLists || this.stationLists.length === 0) {
-                showNotification('No shared stations to clear.', 'warning');
-                return;
-            }
-            
-            const confirmed = await showConfirmationModal({
-                title: 'Clear All Shared Stations',
-                message: `Are you sure you want to remove all ${this.stationLists.length} shared station lists? This action cannot be undone.`,
-                confirmText: 'Clear All',
-                danger: true
-            });
-            
-            if (confirmed) {
-                // Clear all shared station lists
-                this.stationLists = [];
-                this.saveStationLists();
-                this.displayStationLists();
+        const clearSharedStationsBtn = document.getElementById('clear-shared-stations');
+        if (clearSharedStationsBtn) {
+            const handleClearShared = async (e) => {
+                e.preventDefault();
+                if (!this.stationLists || this.stationLists.length === 0) {
+                    showNotification('No shared stations to clear.', 'warning');
+                    return;
+                }
                 
-                showNotification('All shared stations have been removed.', 'success');
-            }
-        });
+                const confirmed = await showConfirmationModal({
+                    title: 'Clear All Shared Stations',
+                    message: `Are you sure you want to remove all ${this.stationLists.length} shared station lists? This action cannot be undone.`,
+                    confirmText: 'Clear All',
+                    danger: true
+                });
+                
+                if (confirmed) {
+                    this.stationLists = [];
+                    this.saveStationLists();
+                    this.displayStationLists();
+                    showNotification('All shared stations have been removed.', 'success');
+                }
+            };
+            clearSharedStationsBtn.addEventListener('mousedown', handleClearShared);
+            clearSharedStationsBtn.addEventListener('touchstart', handleClearShared);
+            clearSharedStationsBtn.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    handleClearShared(e);
+                }
+            });
+        }
 
         // Display initial stations and station lists
         this.displayStations();
@@ -783,7 +680,8 @@ class RadioPlayer {
         const mainStationCards = this.stationsContainer.querySelectorAll('.station-card');
         mainStationCards.forEach(card => {
             const url = card.dataset.url;
-            card.addEventListener('click', (e) => {
+            
+            const handleCardInteraction = (e) => {
                 if (
                     e.target.closest('.remove-btn') ||
                     e.target.closest('.share-btn') ||
@@ -794,6 +692,7 @@ class RadioPlayer {
                     e.target.classList.contains('note-actions') ||
                     e.target.closest('.note-actions')
                 ) return;
+                
                 const station = this.stations.find(s => s.url === url);
                 if (station) {
                     if (this.currentStation && this.currentStation.url === url && this.isPlaying) {
@@ -805,11 +704,14 @@ class RadioPlayer {
                         this.playStation(station);
                     }
                 }
-            });
+            };
+
+            card.addEventListener('click', handleCardInteraction);
+
             // Play or stop button
             const playControl = card.querySelector('.play-btn, .stop-btn');
             if (playControl) {
-                playControl.addEventListener('click', (e) => {
+                const handlePlayControl = (e) => {
                     e.stopPropagation();
                     const station = this.stations.find(s => s.url === url);
                     if (station) {
@@ -822,38 +724,103 @@ class RadioPlayer {
                             this.playStation(station);
                         }
                     }
-                });
+                };
+                playControl.addEventListener('click', handlePlayControl);
             }
+
             // More menu logic
             const moreBtn = card.querySelector('.more-btn');
             const menu = card.querySelector('.station-menu');
             if (moreBtn && menu) {
-                moreBtn.addEventListener('click', (e) => {
+                const handleMoreBtn = (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
-                    document.querySelectorAll('.station-menu').forEach(m => m.classList.add('hidden'));
+                    // Close all other menus first
+                    document.querySelectorAll('.station-menu').forEach(m => {
+                        if (m !== menu) m.classList.add('hidden');
+                    });
+                    // Toggle the current menu
                     menu.classList.toggle('hidden');
+                };
+                moreBtn.addEventListener('mousedown', handleMoreBtn);
+                moreBtn.addEventListener('touchstart', handleMoreBtn);
+                moreBtn.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        handleMoreBtn(e);
+                    }
                 });
+
+                // Add back the document click listener to close menu when clicking outside
+                document.addEventListener('mousedown', (e) => {
+                    if (!card.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                });
+                document.addEventListener('touchstart', (e) => {
+                    if (!card.contains(e.target)) {
+                        menu.classList.add('hidden');
+                    }
+                });
+
+                // Menu item handlers
+                const menuShare = menu.querySelector('.menu-share');
+                const menuEditNote = menu.querySelector('.menu-edit-note');
+                const menuDelete = menu.querySelector('.menu-delete');
+
+                if (menuShare) {
+                    const handleShare = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        menu.classList.add('hidden');
+                        const station = this.stations.find(s => s.url === url);
+                        if (station) this.shareStation(station);
+                    };
+                    menuShare.addEventListener('mousedown', handleShare);
+                    menuShare.addEventListener('touchstart', handleShare);
+                    menuShare.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleShare(e);
+                        }
+                    });
+                }
+
+                if (menuEditNote) {
+                    const handleEditNote = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        menu.classList.add('hidden');
+                        this.showEditNoteUI(card, url);
+                    };
+                    menuEditNote.addEventListener('mousedown', handleEditNote);
+                    menuEditNote.addEventListener('touchstart', handleEditNote);
+                    menuEditNote.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleEditNote(e);
+                        }
+                    });
+                }
+
+                if (menuDelete) {
+                    const handleDelete = async (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        menu.classList.add('hidden');
+                        const station = this.stations.find(s => s.url === url);
+                        if (station) await this.confirmAndRemoveStation(url, station.name);
+                    };
+                    menuDelete.addEventListener('mousedown', handleDelete);
+                    menuDelete.addEventListener('touchstart', handleDelete);
+                    menuDelete.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleDelete(e);
+                        }
+                    });
+                }
             }
-            document.addEventListener('click', (e) => {
-                if (!card.contains(e.target)) menu.classList.add('hidden');
-            });
-            menu.querySelector('.menu-share').addEventListener('click', (e) => {
-                e.stopPropagation();
-                menu.classList.add('hidden');
-                const station = this.stations.find(s => s.url === url);
-                if (station) this.shareStation(station);
-            });
-            menu.querySelector('.menu-edit-note').addEventListener('click', (e) => {
-                e.stopPropagation();
-                menu.classList.add('hidden');
-                this.showEditNoteUI(card, url);
-            });
-            menu.querySelector('.menu-delete').addEventListener('click', async (e) => {
-                e.stopPropagation();
-                menu.classList.add('hidden');
-                const station = this.stations.find(s => s.url === url);
-                if (station) await this.confirmAndRemoveStation(url, station.name);
-            });
         });
     }
 
@@ -927,12 +894,8 @@ class RadioPlayer {
             menu.querySelector('.menu-share').addEventListener('click', (e) => {
                 e.stopPropagation();
                 menu.classList.add('hidden');
-                let foundStation = null;
-                for (const list of this.stationLists) {
-                    foundStation = list.stations.find(s => s.url === url);
-                    if (foundStation) break;
-                }
-                if (foundStation) this.shareStation(foundStation);
+                const station = this.stations.find(s => s.url === url);
+                if (station) this.shareStation(station);
             });
             menu.querySelector('.menu-edit-note').addEventListener('click', (e) => {
                 e.stopPropagation();
@@ -962,6 +925,13 @@ class RadioPlayer {
 
     // Play a station
     playStation(station) {
+        // Show player immediately and set loading state
+        this.currentStation = station;
+        this.isPlaying = false;
+        document.querySelector('.player-bar').classList.add('active');
+        document.querySelector('.player-bar').classList.add('loading');
+        this.updateUI();
+
         // Clean up old audio event listeners if any
         if (this.audio) {
             this.audio.onerror = null;
@@ -983,6 +953,7 @@ class RadioPlayer {
             console.error('Error playing station:', error);
             this.isPlaying = false;
             this.currentStation = null;
+            document.querySelector('.player-bar').classList.remove('loading');
             showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
             this.updateUI();
         };
@@ -993,9 +964,8 @@ class RadioPlayer {
         if (playPromise !== undefined) {
             playPromise
                 .then(() => {
-                    this.currentStation = station;
                     this.isPlaying = true;
-                    document.querySelector('.player-bar').classList.add('active');
+                    document.querySelector('.player-bar').classList.remove('loading');
                     this.updateUI();
                 })
                 .catch(error => {
@@ -1007,6 +977,7 @@ class RadioPlayer {
                     console.error('Error playing station:', error);
                     this.isPlaying = false;
                     this.currentStation = null;
+                    document.querySelector('.player-bar').classList.remove('loading');
                     showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
                     this.updateUI();
                 });
@@ -1091,7 +1062,13 @@ class RadioPlayer {
             
             // Update play/pause icon
             if (playPauseIcon) {
-                playPauseIcon.textContent = this.isPlaying ? 'pause' : 'play_arrow';
+                if (document.querySelector('.player-bar').classList.contains('loading')) {
+                    playPauseIcon.textContent = 'progress_activity';
+                    playPauseIcon.classList.add('spinning');
+                } else {
+                    playPauseIcon.textContent = this.isPlaying ? 'pause' : 'play_arrow';
+                    playPauseIcon.classList.remove('spinning');
+                }
                 console.log('Updated play/pause icon to:', playPauseIcon.textContent);
             }
         } else {
@@ -1104,6 +1081,7 @@ class RadioPlayer {
             
             if (playPauseIcon) {
                 playPauseIcon.textContent = 'play_arrow';
+                playPauseIcon.classList.remove('spinning');
             }
         }
         
@@ -2417,10 +2395,21 @@ function showNotification(message, type = 'success', duration = 3000) {
     }, duration);
     
     // Manual close
-    notification.querySelector('.close-btn').addEventListener('click', () => {
+    const closeBtn = notification.querySelector('.close-btn');
+    const handleClose = (e) => {
+        e.preventDefault();
         clearTimeout(timeout);
         notification.style.opacity = '0';
         setTimeout(() => notification.remove(), 300);
+    };
+    
+    closeBtn.addEventListener('mousedown', handleClose);
+    closeBtn.addEventListener('touchstart', handleClose);
+    closeBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleClose(e);
+        }
     });
 }
 
