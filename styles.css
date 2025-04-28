@@ -481,6 +481,7 @@ input[type="range"] {
     background-color: var(--accent-color-30);
     border-radius: 20px;
     backdrop-filter: blur(10px);
+    box-shadow: 0 30px 120px 50px var(--accent-color-30);
 }
 
 .current-details {
