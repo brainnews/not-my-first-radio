@@ -1,4 +1,4 @@
-const debug = true;
+const debug = false;
 // Theme handling
 const themeSwitcher = document.querySelector('.theme-switcher');
 const themeButtons = document.querySelectorAll('.theme-btn');
