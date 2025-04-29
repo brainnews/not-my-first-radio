@@ -98,7 +98,7 @@ window.addEventListener('load', () => {
 logoContainer.addEventListener('mouseenter', applyRandomAnimation);
 
 // Settings panel functionality
-const settingsBtn = document.getElementById('settings-btn');
+const menuBtn = document.getElementById('menu-btn');
 const settingsPanel = document.getElementById('settings-panel');
 const settingsOverlay = document.getElementById('settings-overlay');
 const closeSettingsBtn = document.getElementById('close-settings');
@@ -145,9 +145,9 @@ const handleOpenSettings = (e) => {
         settingsOverlay.classList.add('visible');
     }, 10);
 };
-settingsBtn.addEventListener('mousedown', handleOpenSettings);
-settingsBtn.addEventListener('touchstart', handleOpenSettings);
-settingsBtn.addEventListener('keydown', (e) => {
+menuBtn.addEventListener('mousedown', handleOpenSettings);
+menuBtn.addEventListener('touchstart', handleOpenSettings);
+menuBtn.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
         handleOpenSettings(e);
@@ -535,9 +535,7 @@ class RadioPlayer {
             this.stationsContainer.innerHTML = `
                 <div class="empty-state">
                     <p class="no-stations">No stations added yet. Search for stations above to add them to your list.</p>
-                    <button class="settings-btn" id="empty-state-settings">
-                        Or open <span class="material-symbols-rounded">settings</span>Settings to add stations by QR code or import from a file.
-                    </button>
+                    <p>Or open <button class="settings-btn" id="empty-state-settings" style="display: inline; width: auto;"><span class="material-symbols-rounded">settings</span>Settings</button> to import stations by QR code or from a .json file.</p>
                 </div>
             `;
             
@@ -1386,8 +1384,7 @@ window.addEventListener('load', () => {
             // Fetch all station details in parallel
             Promise.all(shareData.i.map(async (uuid) => {
                 try {
-                    const response = await fetch(`https://de1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
-                    const stations = await response.json();
+                    const stations = await fetchFromRadioBrowser(`stations/byuuid/${uuid}`);
                     return stations && stations.length > 0 ? stations[0] : null;
                 } catch {
                     return null;
@@ -2070,10 +2067,9 @@ async function searchStations(query) {
     }
     
     try {
-        const response = await fetch(`https://de1.api.radio-browser.info/json/stations/search?name=${encodeURIComponent(query)}&limit=50`);
-        const data = await response.json();
-        displaySearchResults(data);
-        console.log('Search results:', data);
+        const stations = await fetchFromRadioBrowser(`stations/search?name=${encodeURIComponent(query)}&limit=50`);
+        displaySearchResults(stations);
+        console.log('Search results:', stations);
     } catch (error) {
         console.error('Error searching stations:', error);
         const searchResultsSection = document.getElementById('search-results');
@@ -2228,7 +2224,17 @@ async function displaySearchResults(stations) {
     document.querySelectorAll('.add-btn').forEach(btn => {
         btn.addEventListener('click', (e) => {
             e.stopPropagation();
-            addStation(btn);
+            const station = JSON.parse(btn.dataset.station.replace(/&quot;/g, '"'));
+            const exists = radioPlayer.stations.some(s => s.url === station.url);
+            
+            if (exists) {
+                radioPlayer.removeStation(station.url);
+                // replace checkmark with add icon
+                btn.querySelector('.material-symbols-rounded').textContent = 'playlist_add';
+                btn.classList.remove('success');
+            } else {
+                addStation(btn);
+            }
         });
     });
 }
@@ -2329,7 +2335,6 @@ async function addStation(station) {
                 
                 // Wait for animation to complete before clearing
                 await new Promise(resolve => setTimeout(resolve, 500));
-                clearSearchResults();
             }
         }
     } catch (error) {
@@ -2558,4 +2563,31 @@ if (shareUrlBtn) {
             showNotification('Failed to copy URL. Please try again.', 'error');
         });
     });
+}
+
+// Radio Browser API servers
+const RADIO_BROWSER_SERVERS = [
+    'de1',
+    'de2',
+    'at1'
+];
+
+async function fetchFromRadioBrowser(endpoint) {
+    let lastError = null;
+    
+    for (const server of RADIO_BROWSER_SERVERS) {
+        try {
+            const response = await fetch(`https://${server}.api.radio-browser.info/json/${endpoint}`);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return await response.json();
+        } catch (error) {
+            lastError = error;
+            console.warn(`Failed to fetch from ${server} server:`, error);
+            continue;
+        }
+    }
+    
+    throw lastError || new Error('All Radio Browser servers failed');
 }

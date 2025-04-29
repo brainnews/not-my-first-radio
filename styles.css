@@ -11,6 +11,7 @@
     --accent-color-30: #9e66f254;
     --border-color: #333333;
     --purple-color: #291d69;
+    --error-color: #ff3b30;
 }
 
 [data-theme="light"] {
@@ -584,28 +585,33 @@ input[type="range"] {
     font-size: 1.925em;
 }
 
-/* Make QR code and scanner button icons larger */
-#share-qr .material-symbols-rounded,
-#scan-qr .material-symbols-rounded,
-#upload-qr .material-symbols-rounded,
-#close-settings .material-symbols-rounded,
-#share-url .material-symbols-rounded {
-    font-size: 1.925em;
-}
-
-#share-url, #scan-qr, #upload-qr, #share-qr {
-    padding: 0.5rem 1rem;
+.settings-btn {
+    padding: 0;
     width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
     margin-bottom: 1rem;
-    background: var(--accent-color-30);
     transition: background 0.2s ease;
+    cursor: pointer;
+    border-radius: 4px;
 }
 
-#share-url:hover, #scan-qr:hover, #upload-qr:hover, #share-qr:hover {
-    background: var(--accent-color);
+.settings-btn .material-symbols-rounded {
+    margin-right: 0.5rem;
+}
+.settings-btn label {
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.settings-btn:hover {
+    color: var(--accent-color);
+}
+.settings-btn.danger:hover {
+    color: var(--error-color);
 }
 
 /* Make close button icons larger */
@@ -635,34 +641,21 @@ input[type="range"] {
 
 .search-results {
     margin-bottom: 4rem;
+    position: relative;
+    min-height: 100vh;
+}
+
+.search-results.loading .results-header {
+    display: none;
 }
 
 .saved-stations {
     margin-bottom: 6rem;
+    transition: opacity 0.3s ease;
 }
 
-.search-result-card .station-details {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.station-controls button, .search-result-controls button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    padding: 0;
-    border: none;
-    border-radius: 4px;
-    background: transparent;
-    color: var(--text-primary);
-    cursor: pointer;
-}
-
-.station-controls button:hover, .search-result-controls button:hover {
-    color: var(--accent-color);
+.search-results:not(.hidden) ~ .saved-stations {
+    display: none;
 }
 
 .results-header {
@@ -671,6 +664,12 @@ input[type="range"] {
     align-items: flex-start;
     margin-bottom: 1rem;
     padding: 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--bg-primary);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .results-header h2 {
@@ -682,14 +681,18 @@ input[type="range"] {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: transparent;
-    border: none;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
     border-radius: 4px;
     color: var(--text-secondary);
     padding: 0.55rem 0.825rem;
     cursor: pointer;
     font-size: 0.875rem;
-    border: 1px solid var(--border-color);
+    position: sticky;
+    top: 1rem;
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    margin-left: auto;
 }
 
 .clear-results-btn:hover {
@@ -733,7 +736,7 @@ input[type="range"] {
     }
 }
 
-.settings-btn {
+.menu-btn {
     display: flex;
     align-items: center;
     gap: 0.5rem;
@@ -746,7 +749,7 @@ input[type="range"] {
     font-weight: 500;
     font-size: 0.875rem;
 }
-.settings-btn#upload-qr label {
+.menu-btn label {
     cursor: pointer;
     width: 100%;
     display: flex;
@@ -754,20 +757,16 @@ input[type="range"] {
     align-items: center;
 }
 
-.settings-btn:hover {
+.menu-btn:hover {
     background: var(--bg-hover);
 }
 
-.settings-btn.danger {
+.menu-btn.danger {
     color: var(--error-color);
 }
 
-.settings-btn.danger:hover {
+.menu-btn.danger:hover {
     background: var(--error-bg);
-}
-
-.file-input-wrapper {
-    width: 100%;
 }
 
 /* Settings Panel */
@@ -1643,17 +1642,16 @@ input[type="range"] {
 }
 
 .empty-state .settings-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1.5rem;
-    background-color: var(--primary);
-    color: var(--text-on-primary);
-    border: none;
+    color: var(--text-primary);
     border-radius: 0.5rem;
     font-size: 1rem;
     cursor: pointer;
     transition: background-color 0.2s ease;
+    display: inline;
+    padding: 0.5rem;
+    background-color: var(--bg-secondary);
+    border: 1px solid var(--border-color);
+    margin: 0 0.25rem;
 }
 
 .empty-state .settings-btn:hover {
@@ -1661,7 +1659,9 @@ input[type="range"] {
 }
 
 .empty-state .settings-btn .material-symbols-rounded {
-    font-size: 1.25rem;
+    font-size: 1rem;
+    margin-right: 0.25rem;
+    transform: translateY(0.1rem);
 }
 
 .share-btn {

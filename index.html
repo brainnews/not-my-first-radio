@@ -175,7 +175,7 @@
                     </button>
                 </div>
                 </div>
-                <button id="settings-btn" class="settings-btn">
+                <button id="menu-btn" class="menu-btn">
                     <span class="material-symbols-rounded">menu</span>
                 </button>
             </div>
@@ -186,8 +186,7 @@
                 <div class="results-header">
                     <h2 class="section-title"></h2>
                     <button id="clear-results" class="clear-results-btn">
-                        <span class="material-symbols-rounded">close</span>
-                        <span>Clear</span>
+                        <span>Done</span>
                     </button>
                 </div>
                 <div class="results-grid"></div>
@@ -235,28 +234,6 @@
             
             <div class="settings-content">
                 <div class="settings-section">
-                    <h3>Sharing</h3>
-                    <button id="share-url" class="settings-btn">
-                        <span class="material-symbols-rounded">share</span>
-                        Copy shareable URL
-                    </button>
-                    <button id="share-qr" class="settings-btn">
-                        <span class="material-symbols-rounded">qr_code</span>
-                        Share your QR code
-                    </button>
-                    <button id="scan-qr" class="settings-btn">
-                        <span class="material-symbols-rounded">qr_code_scanner</span>
-                        Scan a QR code
-                    </button>
-                    <div id="upload-qr" class="file-input-wrapper settings-btn">
-                        <input type="file" id="qr-upload" accept="image/*" style="display: none;">
-                        <label for="qr-upload">
-                            <span class="material-symbols-rounded">upload</span>
-                            Upload QR code
-                        </label>
-                    </div>
-                </div>
-                <div class="settings-section">
                     <h3>Username</h3>
                     <div class="username-section">
                         <p class="username-hint">This name will be used when sharing your stations with other people.</p>
@@ -268,27 +245,49 @@
                         </div>
                     </div>
                 </div>
-
                 <div class="settings-section">
-                    <h3>Data Management</h3>
+                    <h3>Share & Export</h3>
+                    <button id="share-url" class="settings-btn">
+                        <span class="material-symbols-rounded">link</span>
+                        Copy link to your stations
+                    </button>
+                    <button id="share-qr" class="settings-btn">
+                        <span class="material-symbols-rounded">qr_code</span>
+                        Show your QR code
+                    </button>
                     <button id="export-data" class="settings-btn">
                         <span class="material-symbols-rounded">download</span>
                         Export Stations
                     </button>
-                    <div class="file-input-wrapper">
-                        <input type="file" id="import-file" accept=".json" style="display: none;">
-                        <label for="import-file" class="settings-btn">
-                            <span class="material-symbols-rounded">upload</span>
-                            Import Stations
+                </div>
+                <div class="settings-section">
+                    <h3>Import</h3>
+                    <div id="upload-qr" class="file-input-wrapper settings-btn">
+                        <input type="file" id="qr-upload" accept="image/*" style="display: none;">
+                        <label for="qr-upload">
+                            <span class="material-symbols-rounded">qr_code_2_add</span>
+                            Upload QR code
                         </label>
                     </div>
+                    <button id="scan-qr" class="settings-btn">
+                        <span class="material-symbols-rounded">qr_code_scanner</span>
+                        Scan a QR code (beta)
+                    </button>
+                    <div class="file-input-wrapper settings-btn">
+                        <input type="file" id="import-file" accept=".json" style="display: none;">
+                        <label for="import-file">
+                            <span class="material-symbols-rounded">data_object</span>
+                            Upload .json
+                        </label>
+                    </div>
+                </div>
+                <div class="settings-section">
+                    <h3>Data Management</h3>
                     <button id="clear-stations" class="settings-btn danger">
-                        <span class="material-symbols-rounded">delete</span>
-                        Clear All Stations
+                        Clear your saved stations
                     </button>
                     <button id="clear-shared-stations" class="settings-btn danger">
-                        <span class="material-symbols-rounded">delete</span>
-                        Clear All Shared Stations
+                        Clear all shared stations
                     </button>
                 </div>
             </div>
