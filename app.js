@@ -2591,3 +2591,118 @@ async function fetchFromRadioBrowser(endpoint) {
     
     throw lastError || new Error('All Radio Browser servers failed');
 }
+
+// Handle QR code upload
+const qrUploadInput = document.getElementById('qr-upload');
+qrUploadInput.addEventListener('change', async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+        // Create an image element to load the QR code
+        const img = new Image();
+        img.src = URL.createObjectURL(file);
+
+        img.onload = async () => {
+            // Create a canvas to process the image
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            context.drawImage(img, 0, 0);
+
+            // Get the image data
+            const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+            // Use jsQR to decode the QR code
+            const code = jsQR(imageData.data, imageData.width, imageData.height);
+
+            if (code) {
+                try {
+                    // Parse the QR code data as JSON
+                    const shareData = JSON.parse(code.data);
+                    
+                    if (shareData.i && Array.isArray(shareData.i)) {
+                        // Show loading notification
+                        showNotification('Fetching station details...', 'success');
+
+                        // Fetch full station information for each UUID
+                        const stations = await Promise.all(shareData.i.map(async (uuid) => {
+                            try {
+                                const stationData = await fetchFromRadioBrowser(`stations/byuuid/${uuid}`);
+                                if (stationData && stationData.length > 0) {
+                                    return stationData[0];
+                                }
+                                return null;
+                            } catch (error) {
+                                console.warn(`Failed to fetch station with UUID ${uuid}:`, error);
+                                return null;
+                            }
+                        }));
+
+                        // Filter out any failed lookups
+                        const validStations = stations.filter(station => station !== null);
+
+                        if (validStations.length > 0) {
+                            const sharedUsername = shareData.u || 'Unknown User';
+                            const listName = `${sharedUsername}'s radio`;
+
+                            // Show import options with the fetched stations
+                            const importOption = await showQrImportOptions({
+                                title: 'Import Stations',
+                                message: `Found ${validStations.length} stations from ${sharedUsername}.`
+                            });
+
+                            if (importOption === null) return;
+
+                            switch (importOption) {
+                                case '1':
+                                    // Merge stations, avoiding duplicates
+                                    const existingUrls = radioPlayer.stations.map(s => s.url);
+                                    for (const station of validStations) {
+                                        if (!existingUrls.includes(station.url)) {
+                                            radioPlayer.stations.push(station);
+                                            existingUrls.push(station.url);
+                                        }
+                                    }
+                                    radioPlayer.saveStations();
+                                    radioPlayer.displayStations();
+                                    showNotification('Stations merged successfully!', 'success');
+                                    break;
+
+                                case '3':
+                                    // Add as separate list
+                                    const newList = {
+                                        name: listName,
+                                        stations: validStations
+                                    };
+                                    radioPlayer.stationLists.push(newList);
+                                    radioPlayer.saveStationLists();
+                                    radioPlayer.displayStationLists();
+                                    showNotification('New station list added!', 'success');
+                                    break;
+                            }
+                        } else {
+                            showNotification('No valid stations found in QR code', 'error');
+                        }
+                    } else {
+                        showNotification('Invalid station data in QR code', 'error');
+                    }
+                } catch (error) {
+                    showNotification('Invalid QR code data', 'error');
+                }
+            } else {
+                showNotification('No QR code found in image', 'error');
+            }
+
+            // Clean up
+            URL.revokeObjectURL(img.src);
+        };
+
+        img.onerror = () => {
+            showNotification('Error loading image', 'error');
+        };
+    } catch (error) {
+        showNotification('Error processing QR code', 'error');
+    }
+});

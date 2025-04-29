@@ -3,12 +3,13 @@
 
 :root {
     /* Theme colors */
-    --bg-primary: #000000;
+    --bg-primary: #2c2c2c;
     --bg-secondary: #1a1a1a;
     --text-primary: #ffffff;
     --text-secondary: #a0a0a0;
-    --accent-color: #9e66f2;
-    --accent-color-30: #9e66f254;
+    --accent-color: #9151F0;
+    /* --accent-color: #9e66f2; */
+    --accent-color-30: #9151F054;
     --border-color: #333333;
     --purple-color: #291d69;
     --error-color: #ff3b30;
@@ -203,10 +204,14 @@ main {
         padding: 6px;
     }
     gap: 1rem;
-    padding: 1rem;
+    padding: 0.75rem 0.875rem;
     transition: background 0.2s ease;
+    margin-bottom: 0.5rem;
 }
 .station-card:hover, .search-result-card:hover {
+    background: var(--accent-color-30);
+}
+.station-card.playing {
     background: var(--accent-color-30);
 }
 .station-card .now-playing-icon {
@@ -311,11 +316,11 @@ main {
     align-items: center;
     gap: 0.5rem;
 }
-.station-card svg path {
+.station-card svg {
     filter: opacity(0.25);
     transition: filter 0.2s ease;
 }
-.station-card:hover svg path {
+.station-card:hover svg, .station-card.playing svg {
     filter: opacity(1);
 }
 .station-favicon {
@@ -479,7 +484,7 @@ input[type="range"] {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background-color: var(--accent-color-30);
+    background-color: var(--accent-color);
     border-radius: 20px;
     backdrop-filter: blur(10px);
     box-shadow: 0 30px 120px 50px var(--accent-color-30);
@@ -608,7 +613,7 @@ input[type="range"] {
 }
 
 .settings-btn:hover {
-    color: var(--accent-color);
+    color: var(--text-secondary);
 }
 .settings-btn.danger:hover {
     color: var(--error-color);
@@ -627,6 +632,9 @@ input[type="range"] {
     @media (max-width: 768px) {
         display: none;
     }
+}
+.playing .station-meta {
+    color: var(--text-primary);
 }
 
 .station-meta span {
@@ -777,7 +785,7 @@ input[type="range"] {
     width: 100%;
     max-width: 400px;
     height: 100vh;
-    background: var(--bg-primary);
+    background: var(--bg-secondary);
     backdrop-filter: blur(10px);
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     transform: translateX(100%);
@@ -889,15 +897,15 @@ input[type="range"] {
     width: 42px;
     height: 42px;
     padding: 0 50px;
-    border: none;
+    border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: var(--border-color);
+    background: var(--bg-primary);
     color: var(--text-primary);
     cursor: pointer;
 }
 
 .save-username-btn:hover {
-    background: var(--bg-hover);
+    border-color: var(--accent-color);
 }
 
 .username-hint {
@@ -1482,7 +1490,7 @@ input[type="range"] {
 }
 
 .stop-btn:hover {
-    background-color: rgba(244, 67, 54, 0.1);
+    background-color: transparent;
 }
 
 .stop-btn .material-symbols-rounded {
@@ -1710,6 +1718,11 @@ input[type="range"] {
     color: var(--text-primary);
     cursor: pointer;
     transition: background-color 0.2s ease;
+}
+
+.station-controls button:hover {
+    background: transparent;
+    color: var(--text-secondary);
 }
 
 /* Hide play/pause and share buttons by default on desktop */
