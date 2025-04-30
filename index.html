@@ -11,8 +11,8 @@
     <link rel="shortcut icon" href="./icons/favicon.ico">
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#291d69">
-    <meta name="description" content="A pixelated radio player">
+    <meta name="theme-color" content="#1c1c1c">
+    <meta name="description" content="A simple internet radio player">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/icon192.png">
     
@@ -257,7 +257,7 @@
                     </button>
                     <button id="export-data" class="settings-btn">
                         <span class="material-symbols-rounded">download</span>
-                        Export Stations
+                        Export stations as .json
                     </button>
                 </div>
                 <div class="settings-section">
@@ -266,27 +266,36 @@
                         <input type="file" id="qr-upload" accept="image/*" style="display: none;">
                         <label for="qr-upload">
                             <span class="material-symbols-rounded">qr_code_2_add</span>
-                            Upload QR code
+                            Upload a QR code
                         </label>
                     </div>
                     <button id="scan-qr" class="settings-btn">
-                        <span class="material-symbols-rounded">qr_code_scanner</span>
+                        <span class="material-symbols-rounded">camera_alt</span>
                         Scan a QR code (beta)
                     </button>
                     <div class="file-input-wrapper settings-btn">
                         <input type="file" id="import-file" accept=".json" style="display: none;">
                         <label for="import-file">
-                            <span class="material-symbols-rounded">data_object</span>
-                            Upload .json
+                            <span class="material-symbols-rounded">upload</span>
+                            Upload stations from .json
                         </label>
                     </div>
                 </div>
                 <div class="settings-section">
+                    <h3>Advanced</h3>
+                    <button id="open-add-station" class="settings-btn">
+                        <span class="material-symbols-rounded">add_circle</span>
+                        Add station manually
+                    </button>
+                </div>
+                <div class="settings-section">
                     <h3>Data Management</h3>
                     <button id="clear-stations" class="settings-btn danger">
+                        <span class="material-symbols-rounded">delete_sweep</span>
                         Clear your saved stations
                     </button>
                     <button id="clear-shared-stations" class="settings-btn danger">
+                        <span class="material-symbols-rounded">delete_sweep</span>
                         Clear all shared stations
                     </button>
                 </div>
@@ -325,6 +334,50 @@
                     </button>
                 </div>
                 <p class="scanner-instructions">Point your camera at a QR code to scan it.</p>
+            </div>
+        </div>
+
+        <!-- Add Station Modal -->
+        <div id="add-station-modal" class="modal hidden">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Add Station</h2>
+                    <button id="close-add-station" class="close-modal-btn">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="manual-station-form">
+                        <div class="form-group">
+                            <label for="manual-station-url">Stream URL</label>
+                            <input type="url" id="manual-station-url" placeholder="https://example.com/stream.mp3" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-station-name">Station Name</label>
+                            <input type="text" id="manual-station-name" placeholder="Enter station name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-station-favicon">Favicon URL (optional)</label>
+                            <input type="url" id="manual-station-favicon" placeholder="https://example.com/favicon.ico">
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-station-homepage">Homepage URL (optional)</label>
+                            <input type="url" id="manual-station-homepage" placeholder="https://example.com">
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-station-bitrate">Bitrate (optional)</label>
+                            <input type="number" id="manual-station-bitrate" placeholder="128" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label for="manual-station-country">Country Code (optional)</label>
+                            <input type="text" id="manual-station-country" placeholder="US" maxlength="2">
+                        </div>
+                        <button id="add-manual-station" class="settings-btn">
+                            <span class="material-symbols-rounded">add</span>
+                            Add Station
+                        </button>
+                    </div>
+                </div>
             </div>
         </div>
 
