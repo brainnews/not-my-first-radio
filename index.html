@@ -382,6 +382,23 @@
         </div>
 
         <div id="settings-overlay" class="settings-overlay hidden"></div>
+
+        <!-- Update Notification Modal -->
+        <div id="update-modal" class="modal hidden">
+            <div class="modal-content" style="width: 100%; max-width: 400px; text-align: center; padding: 3rem 1rem;">
+                <div class="modal-header">
+                    <h2 style="text-align: center; width: 100%;">Update Available</h2>
+                </div>
+                <div class="modal-body">
+                    <p>Update now to continue using the app.</p>
+                    <div class="modal-actions" style="margin-top: 2rem; width: 100%; display: flex; justify-content: center;">
+                        <button id="update-now" class="update-now-btn" style="background-color: var(--accent-color);">
+                            Update now
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
     <script src="app.js"></script>
@@ -404,10 +421,22 @@
                         const newWorker = registration.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                // New version available
-                                if (confirm('A new version is available! Would you like to update?')) {
+                                // Show update modal
+                                const updateModal = document.getElementById('update-modal');
+                                const closeUpdateBtn = document.getElementById('close-update');
+                                const updateNowBtn = document.getElementById('update-now');
+                                
+                                updateModal.classList.remove('hidden');
+                                
+                                // Handle update now
+                                updateNowBtn.addEventListener('click', () => {
                                     window.location.reload();
-                                }
+                                });
+                                
+                                // Handle close button
+                                closeUpdateBtn.addEventListener('click', () => {
+                                    updateModal.classList.add('hidden');
+                                });
                             }
                         });
                     });
@@ -418,9 +447,21 @@
 
             // Handle updates when the service worker is already installed
             navigator.serviceWorker.addEventListener('controllerchange', () => {
-                if (confirm('A new version is available! Would you like to update?')) {
+                const updateModal = document.getElementById('update-modal');
+                const closeUpdateBtn = document.getElementById('close-update');
+                const updateNowBtn = document.getElementById('update-now');
+                
+                updateModal.classList.remove('hidden');
+                
+                // Handle update now
+                updateNowBtn.addEventListener('click', () => {
                     window.location.reload();
-                }
+                });
+                
+                // Handle close button
+                closeUpdateBtn.addEventListener('click', () => {
+                    updateModal.classList.add('hidden');
+                });
             });
         }
     </script>

@@ -906,11 +906,10 @@ input[type="range"] {
     border-color: var(--accent-color);
 }
 
-.save-username-btn {
+.save-username-btn, .update-now-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    width: 42px;
     height: 42px;
     padding: 0 50px;
     border: 1px solid var(--border-color);
