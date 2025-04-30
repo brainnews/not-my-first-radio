@@ -1,5 +1,13 @@
 const debug = false;
 
+// detect user's theme and change the favicon accordingly
+const favicon = document.querySelector('link[rel="shortcut icon"]');
+if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    favicon.href = './icons/favicon-dark.ico';
+} else {
+    favicon.href = './icons/favicon-light.ico';
+}
+
 // Logo animation handling
 const logoContainer = document.querySelector('.logo-container');
 const animations = [
@@ -1747,7 +1755,7 @@ function showQrImportOptions(options) {
                 // Play
                 previewAudio.play()
                     .then(() => {
-                        icon.textContent = 'stop';
+                        icon.textContent = 'pause';
                     })
                     .catch(error => {
                         console.error('Error playing preview:', error);
@@ -1778,7 +1786,7 @@ function showQrImportOptions(options) {
             
             // Add event listener for when audio is playing
             previewAudio.addEventListener('play', () => {
-                icon.textContent = 'stop';
+                icon.textContent = 'pause';
             });
         });
     }
@@ -2023,10 +2031,26 @@ function clearSearchResults() {
     const resultsGrid = searchResultsSection.querySelector('.results-grid');
     resultsGrid.innerHTML = '';
     
-    // Stop any preview that might be playing
+    // If there's a preview playing, transition it to the main player
     if (previewAudio) {
-        previewAudio.pause();
-        previewAudio = null;
+        const currentUrl = previewAudio.src;
+        const currentVolume = previewAudio.volume;
+        
+        // Find the station in the user's list
+        const station = radioPlayer.stations.find(s => s.url === currentUrl);
+        if (station) {
+            // Stop the preview
+            previewAudio.pause();
+            previewAudio = null;
+            
+            // Start playing in the main player
+            radioPlayer.playStation(station);
+            radioPlayer.setVolume(currentVolume * 100); // Convert back to percentage
+        } else {
+            // If station not found in user's list, just stop the preview
+            previewAudio.pause();
+            previewAudio = null;
+        }
     }
     
     // Also clear the search input
@@ -2267,6 +2291,7 @@ function previewStation(url) {
         // Reset all preview buttons to their default state
         document.querySelectorAll('.preview-btn').forEach(btn => {
             btn.querySelector('.material-symbols-rounded').textContent = 'play_arrow';
+            btn.classList.remove('loading');
         });
         return;
     }
@@ -2278,6 +2303,7 @@ function previewStation(url) {
         // Reset all preview buttons to their default state
         document.querySelectorAll('.preview-btn').forEach(btn => {
             btn.querySelector('.material-symbols-rounded').textContent = 'play_arrow';
+            btn.classList.remove('loading');
         });
     }
 
@@ -2285,16 +2311,23 @@ function previewStation(url) {
     previewAudio = new Audio(url);
     previewAudio.volume = 0.5;
     
-    // Update only the clicked preview button
+    // Update only the clicked preview button to show loading state
     document.querySelectorAll('.preview-btn').forEach(btn => {
         if (btn.dataset.url === url) {
-            btn.querySelector('.material-symbols-rounded').textContent = 'stop';
+            btn.querySelector('.material-symbols-rounded').textContent = 'progress_activity';
+            btn.classList.add('loading');
         }
     });
 
     previewAudio.play()
         .then(() => {
-            // Success - do nothing, button already updated
+            // Update button to show stop icon when playing
+            document.querySelectorAll('.preview-btn').forEach(btn => {
+                if (btn.dataset.url === url) {
+                    btn.querySelector('.material-symbols-rounded').textContent = 'pause';
+                    btn.classList.remove('loading');
+                }
+            });
         })
         .catch(error => {
             console.error('Error playing preview:', error);
@@ -2302,6 +2335,7 @@ function previewStation(url) {
             document.querySelectorAll('.preview-btn').forEach(btn => {
                 if (btn.dataset.url === url) {
                     btn.querySelector('.material-symbols-rounded').textContent = 'play_arrow';
+                    btn.classList.remove('loading');
                 }
             });
             
@@ -2318,36 +2352,40 @@ function previewStation(url) {
         // Reset all preview buttons when preview ends
         document.querySelectorAll('.preview-btn').forEach(btn => {
             btn.querySelector('.material-symbols-rounded').textContent = 'play_arrow';
+            btn.classList.remove('loading');
         });
     });
 }
 
 // Update the addStation function to use the RadioPlayer's method
-async function addStation(station) {
-    try {
-        const stationJson = station.dataset.station.replace(/&quot;/g, '"');
-        const stationData = JSON.parse(stationJson);
-        
-        // Show success animation
-        const addBtn = station.closest('.add-btn');
-        if (addBtn) {
-            const icon = addBtn.querySelector('.material-symbols-rounded');
-            if (icon) {
-                icon.textContent = 'check';
-                addBtn.classList.add('success');
-                
-                // Add the station to the player's list
-                radioPlayer.stations.push(stationData);
-                radioPlayer.saveStations();
-                radioPlayer.displayStations();
-                
-                // Wait for animation to complete before clearing
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-        }
-    } catch (error) {
-        console.error('Error adding station:', error);
-        showNotification('Error adding station. Please try again.', 'error');
+async function addStation(btn) {
+    const station = JSON.parse(btn.dataset.station.replace(/&quot;/g, '"'));
+    const exists = radioPlayer.stations.some(s => s.url === station.url);
+    
+    if (exists) {
+        showNotification('Station already exists in your list.', 'warning');
+        return;
+    }
+
+    // Store the current preview state
+    const wasPreviewing = previewAudio && previewAudio.src === station.url;
+    const previewVolume = previewAudio ? previewAudio.volume : 0.5;
+
+    // Add the station
+    radioPlayer.stations.push(station);
+    radioPlayer.saveStations();
+    radioPlayer.displayStations();
+
+    // Update the button state
+    btn.querySelector('.material-symbols-rounded').textContent = 'check';
+    btn.classList.add('success');
+
+    showNotification('Station added to your list!', 'success');
+
+    // If the station was being previewed, keep it playing
+    if (wasPreviewing) {
+        // The preview will continue playing since we didn't stop it
+        return;
     }
 }
 
@@ -2807,15 +2845,12 @@ const closeAddStationBtn = document.getElementById('close-add-station');
 
 openAddStationBtn.addEventListener('click', () => {
     addStationModal.classList.remove('hidden');
-    settingsOverlay.classList.remove('hidden');
 });
 
 closeAddStationBtn.addEventListener('click', () => {
     addStationModal.classList.add('hidden');
-    settingsOverlay.classList.add('hidden');
 });
 
 settingsOverlay.addEventListener('click', () => {
     addStationModal.classList.add('hidden');
-    settingsOverlay.classList.add('hidden');
 });

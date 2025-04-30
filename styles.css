@@ -590,6 +590,20 @@ input[type="range"] {
     font-size: 1.925em;
 }
 
+/* Loading animation for preview button */
+.preview-btn.loading .material-symbols-rounded {
+    animation: spin 1s linear infinite;
+}
+
+.preview-btn.loading {
+    color: var(--primary-color);
+    cursor: wait;
+}
+
+.preview-btn.loading:hover {
+    background: none;
+}
+
 .settings-btn {
     padding: 0;
     width: 100%;
