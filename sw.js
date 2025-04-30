@@ -14,6 +14,9 @@ const ASSETS_TO_CACHE = [
 
 // Install event - cache assets
 self.addEventListener('install', event => {
+    // Skip waiting to activate the new service worker immediately
+    self.skipWaiting();
+    
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then(cache => {
@@ -24,16 +27,22 @@ self.addEventListener('install', event => {
 
 // Activate event - clean up old caches
 self.addEventListener('activate', event => {
+    // Claim clients to ensure the new service worker takes control immediately
     event.waitUntil(
-        caches.keys().then(cacheNames => {
-            return Promise.all(
-                cacheNames.map(cacheName => {
-                    if (cacheName !== CACHE_NAME) {
-                        return caches.delete(cacheName);
-                    }
-                })
-            );
-        })
+        Promise.all([
+            // Clean up old caches
+            caches.keys().then(cacheNames => {
+                return Promise.all(
+                    cacheNames.map(cacheName => {
+                        if (cacheName !== CACHE_NAME) {
+                            return caches.delete(cacheName);
+                        }
+                    })
+                );
+            }),
+            // Take control of all clients
+            clients.claim()
+        ])
     );
 });
 
@@ -47,7 +56,7 @@ function isAudioStream(url) {
            audioPatterns.some(pattern => lowerUrl.includes(pattern));
 }
 
-// Fetch event - serve from cache, fall back to network
+// Fetch event - network first strategy for HTML and JS, cache first for others
 self.addEventListener('fetch', event => {
     const request = event.request;
     const url = new URL(request.url);
@@ -58,7 +67,6 @@ self.addEventListener('fetch', event => {
             fetch(request)
                 .catch(error => {
                     console.error('Error fetching audio stream:', error);
-                    // Return a custom error response that the app can handle
                     return new Response(JSON.stringify({
                         error: 'Failed to load stream',
                         url: url.href
@@ -71,36 +79,66 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // For non-audio requests, use the cache-first strategy
-    event.respondWith(
-        caches.match(request)
-            .then(response => {
-                // Return cached response if found
-                if (response) {
-                    return response;
-                }
-
-                // Clone the request
-                const fetchRequest = request.clone();
-
-                // Make network request and cache the response
-                return fetch(fetchRequest).then(response => {
-                    // Check if valid response
-                    if (!response || response.status !== 200 || response.type !== 'basic') {
-                        return response;
-                    }
-
-                    // Clone the response
+    // Network-first strategy for HTML, JS, and CSS files
+    if (request.headers.get('accept').includes('text/html') || 
+        request.url.endsWith('.js') ||
+        request.url.endsWith('.css')) {
+        event.respondWith(
+            fetch(request)
+                .then(response => {
+                    // Cache the new response
                     const responseToCache = response.clone();
-
-                    // Cache the response
                     caches.open(CACHE_NAME)
                         .then(cache => {
                             cache.put(request, responseToCache);
                         });
-
                     return response;
-                });
+                })
+                .catch(() => {
+                    // Fall back to cache if network fails
+                    return caches.match(request);
+                })
+        );
+        return;
+    }
+
+    // Cache-first strategy for other assets
+    event.respondWith(
+        caches.match(request)
+            .then(response => {
+                if (response) {
+                    // Check if the cached response is stale
+                    fetch(request)
+                        .then(networkResponse => {
+                            if (networkResponse.ok) {
+                                const responseToCache = networkResponse.clone();
+                                caches.open(CACHE_NAME)
+                                    .then(cache => {
+                                        cache.put(request, responseToCache);
+                                    });
+                            }
+                        })
+                        .catch(() => {
+                            // Network request failed, continue using cached response
+                        });
+                    return response;
+                }
+
+                // If not in cache, fetch from network
+                return fetch(request)
+                    .then(response => {
+                        if (!response || response.status !== 200 || response.type !== 'basic') {
+                            return response;
+                        }
+
+                        const responseToCache = response.clone();
+                        caches.open(CACHE_NAME)
+                            .then(cache => {
+                                cache.put(request, responseToCache);
+                            });
+
+                        return response;
+                    });
             })
     );
 }); 

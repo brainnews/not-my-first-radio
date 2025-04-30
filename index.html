@@ -336,14 +336,38 @@
     <!-- Service Worker Registration -->
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
+            // Register service worker
+            navigator.serviceWorker.register('sw.js')
+                .then(registration => {
+                    console.log('ServiceWorker registration successful');
+                    
+                    // Check for updates every hour
+                    setInterval(() => {
+                        registration.update();
+                    }, 60 * 60 * 1000);
+
+                    // Listen for updates
+                    registration.addEventListener('updatefound', () => {
+                        const newWorker = registration.installing;
+                        newWorker.addEventListener('statechange', () => {
+                            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                // New version available
+                                if (confirm('A new version is available! Would you like to update?')) {
+                                    window.location.reload();
+                                }
+                            }
+                        });
                     });
+                })
+                .catch(err => {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+
+            // Handle updates when the service worker is already installed
+            navigator.serviceWorker.addEventListener('controllerchange', () => {
+                if (confirm('A new version is available! Would you like to update?')) {
+                    window.location.reload();
+                }
             });
         }
     </script>

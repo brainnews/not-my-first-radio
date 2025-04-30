@@ -783,7 +783,6 @@ input[type="range"] {
     top: 0;
     right: 0;
     width: 100%;
-    max-width: 400px;
     height: 100vh;
     background: var(--bg-secondary);
     backdrop-filter: blur(10px);
@@ -792,6 +791,9 @@ input[type="range"] {
     transition: transform 0.3s ease;
     z-index: 1000;
     padding: 2rem;
+    @media (min-width: 769px) {
+        max-width: 400px;
+    }
 }
 
 .settings-panel.visible {
