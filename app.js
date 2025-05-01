@@ -102,6 +102,8 @@ const handleOpenSettings = (e) => {
     e.preventDefault();
     settingsPanel.classList.remove('hidden');
     settingsOverlay.classList.remove('hidden');
+    document.body.style.overflow = 'hidden';
+    document.body.style.height = '100vh';
     // Use setTimeout to ensure the transitions work properly
     setTimeout(() => {
         settingsPanel.classList.add('visible');
@@ -122,6 +124,8 @@ function closeSettingsPanel(e) {
     if (e) e.preventDefault();
     settingsPanel.classList.remove('visible');
     settingsOverlay.classList.remove('visible');
+    document.body.style.overflow = 'auto';
+    document.body.style.height = 'auto';
     // Wait for transitions to complete before hiding
     setTimeout(() => {
         settingsPanel.classList.add('hidden');
@@ -174,8 +178,7 @@ const handleExportData = (e) => {
         showNotification('Error exporting stations. Please try again.', 'error');
     }
 };
-exportDataBtn.addEventListener('mousedown', handleExportData);
-exportDataBtn.addEventListener('touchstart', handleExportData);
+exportDataBtn.addEventListener('click', handleExportData);
 exportDataBtn.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -270,8 +273,7 @@ const handleClearStations = async (e) => {
         showNotification('All stations have been removed.', 'success');
     }
 };
-clearStationsBtn.addEventListener('mousedown', handleClearStations);
-clearStationsBtn.addEventListener('touchstart', handleClearStations);
+clearStationsBtn.addEventListener('click', handleClearStations);
 clearStationsBtn.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
@@ -450,8 +452,7 @@ class RadioPlayer {
                     showNotification('All shared stations have been removed.', 'success');
                 }
             };
-            clearSharedStationsBtn.addEventListener('mousedown', handleClearShared);
-            clearSharedStationsBtn.addEventListener('touchstart', handleClearShared);
+            clearSharedStationsBtn.addEventListener('click', handleClearShared);
             clearSharedStationsBtn.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -707,7 +708,10 @@ class RadioPlayer {
                     menu.classList.toggle('hidden');
                 };
                 moreBtn.addEventListener('mousedown', handleMoreBtn);
-                moreBtn.addEventListener('touchstart', handleMoreBtn);
+                moreBtn.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevent scrolling
+                    handleMoreBtn(e);
+                });
                 moreBtn.addEventListener('keydown', (e) => {
                     if (e.key === 'Enter' || e.key === ' ') {
                         e.preventDefault();
@@ -741,7 +745,10 @@ class RadioPlayer {
                         if (station) this.shareStation(station);
                     };
                     menuShare.addEventListener('mousedown', handleShare);
-                    menuShare.addEventListener('touchstart', handleShare);
+                    menuShare.addEventListener('touchstart', (e) => {
+                        e.preventDefault(); // Prevent scrolling
+                        handleShare(e);
+                    });
                     menuShare.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
@@ -758,7 +765,10 @@ class RadioPlayer {
                         this.showEditNoteUI(card, url);
                     };
                     menuEditNote.addEventListener('mousedown', handleEditNote);
-                    menuEditNote.addEventListener('touchstart', handleEditNote);
+                    menuEditNote.addEventListener('touchstart', (e) => {
+                        e.preventDefault(); // Prevent scrolling
+                        handleEditNote(e);
+                    });
                     menuEditNote.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
@@ -776,7 +786,10 @@ class RadioPlayer {
                         if (station) await this.confirmAndRemoveStation(url, station.name);
                     };
                     menuDelete.addEventListener('mousedown', handleDelete);
-                    menuDelete.addEventListener('touchstart', handleDelete);
+                    menuDelete.addEventListener('touchstart', (e) => {
+                        e.preventDefault(); // Prevent scrolling
+                        handleDelete(e);
+                    });
                     menuDelete.addEventListener('keydown', (e) => {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
@@ -1736,7 +1749,9 @@ function showQrImportOptions(options) {
         mergeBtn.parentNode.insertBefore(previewBtn, mergeBtn);
         
         // Add preview functionality
-        previewBtn.addEventListener('click', () => {
+        const handlePreview = (e) => {
+            e.preventDefault(); // Prevent scrolling on mobile
+            
             // Stop any currently playing preview
             if (previewAudio) {
                 previewAudio.pause();
@@ -1788,7 +1803,11 @@ function showQrImportOptions(options) {
             previewAudio.addEventListener('play', () => {
                 icon.textContent = 'pause';
             });
-        });
+        };
+
+        // Add click and touch event listeners
+        previewBtn.addEventListener('click', handlePreview);
+        previewBtn.addEventListener('touchstart', handlePreview);
     }
     
     // Show modal

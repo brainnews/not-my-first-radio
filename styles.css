@@ -131,7 +131,7 @@ header h1 {
     flex: 1;
     padding: 0.75rem 2.5rem 0.75rem 2.5rem;
     border: 1px solid var(--border-color);
-    border-radius: 4px;
+    border-radius: 8px;
     background: var(--bg-secondary);
     color: var(--text-primary);
     font-size: 1.1rem;
@@ -805,6 +805,7 @@ input[type="range"] {
     transition: transform 0.3s ease;
     z-index: 1000;
     padding: 2rem;
+    overflow-y: auto;
     @media (min-width: 769px) {
         max-width: 400px;
     }
@@ -911,7 +912,7 @@ input[type="range"] {
     align-items: center;
     justify-content: center;
     height: 42px;
-    padding: 0 50px;
+    padding: 0 1rem;
     border: 1px solid var(--border-color);
     border-radius: 4px;
     background: var(--bg-primary);
