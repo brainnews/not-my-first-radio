@@ -489,7 +489,7 @@ input[type="range"] {
     align-items: center;
     gap: 1rem;
     padding: 1rem;
-    background-color: var(--accent-color);
+    background-color: var(--accent-color-30);
     border-radius: 20px;
     backdrop-filter: blur(10px);
     box-shadow: 0 30px 120px 50px var(--accent-color-30);
@@ -498,6 +498,7 @@ input[type="range"] {
 .current-details {
     flex: 1;
     min-width: 0;
+    max-width: 370px;
     @media (max-width: 768px) {
         max-width: 225px;
     }
