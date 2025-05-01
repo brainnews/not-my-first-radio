@@ -408,7 +408,7 @@ class RadioPlayer {
         this.isPlaying = false;
         this.isEditMode = false;
         this.stationLists = this.loadStationLists();
-        this.volume = 100; // Initialize volume to 100%
+        this.volume = 70; // Initialize volume to 100%
 
         // DOM elements
         this.playPauseBtn = document.getElementById('play-pause');
