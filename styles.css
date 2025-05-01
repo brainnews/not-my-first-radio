@@ -13,6 +13,7 @@
     --border-color: #333333;
     --purple-color: #291d69;
     --error-color: #ff3b30;
+    --border-style-primary: 1px dashed var(--accent-color-30);
 }
 
 [data-theme="light"] {
@@ -48,7 +49,10 @@ button {
     color: var(--text-primary);
     cursor: pointer;
 }
-
+.tip {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+}
 .alert-banner {
     background-color: var(--accent-color-30);
     color: var(--text-primary);
@@ -202,6 +206,7 @@ main {
     border-radius: 10px;
     @media (max-width: 768px) {
         padding: 6px;
+        border-radius: 0px;
     }
     gap: 1rem;
     padding: 0.75rem 0.875rem;
@@ -671,8 +676,8 @@ input[type="range"] {
     display: none;
 }
 
-.saved-stations {
-    margin-bottom: 6rem;
+.saved-stations, .search-results {
+    margin-bottom: 7rem;
     transition: opacity 0.3s ease;
 }
 
@@ -684,7 +689,6 @@ input[type="range"] {
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    margin-bottom: 1rem;
     padding: 1rem;
     position: sticky;
     top: 0;
@@ -692,6 +696,9 @@ input[type="range"] {
     background: var(--bg-primary);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
+}
+.search-results .tip {
+    padding: 1rem;
 }
 
 .results-header h2 {
@@ -1947,6 +1954,9 @@ input[type="range"] {
 /* Station menu styles */
 .station-controls {
     position: relative;
+    @media (max-width: 768px) {
+        position: inherit;
+    }
 }
 
 .more-btn {
@@ -1977,16 +1987,64 @@ input[type="range"] {
     flex-direction: column;
     align-items: flex-start;
     padding: 0.25rem 0;
+    @media (max-width: 768px) {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        top: auto;
+        height: fit-content;
+        border-radius: 0;
+        border: none;
+        padding: 0.75rem;
+    }
 }
+
+.station-menu-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--accent-color-30);
+    backdrop-filter: blur(10px);
+    z-index: 9;
+    display: none;
+    @media (max-width: 768px) {
+        display: block;
+    }
+}
+
+.station-menu-overlay.hidden {
+    display: none;
+}
+
 .station-menu.hidden {
     display: none;
 }
+
+.station-menu-info {
+    padding: 0 0.75rem 0.5rem 0.75rem;
+    font-size: 0.85em;
+    color: var(--text-secondary);
+    border-bottom: 1px dashed var(--accent-color-30);
+    width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: none;
+    margin-bottom: 0.5rem;
+    @media (max-width: 768px) {
+        display: block;
+    }
+}
+
 .station-menu button {
     background: none;
     border: none;
     color: var(--text-primary);
     text-align: left;
-    padding: 0.5rem 0.5rem;
+    padding: 1.25rem 0.5rem;
     font-size: 0.85em;
     cursor: pointer;
     display: flex;
@@ -1999,6 +2057,10 @@ input[type="range"] {
 }
 .station-menu button:hover {
     background: var(--border-color);
+    color: var(--text-primary);
+}
+.station-menu button .material-symbols-rounded {
+    font-size: 1.25rem;
 }
 
 /* Note styles */
@@ -2130,3 +2192,71 @@ input[type="range"] {
     width: 60px;
     text-transform: uppercase;
 }
+
+/* TV Static Animation */
+@keyframes tvStatic {
+    0% {
+        background-position: 0 0;
+    }
+    100% {
+        background-position: 100% 100%;
+    }
+}
+
+.static {
+    background: linear-gradient(
+        90deg,
+        rgba(255, 255, 255, 0.05) 0%,
+        rgba(255, 255, 255, 0.1) 50%,
+        rgba(255, 255, 255, 0.05) 100%
+    );
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    border-radius: 18px;
+    z-index: -1;
+    transform-style: preserve-3d;
+    perspective: 1000px;
+}
+
+.static::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        90deg,
+        transparent 0%,
+        rgba(255, 255, 255, 0.1) 25%,
+        rgba(255, 255, 255, 0.2) 50%,
+        rgba(255, 255, 255, 0.1) 75%,
+        transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: wormhole 3s infinite linear;
+    transform: translateZ(0);
+    filter: blur(8px);
+}
+
+@keyframes wormhole {
+    0% {
+        background-position: 0% 50%;
+        transform: translateZ(0) scale(1);
+    }
+    50% {
+        background-position: 100% 50%;
+        transform: translateZ(100px) scale(1.5);
+    }
+    100% {
+        background-position: 0% 50%;
+        transform: translateZ(0) scale(1);
+    }
+}
+

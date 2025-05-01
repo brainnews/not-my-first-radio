@@ -628,9 +628,12 @@ class RadioPlayer {
                     <button class="more-btn" title="More actions">
                         <span class="material-symbols-rounded">more_vert</span>
                     </button>
+                    <div class="station-menu-overlay hidden"></div>
                     <div class="station-menu hidden">
+                        <div class="station-menu-info">${station.name}</div>
                         <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
                         <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
+                        <button class="menu-homepage"><span class="material-symbols-rounded">open_in_new</span> Visit Website</button>
                         <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
                     </div>
                 </div>
@@ -652,6 +655,7 @@ class RadioPlayer {
                     e.target.closest('.share-btn') ||
                     e.target.closest('.more-btn') ||
                     e.target.closest('.station-menu') ||
+                    e.target.closest('.station-menu-overlay') ||
                     e.target.classList.contains('note-input') ||
                     e.target.closest('.note-input') ||
                     e.target.classList.contains('note-actions') ||
@@ -696,16 +700,21 @@ class RadioPlayer {
             // More menu logic
             const moreBtn = card.querySelector('.more-btn');
             const menu = card.querySelector('.station-menu');
+            const overlay = card.querySelector('.station-menu-overlay');
             if (moreBtn && menu) {
                 const handleMoreBtn = (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     // Close all other menus first
                     document.querySelectorAll('.station-menu').forEach(m => {
-                        if (m !== menu) m.classList.add('hidden');
+                        if (m !== menu) {
+                            m.classList.add('hidden');
+                            m.previousElementSibling?.classList.add('hidden'); // Hide overlay
+                        }
                     });
                     // Toggle the current menu
                     menu.classList.toggle('hidden');
+                    overlay.classList.toggle('hidden');
                 };
                 moreBtn.addEventListener('mousedown', handleMoreBtn);
                 moreBtn.addEventListener('touchstart', (e) => {
@@ -723,12 +732,22 @@ class RadioPlayer {
                 document.addEventListener('mousedown', (e) => {
                     if (!card.contains(e.target)) {
                         menu.classList.add('hidden');
+                        overlay.classList.add('hidden');
                     }
                 });
                 document.addEventListener('touchstart', (e) => {
                     if (!card.contains(e.target)) {
                         menu.classList.add('hidden');
+                        overlay.classList.add('hidden');
                     }
+                });
+
+                // Add overlay click handler to close menu
+                overlay.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    menu.classList.add('hidden');
+                    overlay.classList.add('hidden');
                 });
 
                 // Menu item handlers
@@ -741,6 +760,7 @@ class RadioPlayer {
                         e.preventDefault();
                         e.stopPropagation();
                         menu.classList.add('hidden');
+                        overlay.classList.add('hidden');
                         const station = this.stations.find(s => s.url === url);
                         if (station) this.shareStation(station);
                     };
@@ -762,6 +782,7 @@ class RadioPlayer {
                         e.preventDefault();
                         e.stopPropagation();
                         menu.classList.add('hidden');
+                        overlay.classList.add('hidden');
                         this.showEditNoteUI(card, url);
                     };
                     menuEditNote.addEventListener('mousedown', handleEditNote);
@@ -782,6 +803,7 @@ class RadioPlayer {
                         e.preventDefault();
                         e.stopPropagation();
                         menu.classList.add('hidden');
+                        overlay.classList.add('hidden');
                         const station = this.stations.find(s => s.url === url);
                         if (station) await this.confirmAndRemoveStation(url, station.name);
                     };
@@ -794,6 +816,32 @@ class RadioPlayer {
                         if (e.key === 'Enter' || e.key === ' ') {
                             e.preventDefault();
                             handleDelete(e);
+                        }
+                    });
+                }
+
+                // Add homepage button handler
+                const menuHomepage = menu.querySelector('.menu-homepage');
+                if (menuHomepage) {
+                    const handleHomepage = (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        menu.classList.add('hidden');
+                        overlay.classList.add('hidden');
+                        const station = this.stations.find(s => s.url === url);
+                        if (station && station.homepage) {
+                            window.open(station.homepage, '_blank');
+                        }
+                    };
+                    menuHomepage.addEventListener('mousedown', handleHomepage);
+                    menuHomepage.addEventListener('touchstart', (e) => {
+                        e.preventDefault(); // Prevent scrolling
+                        handleHomepage(e);
+                    });
+                    menuHomepage.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleHomepage(e);
                         }
                     });
                 }
@@ -871,12 +919,14 @@ class RadioPlayer {
             menu.querySelector('.menu-share').addEventListener('click', (e) => {
                 e.stopPropagation();
                 menu.classList.add('hidden');
+                overlay.classList.remove('hidden');
                 const station = this.stations.find(s => s.url === url);
                 if (station) this.shareStation(station);
             });
             menu.querySelector('.menu-edit-note').addEventListener('click', (e) => {
                 e.stopPropagation();
                 menu.classList.add('hidden');
+                overlay.classList.remove('hidden');
                 this.showEditNoteUI(card, url);
             });
             const moveBtn = menu.querySelector('.menu-move');
@@ -884,12 +934,27 @@ class RadioPlayer {
                 moveBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     menu.classList.add('hidden');
+                    overlay.classList.remove('hidden');
                     this.moveStationToUserList(url);
                 });
             }
+            menu.querySelector('.menu-homepage').addEventListener('click', (e) => {
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                overlay.classList.remove('hidden');
+                let foundStation = null;
+                for (const list of this.stationLists) {
+                    foundStation = list.stations.find(s => s.url === url);
+                    if (foundStation) break;
+                }
+                if (foundStation && foundStation.homepage) {
+                    window.open(foundStation.homepage, '_blank');
+                }
+            });
             menu.querySelector('.menu-delete').addEventListener('click', async (e) => {
                 e.stopPropagation();
                 menu.classList.add('hidden');
+                overlay.classList.remove('hidden');
                 let foundStation = null;
                 for (const list of this.stationLists) {
                     foundStation = list.stations.find(s => s.url === url);
@@ -902,20 +967,21 @@ class RadioPlayer {
 
     // Play a station
     playStation(station) {
-        // Show player immediately and set loading state
-        this.currentStation = station;
-        this.isPlaying = false;
-        document.querySelector('.player-bar').classList.add('active');
-        document.querySelector('.player-bar').classList.add('loading');
-        this.updateUI();
-
-        // Clean up old audio event listeners if any
+        // Clean up old audio event listeners and state first
         if (this.audio) {
             this.audio.onerror = null;
             this.audio.onended = null;
             this.audio.pause();
             this.audio.src = '';
         }
+
+        // Show player immediately and set loading state
+        this.currentStation = station;
+        this.isPlaying = false;
+        document.querySelector('.player-bar').classList.add('active');
+        document.querySelector('.player-bar').classList.add('loading');
+        document.querySelector('.static').classList.remove('hidden');
+        this.updateUI();
 
         // Try to use HTTPS if the URL is HTTP
         let streamUrl = station.url;
@@ -926,33 +992,83 @@ class RadioPlayer {
         this.audio = new Audio(streamUrl);
         this.audio.volume = this.volume / 100;
 
+        // Track if we've shown an error for this station
+        let hasShownError = false;
+
         // Add error handling for the audio element
         this.audio.onerror = (error) => {
+            // Only process errors if this is still the current station
+            if (this.currentStation !== station) return;
+
             // If HTTPS failed and we tried HTTPS, fall back to HTTP
             if (streamUrl.startsWith('https://') && station.url.startsWith('http://')) {
                 this.audio.src = station.url;
                 this.audio.play().catch(error => {
-                    console.error('Error playing station:', error);
-                    this.isPlaying = false;
-                    this.currentStation = null;
-                    document.querySelector('.player-bar').classList.remove('loading');
-                    showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
-                    this.updateUI();
+                    // Only process errors if this is still the current station
+                    if (this.currentStation !== station) return;
+                    
+                    // Check if it's an AbortError
+                    if (error && error.name === 'AbortError') {
+                        // For AbortError, check if the audio is actually playing
+                        if (this.audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+                            this.isPlaying = true;
+                            document.querySelector('.player-bar').classList.remove('loading');
+                            document.querySelector('.static').classList.add('hidden');
+                            this.updateUI();
+                            return;
+                        }
+                        // If not playing yet, just return without showing error
+                        return;
+                    }
+                    
+                    if (!hasShownError) {
+                        console.error('Error playing station:', error);
+                        this.isPlaying = false;
+                        this.currentStation = null;
+                        document.querySelector('.player-bar').classList.remove('loading');
+                        document.querySelector('.static').classList.add('hidden');
+                        showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
+                        this.updateUI();
+                        hasShownError = true;
+                    }
                 });
                 return;
             }
 
             // Only show notification if not an AbortError
             if (error && error.target && error.target.error && error.target.error.name === 'AbortError') {
-                // Ignore AbortError
+                // For AbortError, check if the audio is actually playing
+                if (this.audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+                    this.isPlaying = true;
+                    document.querySelector('.player-bar').classList.remove('loading');
+                    document.querySelector('.static').classList.add('hidden');
+                    this.updateUI();
+                    return;
+                }
+                // If not playing yet, just return without showing error
                 return;
             }
-            console.error('Error playing station:', error);
-            this.isPlaying = false;
-            this.currentStation = null;
-            document.querySelector('.player-bar').classList.remove('loading');
-            showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
-            this.updateUI();
+
+            if (!hasShownError) {
+                console.error('Error playing station:', error);
+                this.isPlaying = false;
+                this.currentStation = null;
+                document.querySelector('.player-bar').classList.remove('loading');
+                document.querySelector('.static').classList.add('hidden');
+                showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
+                this.updateUI();
+                hasShownError = true;
+            }
+        };
+
+        // Add canplay event listener to handle successful loading
+        this.audio.oncanplay = () => {
+            if (this.currentStation === station) {
+                this.isPlaying = true;
+                document.querySelector('.player-bar').classList.remove('loading');
+                document.querySelector('.static').classList.add('hidden');
+                this.updateUI();
+            }
         };
 
         // Try to play the station
@@ -961,36 +1077,77 @@ class RadioPlayer {
         if (playPromise !== undefined) {
             playPromise
                 .then(() => {
-                    this.isPlaying = true;
-                    document.querySelector('.player-bar').classList.remove('loading');
-                    this.updateUI();
+                    // Only update if this is still the current station
+                    if (this.currentStation === station) {
+                        this.isPlaying = true;
+                        document.querySelector('.player-bar').classList.remove('loading');
+                        document.querySelector('.static').classList.add('hidden');
+                        this.updateUI();
+                    }
                 })
                 .catch(error => {
+                    // Only process errors if this is still the current station
+                    if (this.currentStation !== station) return;
+
                     // If HTTPS failed and we tried HTTPS, fall back to HTTP
                     if (streamUrl.startsWith('https://') && station.url.startsWith('http://')) {
                         this.audio.src = station.url;
                         this.audio.play().catch(error => {
-                            console.error('Error playing station:', error);
-                            this.isPlaying = false;
-                            this.currentStation = null;
-                            document.querySelector('.player-bar').classList.remove('loading');
-                            showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
-                            this.updateUI();
+                            // Only process errors if this is still the current station
+                            if (this.currentStation !== station) return;
+                            
+                            // Check if it's an AbortError
+                            if (error && error.name === 'AbortError') {
+                                // For AbortError, check if the audio is actually playing
+                                if (this.audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+                                    this.isPlaying = true;
+                                    document.querySelector('.player-bar').classList.remove('loading');
+                                    document.querySelector('.static').classList.add('hidden');
+                                    this.updateUI();
+                                    return;
+                                }
+                                // If not playing yet, just return without showing error
+                                return;
+                            }
+                            
+                            if (!hasShownError) {
+                                console.error('Error playing station:', error);
+                                this.isPlaying = false;
+                                this.currentStation = null;
+                                document.querySelector('.player-bar').classList.remove('loading');
+                                document.querySelector('.static').classList.add('hidden');
+                                showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
+                                this.updateUI();
+                                hasShownError = true;
+                            }
                         });
                         return;
                     }
 
-                    // Only show notification if not an AbortError
+                    // Check if it's an AbortError
                     if (error && error.name === 'AbortError') {
-                        // Ignore AbortError
+                        // For AbortError, check if the audio is actually playing
+                        if (this.audio.readyState >= 2) { // HAVE_CURRENT_DATA or higher
+                            this.isPlaying = true;
+                            document.querySelector('.player-bar').classList.remove('loading');
+                            document.querySelector('.static').classList.add('hidden');
+                            this.updateUI();
+                            return;
+                        }
+                        // If not playing yet, just return without showing error
                         return;
                     }
-                    console.error('Error playing station:', error);
-                    this.isPlaying = false;
-                    this.currentStation = null;
-                    document.querySelector('.player-bar').classList.remove('loading');
-                    showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
-                    this.updateUI();
+
+                    if (!hasShownError) {
+                        console.error('Error playing station:', error);
+                        this.isPlaying = false;
+                        this.currentStation = null;
+                        document.querySelector('.player-bar').classList.remove('loading');
+                        document.querySelector('.static').classList.add('hidden');
+                        showNotification('Unable to play this station. It may be unavailable or use an unsupported format.', 'error');
+                        this.updateUI();
+                        hasShownError = true;
+                    }
                 });
         }
     }
@@ -1308,10 +1465,13 @@ class RadioPlayer {
                             <button class="more-btn" title="More actions">
                                 <span class="material-symbols-rounded">more_vert</span>
                             </button>
+                            <div class="station-menu-overlay hidden"></div>
                             <div class="station-menu hidden">
+                                <div class="station-menu-info">${station.name}</div>
                                 <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
-                                <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
-                                <button class="menu-move"><span class="material-symbols-rounded">playlist_add</span> Move to My Stations</button>
+                                <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit note</button>
+                                <button class="menu-move"><span class="material-symbols-rounded">content_copy</span> Copy to your radio</button>
+                                <button class="menu-homepage"><span class="material-symbols-rounded">open_in_new</span> Visit website</button>
                                 <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
                             </div>
                         </div>
@@ -2039,6 +2199,7 @@ const searchInput = document.getElementById('search-input');
 const clearInputBtn = document.getElementById('clear-input');
 const searchResults = document.getElementById('search-results');
 const clearResultsBtn = document.getElementById('clear-results');
+const searchTip = document.querySelector('.search-results .tip');
 let previewAudio = null;
 let searchTimeout = null;
 const SEARCH_DELAY = 500; // milliseconds delay for search after user stops typing
@@ -2047,6 +2208,7 @@ const SEARCH_DELAY = 500; // milliseconds delay for search after user stops typi
 function clearSearchResults() {
     const searchResultsSection = document.getElementById('search-results');
     searchResultsSection.classList.add('hidden');
+    searchTip.classList.add('hidden');
     const resultsGrid = searchResultsSection.querySelector('.results-grid');
     resultsGrid.innerHTML = '';
     
@@ -2126,7 +2288,9 @@ async function searchStations(query) {
         const searchResultsSection = document.getElementById('search-results');
         const resultsGrid = searchResultsSection.querySelector('.results-grid');
         const sectionTitle = searchResultsSection.querySelector('.section-title');
-        
+        const searchTip = searchResultsSection.querySelector('.tip');
+
+        searchTip.classList.remove('hidden');
         searchResultsSection.classList.remove('hidden');
         sectionTitle.textContent = 'Error';
         resultsGrid.innerHTML = `
@@ -2147,10 +2311,12 @@ async function displaySearchResults(stations) {
     const searchResultsSection = document.getElementById('search-results');
     const resultsGrid = searchResultsSection.querySelector('.results-grid');
     const sectionTitle = searchResultsSection.querySelector('.section-title');
+    const searchTip = searchResultsSection.querySelector('.tip');
     
     // Show loading indicator
     searchResultsSection.classList.add('loading');
     searchResultsSection.classList.remove('hidden');
+    searchTip.classList.remove('hidden');
     // Hide the section title and clear button while loading
     sectionTitle.style.display = 'none';
     if (clearResultsBtn) clearResultsBtn.style.display = 'none';
