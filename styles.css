@@ -138,7 +138,7 @@ header h1 {
     border-radius: 8px;
     background: var(--bg-secondary);
     color: var(--text-primary);
-    font-size: 1.1rem;
+    font-size: 1rem;
     @media (max-width: 768px) {
         height: 42px;
         font-size: 0.875rem;
@@ -2079,9 +2079,9 @@ input[type="range"] {
     padding: 0.3em 0.5em;
     border: 1px solid var(--border-color);
     border-radius: 4px;
-    background: var(--bg-primary);
+    background: var(--bg-secondary);
     color: var(--text-primary);
-    margin-bottom: 0.25em;
+    margin-bottom: 0.75em;
     box-sizing: border-box;
 }
 .note-actions {
@@ -2091,10 +2091,10 @@ input[type="range"] {
 }
 .note-actions button {
     font-size: 0.85em;
-    padding: 0.2em 0.8em;
-    border-radius: 4px;
+    padding: 0.25em 0.8em;
+    border-radius: 2px;
     border: none;
-    background: var(--border-color);
+    background: var(--accent-color-30);
     color: var(--text-primary);
     cursor: pointer;
     transition: background 0.2s;

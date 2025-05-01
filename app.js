@@ -785,7 +785,7 @@ class RadioPlayer {
                         overlay.classList.add('hidden');
                         this.showEditNoteUI(card, url);
                     };
-                    menuEditNote.addEventListener('mousedown', handleEditNote);
+                    menuEditNote.addEventListener('click', handleEditNote);
                     menuEditNote.addEventListener('touchstart', (e) => {
                         e.preventDefault(); // Prevent scrolling
                         handleEditNote(e);
@@ -2717,7 +2717,7 @@ RadioPlayer.prototype.showEditNoteUI = function(card, url) {
         noteDiv.className = 'station-note';
         card.querySelector('.station-details').appendChild(noteDiv);
     }
-    noteDiv.innerHTML = `<input maxlength="100" class="note-input" type="text" value="${station.note ? station.note.replace(/"/g, '&quot;') : ''}">
+    noteDiv.innerHTML = `<input maxlength="100" placeholder="Add a note..." class="note-input" type="text" value="${station.note ? station.note.replace(/"/g, '&quot;') : ''}">
         <div class="note-actions">
             <button class="save-note-btn">Save</button>
             <button class="cancel-note-btn">Cancel</button>
