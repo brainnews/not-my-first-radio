@@ -535,7 +535,7 @@ class RadioPlayer {
             const loadStarterPacks = async () => {
                 try {
                     // Get list of starter packs
-                    const response = await fetch('starter-packs/');
+                    const response = await fetch('https://files.notmyfirstradio.com/starter-packs/');
                     const text = await response.text();
                     const parser = new DOMParser();
                     const doc = parser.parseFromString(text, 'text/html');
