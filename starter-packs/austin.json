@@ -158,6 +158,7 @@
     }
   ],
   "version": "1.0",
-  "username": "Austin Starter Pack",
-  "description": "A collection of radio stations from Austin, TX"
+  "username": "ATX4EVER",
+  "description": "Some of the best stations in the thriving Austin radio scene.",
+  "thumbnail_path": "./starter-packs/austin-thumb.png"
 }

@@ -498,15 +498,27 @@ class RadioPlayer {
 
     // Display stations in the UI
     displayStations() {
+        const savedStationsTitle = document.getElementById('saved-stations-title');
         if (this.stations.length === 0) {
+            savedStationsTitle.classList.add('hidden');
+            // First show the empty state with loading indicator
             this.stationsContainer.innerHTML = `
                 <div class="empty-state">
-                    <p class="no-stations">No stations added yet. Search for stations above to add them to your list.</p>
-                    <p>Or open <button class="settings-btn" id="empty-state-settings" style="display: inline; width: auto;"><span class="material-symbols-rounded">settings</span>Settings</button> to import stations by QR code or from a .json file.</p>
+                    <div class="empty-state-header">
+                        <img src="./icons/icon128-transparent.png" alt="Not My First Radio" class="welcome-icon">
+                        <p class="welcome">Not My First Radio is a lightweight, private, and local first radio player. Search over 30,000 stations above or start listening right away with a starter pack below. No account required.</p>
+                    </div>
+                    <div class="starter-packs-grid">
+                        <div class="loading-indicator">
+                            <div class="loading-spinner"></div>
+                            <div class="loading-text">Loading starter packs...</div>
+                        </div>
+                    </div>
+                    <p style="color: var(--text-secondary);">Have a QR code or .json file? Open <button class="settings-btn" id="empty-state-settings" style="display: inline; width: auto;"><span class="material-symbols-rounded">settings</span>Settings</button> to import them as stations.</p>
                 </div>
             `;
-            
-            // Add event listener to the new settings button
+
+            // Add event listener to the settings button
             const emptyStateSettingsBtn = document.getElementById('empty-state-settings');
             if (emptyStateSettingsBtn) {
                 emptyStateSettingsBtn.addEventListener('click', () => {
@@ -518,7 +530,93 @@ class RadioPlayer {
                     }, 10);
                 });
             }
+
+            // Load all starter packs
+            const loadStarterPacks = async () => {
+                try {
+                    // Get list of starter packs
+                    const response = await fetch('starter-packs/');
+                    const text = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(text, 'text/html');
+                    const links = Array.from(doc.querySelectorAll('a'))
+                        .map(a => a.href)
+                        .filter(href => href.endsWith('.json'))
+                        .map(href => href.split('/').pop());
+
+                    // Load each starter pack
+                    const packs = await Promise.all(links.map(async (filename) => {
+                        try {
+                            const response = await fetch(`starter-packs/${filename}`);
+                            const data = await response.json();
+                            return {
+                                filename,
+                                data
+                            };
+                        } catch (error) {
+                            console.error(`Error loading starter pack ${filename}:`, error);
+                            return null;
+                        }
+                    }));
+
+                    // Filter out failed loads and update UI
+                    const validPacks = packs.filter(pack => pack !== null);
+                    const starterPacksGrid = document.querySelector('.starter-packs-grid');
+                    
+                    if (validPacks.length === 0) {
+                        starterPacksGrid.innerHTML = '<p class="no-stations">No starter packs available.</p>';
+                        return;
+                    }
+
+                    starterPacksGrid.innerHTML = validPacks.map(pack => `
+                        <div class="starter-pack-card" data-pack="${pack.filename.replace('.json', '')}">
+                            <img src="${pack.data.thumbnail_path || 'https://place-hold.it/250x250'}" alt="${pack.data.username} Starter Pack" class="starter-pack-image">
+                            <div class="starter-pack-card-content">
+                                <p>${pack.data.description || 'A collection of radio stations'}</p>
+                                <button class="add-starter-pack-btn" data-pack="${pack.filename.replace('.json', '')}">
+                                    <span class="material-symbols-rounded">add</span>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+
+                    // Add event listeners to starter pack buttons
+                    const addStarterPackBtns = document.querySelectorAll('.add-starter-pack-btn');
+                    addStarterPackBtns.forEach(btn => {
+                        btn.addEventListener('click', async (e) => {
+                            const packName = e.target.closest('.add-starter-pack-btn').dataset.pack;
+                            try {
+                                const response = await fetch(`starter-packs/${packName}.json`);
+                                const data = await response.json();
+                                
+                                if (!data || !data.stations || !Array.isArray(data.stations)) {
+                                    showNotification('Invalid starter pack format.', 'error');
+                                    return;
+                                }
+
+                                // Add all stations from the pack
+                                this.stations = data.stations;
+                                this.saveStations();
+                                this.displayStations();
+                                showNotification('Starter pack added successfully!', 'success');
+                            } catch (error) {
+                                console.error('Error loading starter pack:', error);
+                                showNotification('Failed to load starter pack.', 'error');
+                            }
+                        });
+                    });
+                } catch (error) {
+                    console.error('Error loading starter packs:', error);
+                    const starterPacksGrid = document.querySelector('.starter-packs-grid');
+                    starterPacksGrid.innerHTML = '<p class="no-stations">Failed to load starter packs. Please try again later.</p>';
+                }
+            };
+
+            // Start loading starter packs
+            loadStarterPacks();
             return;
+        } else {
+            savedStationsTitle.classList.remove('hidden');
         }
 
         this.stationsContainer.innerHTML = this.stations.map(station => `
@@ -609,7 +707,7 @@ class RadioPlayer {
                             </div>
                         </div>
                         <div class="station-meta">
-                            ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
+                            ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11V9ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
                             ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
                             ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
                         </div>
@@ -711,6 +809,19 @@ class RadioPlayer {
                     e.stopPropagation();
                     menu.classList.remove('hidden');
                     overlay.classList.remove('hidden');
+                    // Add active class for mobile
+                    if (window.innerWidth <= 768) {
+                        menu.classList.add('active');
+                    }
+                };
+
+                const closeMenu = () => {
+                    menu.classList.add('hidden');
+                    overlay.classList.add('hidden');
+                    // Remove active class for mobile
+                    if (window.innerWidth <= 768) {
+                        menu.classList.remove('active');
+                    }
                 };
 
                 moreBtn.addEventListener('click', handleMoreBtn);
@@ -728,8 +839,7 @@ class RadioPlayer {
                     // If movement exceeds threshold, close the menu
                     if (deltaY > TOUCH_THRESHOLD || deltaX > TOUCH_THRESHOLD) {
                         e.preventDefault();
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
+                        closeMenu();
                     }
                 });
                 moreBtn.addEventListener('touchend', (e) => {
@@ -747,14 +857,12 @@ class RadioPlayer {
                 // Add back the document click listener to close menu when clicking outside
                 document.addEventListener('mousedown', (e) => {
                     if (!card.contains(e.target)) {
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
+                        closeMenu();
                     }
                 });
                 document.addEventListener('touchstart', (e) => {
                     if (!card.contains(e.target)) {
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
+                        closeMenu();
                     }
                 });
 
@@ -762,8 +870,7 @@ class RadioPlayer {
                 overlay.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    menu.classList.add('hidden');
-                    overlay.classList.add('hidden');
+                    closeMenu();
                 });
 
                 // Menu item handlers
@@ -780,7 +887,7 @@ class RadioPlayer {
                         const station = this.stations.find(s => s.url === url);
                         if (station) this.shareStation(station);
                     };
-                    menuShare.addEventListener('mousedown', handleShare);
+                    menuShare.addEventListener('click', handleShare);
                     menuShare.addEventListener('touchstart', (e) => {
                         e.preventDefault(); // Prevent scrolling
                         handleShare(e);
@@ -801,7 +908,7 @@ class RadioPlayer {
                         overlay.classList.add('hidden');
                         this.showEditNoteUI(card, url);
                     };
-                    menuEditNote.addEventListener('click', handleEditNote);
+                    menuEditNote.addEventListener('mousedown', handleEditNote);
                     menuEditNote.addEventListener('touchstart', (e) => {
                         e.preventDefault(); // Prevent scrolling
                         handleEditNote(e);
@@ -933,31 +1040,35 @@ class RadioPlayer {
                 if (!card.contains(e.target)) menu.classList.add('hidden');
             });
             menu.querySelector('.menu-share').addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 menu.classList.add('hidden');
-                overlay.classList.remove('hidden');
+                settingsOverlay.classList.remove('hidden');
                 const station = this.stations.find(s => s.url === url);
                 if (station) this.shareStation(station);
             });
             menu.querySelector('.menu-edit-note').addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 menu.classList.add('hidden');
-                overlay.classList.remove('hidden');
+                settingsOverlay.classList.remove('hidden');
                 this.showEditNoteUI(card, url);
             });
             const moveBtn = menu.querySelector('.menu-move');
             if (moveBtn) {
                 moveBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
                     e.stopPropagation();
                     menu.classList.add('hidden');
-                    overlay.classList.remove('hidden');
+                    settingsOverlay.classList.remove('hidden');
                     this.moveStationToUserList(url);
                 });
             }
             menu.querySelector('.menu-homepage').addEventListener('click', (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 menu.classList.add('hidden');
-                overlay.classList.remove('hidden');
+                settingsOverlay.classList.remove('hidden');
                 let foundStation = null;
                 for (const list of this.stationLists) {
                     foundStation = list.stations.find(s => s.url === url);
@@ -968,15 +1079,24 @@ class RadioPlayer {
                 }
             });
             menu.querySelector('.menu-delete').addEventListener('click', async (e) => {
+                e.preventDefault();
                 e.stopPropagation();
                 menu.classList.add('hidden');
-                overlay.classList.remove('hidden');
+                settingsOverlay.classList.remove('hidden');
                 let foundStation = null;
                 for (const list of this.stationLists) {
                     foundStation = list.stations.find(s => s.url === url);
                     if (foundStation) break;
                 }
                 if (foundStation) await this.confirmAndRemoveStation(url, foundStation.name);
+            });
+
+            // Add touch event handlers to prevent default touch behavior
+            const menuButtons = menu.querySelectorAll('button');
+            menuButtons.forEach(button => {
+                button.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevent default touch behavior
+                }, { passive: false });
             });
         });
     }
@@ -1462,7 +1582,7 @@ class RadioPlayer {
                                     </div>
                                 </div>
                                 <div class="station-meta">
-                                    ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
+                                    ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11V9ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
                                     ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
                                     ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
                                 </div>
