@@ -12,6 +12,13 @@ const ASSETS_TO_CACHE = [
     '/icons/favicon-32x32.png'
 ];
 
+// Files to check for updates
+const FILES_TO_CHECK = [
+    '/index.html',
+    '/styles.css',
+    '/app.js'
+];
+
 // Install event - cache assets
 self.addEventListener('install', event => {
     // Skip waiting to activate the new service worker immediately
@@ -56,6 +63,28 @@ function isAudioStream(url) {
            audioPatterns.some(pattern => lowerUrl.includes(pattern));
 }
 
+// Helper function to check if a file has changed
+async function checkFileForUpdates(url) {
+    try {
+        const cache = await caches.open(CACHE_NAME);
+        const cachedResponse = await cache.match(url);
+        
+        if (!cachedResponse) return true;
+
+        const networkResponse = await fetch(url, { cache: 'no-store' });
+        
+        if (!networkResponse.ok) return false;
+
+        const cachedText = await cachedResponse.text();
+        const networkText = await networkResponse.text();
+
+        return cachedText !== networkText;
+    } catch (error) {
+        console.error('Error checking file for updates:', error);
+        return false;
+    }
+}
+
 // Fetch event - network first strategy for HTML and JS, cache first for others
 self.addEventListener('fetch', event => {
     const request = event.request;
@@ -79,25 +108,34 @@ self.addEventListener('fetch', event => {
         return;
     }
 
-    // Network-first strategy for HTML, JS, and CSS files
-    if (request.headers.get('accept').includes('text/html') || 
-        request.url.endsWith('.js') ||
-        request.url.endsWith('.css')) {
+    // Check for updates in specific files
+    if (FILES_TO_CHECK.includes(url.pathname)) {
         event.respondWith(
-            fetch(request)
-                .then(response => {
-                    // Cache the new response
-                    const responseToCache = response.clone();
-                    caches.open(CACHE_NAME)
-                        .then(cache => {
-                            cache.put(request, responseToCache);
+            (async () => {
+                const hasUpdate = await checkFileForUpdates(url.pathname);
+                
+                if (hasUpdate) {
+                    // Notify clients about the update
+                    const clients = await self.clients.matchAll();
+                    clients.forEach(client => {
+                        client.postMessage({
+                            type: 'UPDATE_AVAILABLE',
+                            file: url.pathname
                         });
+                    });
+                }
+
+                // Network-first strategy for these files
+                try {
+                    const response = await fetch(request);
+                    const responseToCache = response.clone();
+                    const cache = await caches.open(CACHE_NAME);
+                    await cache.put(request, responseToCache);
                     return response;
-                })
-                .catch(() => {
-                    // Fall back to cache if network fails
+                } catch (error) {
                     return caches.match(request);
-                })
+                }
+            })()
         );
         return;
     }
@@ -141,4 +179,11 @@ self.addEventListener('fetch', event => {
                     });
             })
     );
+});
+
+// Add message event listener to handle update notifications
+self.addEventListener('message', event => {
+    if (event.data && event.data.type === 'SKIP_WAITING') {
+        self.skipWaiting();
+    }
 }); 

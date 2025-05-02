@@ -189,7 +189,7 @@
                         <span>Done</span>
                     </button>
                 </div>
-                <div class="tip hidden">Some stations may take a while to load. Please be patient. You will be notified if they fail to connect.</div>
+                <div class="tip hidden">Some stations may take a few seconds to connect. Please be patient. You will be notified if a station fails to connect.</div>
                 <div class="results-grid"></div>
             </section>
 
@@ -390,6 +390,9 @@
             <div class="modal-content" style="width: 100%; max-width: 400px; text-align: center; padding: 3rem 1rem;">
                 <div class="modal-header">
                     <h2 style="text-align: center; width: 100%;">Update Available</h2>
+                    <button id="close-update" class="close-btn" style="position: absolute; top: 1rem; right: 1rem;">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
                 </div>
                 <div class="modal-body">
                     <p>Update now to continue using the app.</p>
@@ -410,7 +413,7 @@
         if ('serviceWorker' in navigator) {
             // Register service worker
             navigator.serviceWorker.register('sw.js')
-                .then(registration => {     
+                .then(registration => {
                     // Check for updates every hour
                     setInterval(() => {
                         registration.update();
@@ -421,40 +424,48 @@
                         const newWorker = registration.installing;
                         newWorker.addEventListener('statechange', () => {
                             if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                // Show update modal
-                                const updateModal = document.getElementById('update-modal');
-                                const closeUpdateBtn = document.getElementById('close-update');
-                                const updateNowBtn = document.getElementById('update-now');
-                                
-                                updateModal.classList.remove('hidden');
-                                
-                                // Handle update now
-                                updateNowBtn.addEventListener('click', () => {
-                                    window.location.reload();
-                                });
-                                
-                                // Handle close button
-                                closeUpdateBtn.addEventListener('click', () => {
-                                    updateModal.classList.add('hidden');
-                                });
+                                showUpdateNotification();
                             }
                         });
                     });
+
+                    // Listen for file-specific updates
+                    navigator.serviceWorker.addEventListener('message', event => {
+                        if (event.data && event.data.type === 'UPDATE_AVAILABLE') {
+                            showUpdateNotification(event.data.file);
+                        }
+                    });
                 })
                 .catch(err => {
-                    console.log('ServiceWorker registration failed: ', err);
+                    console.error('ServiceWorker registration failed: ', err);
                 });
 
             // Handle updates when the service worker is already installed
             navigator.serviceWorker.addEventListener('controllerchange', () => {
+                window.location.reload();
+            });
+
+            // Function to show update notification
+            function showUpdateNotification(updatedFile) {
                 const updateModal = document.getElementById('update-modal');
                 const closeUpdateBtn = document.getElementById('close-update');
                 const updateNowBtn = document.getElementById('update-now');
+                const updateMessage = document.querySelector('#update-modal .modal-body p');
+                
+                // Update the message if a specific file was updated
+                if (updatedFile) {
+                    const fileName = updatedFile.split('/').pop();
+                    updateMessage.textContent = `An update is available for ${fileName}. Update now to continue using the app.`;
+                } else {
+                    updateMessage.textContent = 'Update now to continue using the app.';
+                }
                 
                 updateModal.classList.remove('hidden');
                 
                 // Handle update now
                 updateNowBtn.addEventListener('click', () => {
+                    // Send message to service worker to skip waiting
+                    navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
                     window.location.reload();
                 });
                 
@@ -462,7 +473,7 @@
                 closeUpdateBtn.addEventListener('click', () => {
                     updateModal.classList.add('hidden');
                 });
-            });
+            }
         }
     </script>
 </body>

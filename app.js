@@ -701,29 +701,45 @@ class RadioPlayer {
             const moreBtn = card.querySelector('.more-btn');
             const menu = card.querySelector('.station-menu');
             const overlay = card.querySelector('.station-menu-overlay');
-            if (moreBtn && menu) {
+            if (moreBtn && menu && overlay) {
+                let touchStartY = 0;
+                let touchStartX = 0;
+                const TOUCH_THRESHOLD = 10; // pixels of movement allowed before considering it a scroll
+
                 const handleMoreBtn = (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    // Close all other menus first
-                    document.querySelectorAll('.station-menu').forEach(m => {
-                        if (m !== menu) {
-                            m.classList.add('hidden');
-                            m.previousElementSibling?.classList.add('hidden'); // Hide overlay
-                        }
-                    });
-                    // Toggle the current menu
-                    menu.classList.toggle('hidden');
-                    overlay.classList.toggle('hidden');
+                    menu.classList.remove('hidden');
+                    overlay.classList.remove('hidden');
                 };
-                moreBtn.addEventListener('mousedown', handleMoreBtn);
+
+                moreBtn.addEventListener('click', handleMoreBtn);
                 moreBtn.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); // Prevent scrolling
+                    touchStartY = e.touches[0].clientY;
+                    touchStartX = e.touches[0].clientX;
                     handleMoreBtn(e);
                 });
-                moreBtn.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
+                moreBtn.addEventListener('touchmove', (e) => {
+                    const touchY = e.touches[0].clientY;
+                    const touchX = e.touches[0].clientX;
+                    const deltaY = Math.abs(touchY - touchStartY);
+                    const deltaX = Math.abs(touchX - touchStartX);
+                    
+                    // If movement exceeds threshold, close the menu
+                    if (deltaY > TOUCH_THRESHOLD || deltaX > TOUCH_THRESHOLD) {
                         e.preventDefault();
+                        menu.classList.add('hidden');
+                        overlay.classList.add('hidden');
+                    }
+                });
+                moreBtn.addEventListener('touchend', (e) => {
+                    const touchY = e.changedTouches[0].clientY;
+                    const touchX = e.changedTouches[0].clientX;
+                    const deltaY = Math.abs(touchY - touchStartY);
+                    const deltaX = Math.abs(touchX - touchStartX);
+                    
+                    // Only open menu if movement was minimal
+                    if (deltaY <= TOUCH_THRESHOLD && deltaX <= TOUCH_THRESHOLD) {
                         handleMoreBtn(e);
                     }
                 });
@@ -2406,7 +2422,7 @@ async function displaySearchResults(stations) {
                     <div class="station-details">
                         <h3>${station.name}</h3>
                         <div class="station-meta">
-                            ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
+                            ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11V9ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
                             ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
                             ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
                         </div>
