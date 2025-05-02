@@ -2081,6 +2081,7 @@ input[type="range"] {
     width: 100%;
     @media (max-width: 768px) {
         font-size: 1.25rem;
+    }
 }
 .station-menu button:hover {
     background: var(--border-color);
