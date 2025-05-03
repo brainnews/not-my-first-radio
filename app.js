@@ -899,7 +899,7 @@ class RadioPlayer {
                         overlay.classList.add('hidden');
                         this.showEditNoteUI(card, url);
                     };
-                    menuEditNote.addEventListener('mousedown', handleEditNote);
+                    menuEditNote.addEventListener('click', handleEditNote);
                     menuEditNote.addEventListener('touchstart', (e) => {
                         e.preventDefault(); // Prevent scrolling
                         handleEditNote(e);
