@@ -2315,6 +2315,10 @@ input[type="range"] {
     width: 120px;
     height: 120px;
     object-fit: cover;
+    @media (max-width: 768px) {
+        width: 140px;
+        height: 140px;
+    }
 }
 
 .starter-pack-card-content {
