@@ -534,27 +534,23 @@ class RadioPlayer {
             // Load all starter packs
             const loadStarterPacks = async () => {
                 try {
-                    // Get list of starter packs
-                    const response = await fetch('https://files.notmyfirstradio.com/starter-packs/');
-                    const text = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(text, 'text/html');
-                    const links = Array.from(doc.querySelectorAll('a'))
-                        .map(a => a.href)
-                        .filter(href => href.endsWith('.json'))
-                        .map(href => href.split('/').pop());
+                    // Load specific starter packs
+                    const starterPackUrls = [
+                        'https://files.notmyfirstradio.com/starter-packs/austin.json',
+                        'https://files.notmyfirstradio.com/starter-packs/jungle-dnb.json'
+                    ];
 
                     // Load each starter pack
-                    const packs = await Promise.all(links.map(async (filename) => {
+                    const packs = await Promise.all(starterPackUrls.map(async (url) => {
                         try {
-                            const response = await fetch(`starter-packs/${filename}`);
+                            const response = await fetch(url);
                             const data = await response.json();
                             return {
-                                filename,
+                                filename: url.split('/').pop(),
                                 data
                             };
                         } catch (error) {
-                            console.error(`Error loading starter pack ${filename}:`, error);
+                            console.error(`Error loading starter pack ${url}:`, error);
                             return null;
                         }
                     }));
