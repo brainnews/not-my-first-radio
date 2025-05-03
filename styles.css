@@ -1992,8 +1992,8 @@ input[type="range"] {
 
 .station-menu {
     position: absolute;
-    top: 2.2rem;
-    right: 0;
+    top: 0;
+    right: 2rem;
     bottom: auto;
     background: var(--bg-secondary);
     border: 1px solid var(--border-color);
@@ -2007,21 +2007,22 @@ input[type="range"] {
     padding: 0.25rem 0;
     @media (max-width: 768px) {
         position: fixed;
-        bottom: -300px;
+        bottom: 0;
         left: 0;
         right: 0;
+        transform: translateY(0px);
         top: auto;
         height: fit-content;
         border-radius: 0;
         border: none;
         padding: 0.75rem;
         gap: 1rem;
-        transition: bottom 0.1s ease;
+        transition: transform 0.1s ease;
     }
 }
-.station-menu.active {
+.station-menu.hidden {
     @media (max-width: 768px) {
-        bottom: 0;
+        transform: translateY(400px);
     }
 }
 
