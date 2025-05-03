@@ -882,6 +882,9 @@ input[type="range"] {
     margin-bottom: 1rem;
     color: var(--text-secondary);
 }
+.settings-section p {
+    font-size: 0.875rem;
+}
 
 .username-section {
     margin-bottom: 1.5rem;
