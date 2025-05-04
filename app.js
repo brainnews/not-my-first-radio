@@ -533,83 +533,71 @@ class RadioPlayer {
 
             // Load all starter packs
             const loadStarterPacks = async () => {
-                try {
-                    // Get list of starter packs
-                    const response = await fetch('starter-packs/');
-                    const text = await response.text();
-                    const parser = new DOMParser();
-                    const doc = parser.parseFromString(text, 'text/html');
-                    const links = Array.from(doc.querySelectorAll('a'))
-                        .map(a => a.href)
-                        .filter(href => href.endsWith('.json'))
-                        .map(href => href.split('/').pop());
+                const specificPacks = [
+                    'austin.json',
+                    'jungle-dnb.json'
+                ];
 
-                    // Load each starter pack
-                    const packs = await Promise.all(links.map(async (filename) => {
-                        try {
-                            const response = await fetch(`starter-packs/${filename}`);
-                            const data = await response.json();
-                            return {
-                                filename,
-                                data
-                            };
-                        } catch (error) {
-                            console.error(`Error loading starter pack ${filename}:`, error);
-                            return null;
-                        }
-                    }));
-
-                    // Filter out failed loads and update UI
-                    const validPacks = packs.filter(pack => pack !== null);
-                    const starterPacksGrid = document.querySelector('.starter-packs-grid');
-                    
-                    if (validPacks.length === 0) {
-                        starterPacksGrid.innerHTML = '<p class="no-stations">No starter packs available.</p>';
-                        return;
+                const packs = await Promise.all(specificPacks.map(async (filename) => {
+                    try {
+                        const response = await fetch(`https://files.notmyfirstradio.com/starter-packs/${filename}`);
+                        const data = await response.json();
+                        return {
+                            filename,
+                            data
+                        };
+                    } catch (error) {
+                        console.error(`Error loading starter pack ${filename}:`, error);
+                        return null;
                     }
+                }));
 
-                    starterPacksGrid.innerHTML = validPacks.map(pack => `
-                        <div class="starter-pack-card" data-pack="${pack.filename.replace('.json', '')}">
-                            <img src="${pack.data.thumbnail_path || 'https://place-hold.it/250x250'}" alt="${pack.data.username} Starter Pack" class="starter-pack-image">
-                            <div class="starter-pack-card-content">
-                                <p>${pack.data.description || 'A collection of radio stations'}</p>
-                                <button class="add-starter-pack-btn" data-pack="${pack.filename.replace('.json', '')}">
-                                    <span class="material-symbols-rounded">add</span>
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
-
-                    // Add event listeners to starter pack buttons
-                    const addStarterPackBtns = document.querySelectorAll('.add-starter-pack-btn');
-                    addStarterPackBtns.forEach(btn => {
-                        btn.addEventListener('click', async (e) => {
-                            const packName = e.target.closest('.add-starter-pack-btn').dataset.pack;
-                            try {
-                                const response = await fetch(`starter-packs/${packName}.json`);
-                                const data = await response.json();
-                                
-                                if (!data || !data.stations || !Array.isArray(data.stations)) {
-                                    showNotification('Invalid starter pack format.', 'error');
-                                    return;
-                                }
-
-                                // Add all stations from the pack
-                                this.stations = data.stations;
-                                this.saveStations();
-                                this.displayStations();
-                                showNotification('Starter pack added successfully!', 'success');
-                            } catch (error) {
-                                console.error('Error loading starter pack:', error);
-                                showNotification('Failed to load starter pack.', 'error');
-                            }
-                        });
-                    });
-                } catch (error) {
-                    console.error('Error loading starter packs:', error);
-                    const starterPacksGrid = document.querySelector('.starter-packs-grid');
-                    starterPacksGrid.innerHTML = '<p class="no-stations">Failed to load starter packs. Please try again later.</p>';
+                // Filter out failed loads and update UI
+                const validPacks = packs.filter(pack => pack !== null);
+                const starterPacksGrid = document.querySelector('.starter-packs-grid');
+                
+                if (validPacks.length === 0) {
+                    starterPacksGrid.innerHTML = '<p class="no-stations">Error loading starter packs. Please try again later.</p>';
+                    return;
                 }
+
+                starterPacksGrid.innerHTML = validPacks.map(pack => `
+                    <div class="starter-pack-card" data-pack="${pack.filename.replace('.json', '')}">
+                        <img src="${pack.data.thumbnail_path || 'https://place-hold.it/250x250'}" alt="${pack.data.username} Starter Pack" class="starter-pack-image">
+                        <div class="starter-pack-card-content">
+                            <p>${pack.data.description || 'A collection of radio stations'}</p>
+                            <button class="add-starter-pack-btn" data-pack="${pack.filename.replace('.json', '')}">
+                                <span class="material-symbols-rounded">add</span>
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+
+                // Add event listeners to starter pack buttons
+                const addStarterPackBtns = document.querySelectorAll('.add-starter-pack-btn');
+                addStarterPackBtns.forEach(btn => {
+                    btn.addEventListener('click', async (e) => {
+                        const packName = e.target.closest('.add-starter-pack-btn').dataset.pack;
+                        try {
+                            const response = await fetch(`starter-packs/${packName}.json`);
+                            const data = await response.json();
+                            
+                            if (!data || !data.stations || !Array.isArray(data.stations)) {
+                                showNotification('Invalid starter pack format.', 'error');
+                                return;
+                            }
+
+                            // Add all stations from the pack
+                            this.stations = data.stations;
+                            this.saveStations();
+                            this.displayStations();
+                            showNotification('Starter pack added successfully!', 'success');
+                        } catch (error) {
+                            console.error('Error loading starter pack:', error);
+                            showNotification('Failed to load starter pack.', 'error');
+                        }
+                    });
+                });
             };
 
             // Start loading starter packs
@@ -809,6 +797,19 @@ class RadioPlayer {
                     e.stopPropagation();
                     menu.classList.remove('hidden');
                     overlay.classList.remove('hidden');
+                    // Add active class for mobile
+                    if (window.innerWidth <= 768) {
+                        menu.classList.add('active');
+                    }
+                };
+
+                const closeMenu = () => {
+                    menu.classList.add('hidden');
+                    overlay.classList.add('hidden');
+                    // Remove active class for mobile
+                    if (window.innerWidth <= 768) {
+                        menu.classList.remove('active');
+                    }
                 };
 
                 moreBtn.addEventListener('click', handleMoreBtn);
@@ -826,8 +827,7 @@ class RadioPlayer {
                     // If movement exceeds threshold, close the menu
                     if (deltaY > TOUCH_THRESHOLD || deltaX > TOUCH_THRESHOLD) {
                         e.preventDefault();
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
+                        closeMenu();
                     }
                 });
                 moreBtn.addEventListener('touchend', (e) => {
@@ -845,14 +845,12 @@ class RadioPlayer {
                 // Add back the document click listener to close menu when clicking outside
                 document.addEventListener('mousedown', (e) => {
                     if (!card.contains(e.target)) {
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
+                        closeMenu();
                     }
                 });
                 document.addEventListener('touchstart', (e) => {
                     if (!card.contains(e.target)) {
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
+                        closeMenu();
                     }
                 });
 
@@ -860,8 +858,7 @@ class RadioPlayer {
                 overlay.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    menu.classList.add('hidden');
-                    overlay.classList.add('hidden');
+                    closeMenu();
                 });
 
                 // Menu item handlers
@@ -899,7 +896,7 @@ class RadioPlayer {
                         overlay.classList.add('hidden');
                         this.showEditNoteUI(card, url);
                     };
-                    menuEditNote.addEventListener('click', handleEditNote);
+                    menuEditNote.addEventListener('mousedown', handleEditNote);
                     menuEditNote.addEventListener('touchstart', (e) => {
                         e.preventDefault(); // Prevent scrolling
                         handleEditNote(e);
@@ -968,20 +965,17 @@ class RadioPlayer {
         const listStationCards = document.querySelectorAll('.list-stations .station-card');
         listStationCards.forEach(card => {
             const url = card.dataset.url;
-            
-            const handleCardInteraction = (e) => {
+            card.addEventListener('click', (e) => {
                 if (
                     e.target.closest('.remove-btn') ||
                     e.target.closest('.share-btn') ||
                     e.target.closest('.more-btn') ||
                     e.target.closest('.station-menu') ||
-                    e.target.closest('.station-menu-overlay') ||
                     e.target.classList.contains('note-input') ||
                     e.target.closest('.note-input') ||
                     e.target.classList.contains('note-actions') ||
                     e.target.closest('.note-actions')
                 ) return;
-                
                 let foundStation = null;
                 for (const list of this.stationLists) {
                     foundStation = list.stations.find(s => s.url === url);
@@ -997,14 +991,11 @@ class RadioPlayer {
                         this.playStation(foundStation);
                     }
                 }
-            };
-
-            card.addEventListener('click', handleCardInteraction);
-
+            });
             // Play or stop button
             const playControl = card.querySelector('.play-btn, .stop-btn');
             if (playControl) {
-                const handlePlayControl = (e) => {
+                playControl.addEventListener('click', (e) => {
                     e.stopPropagation();
                     let foundStation = null;
                     for (const list of this.stationLists) {
@@ -1021,208 +1012,80 @@ class RadioPlayer {
                             this.playStation(foundStation);
                         }
                     }
-                };
-                playControl.addEventListener('click', handlePlayControl);
+                });
             }
-
             // More menu logic
             const moreBtn = card.querySelector('.more-btn');
             const menu = card.querySelector('.station-menu');
-            const overlay = card.querySelector('.station-menu-overlay');
-            if (moreBtn && menu && overlay) {
-                let touchStartY = 0;
-                let touchStartX = 0;
-                const TOUCH_THRESHOLD = 10; // pixels of movement allowed before considering it a scroll
-
-                const handleMoreBtn = (e) => {
-                    e.preventDefault();
+            if (moreBtn && menu) {
+                moreBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
-                    menu.classList.remove('hidden');
-                    overlay.classList.remove('hidden');
-                };
-
-                moreBtn.addEventListener('click', handleMoreBtn);
-                moreBtn.addEventListener('touchstart', (e) => {
-                    touchStartY = e.touches[0].clientY;
-                    touchStartX = e.touches[0].clientX;
-                    handleMoreBtn(e);
+                    document.querySelectorAll('.station-menu').forEach(m => m.classList.add('hidden'));
+                    menu.classList.toggle('hidden');
                 });
-                moreBtn.addEventListener('touchmove', (e) => {
-                    const touchY = e.touches[0].clientY;
-                    const touchX = e.touches[0].clientX;
-                    const deltaY = Math.abs(touchY - touchStartY);
-                    const deltaX = Math.abs(touchX - touchStartX);
-                    
-                    // If movement exceeds threshold, close the menu
-                    if (deltaY > TOUCH_THRESHOLD || deltaX > TOUCH_THRESHOLD) {
-                        e.preventDefault();
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
-                    }
-                });
-                moreBtn.addEventListener('touchend', (e) => {
-                    const touchY = e.changedTouches[0].clientY;
-                    const touchX = e.changedTouches[0].clientX;
-                    const deltaY = Math.abs(touchY - touchStartY);
-                    const deltaX = Math.abs(touchX - touchStartX);
-                    
-                    // Only open menu if movement was minimal
-                    if (deltaY <= TOUCH_THRESHOLD && deltaX <= TOUCH_THRESHOLD) {
-                        handleMoreBtn(e);
-                    }
-                });
-
-                // Add back the document click listener to close menu when clicking outside
-                document.addEventListener('mousedown', (e) => {
-                    if (!card.contains(e.target)) {
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
-                    }
-                });
-                document.addEventListener('touchstart', (e) => {
-                    if (!card.contains(e.target)) {
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
-                    }
-                });
-
-                // Add overlay click handler to close menu
-                overlay.addEventListener('click', (e) => {
+            }
+            document.addEventListener('click', (e) => {
+                if (!card.contains(e.target)) menu.classList.add('hidden');
+            });
+            menu.querySelector('.menu-share').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                settingsOverlay.classList.remove('hidden');
+                const station = this.stations.find(s => s.url === url);
+                if (station) this.shareStation(station);
+            });
+            menu.querySelector('.menu-edit-note').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                settingsOverlay.classList.remove('hidden');
+                this.showEditNoteUI(card, url);
+            });
+            const moveBtn = menu.querySelector('.menu-move');
+            if (moveBtn) {
+                moveBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
                     menu.classList.add('hidden');
-                    overlay.classList.add('hidden');
+                    settingsOverlay.classList.remove('hidden');
+                    this.moveStationToUserList(url);
                 });
-
-                // Menu item handlers
-                const menuShare = menu.querySelector('.menu-share');
-                const menuEditNote = menu.querySelector('.menu-edit-note');
-                const menuMove = menu.querySelector('.menu-move');
-                const menuHomepage = menu.querySelector('.menu-homepage');
-                const menuDelete = menu.querySelector('.menu-delete');
-
-                if (menuShare) {
-                    const handleShare = (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
-                        let foundStation = null;
-                        for (const list of this.stationLists) {
-                            foundStation = list.stations.find(s => s.url === url);
-                            if (foundStation) break;
-                        }
-                        if (foundStation) this.shareStation(foundStation);
-                    };
-                    menuShare.addEventListener('click', handleShare);
-                    menuShare.addEventListener('touchstart', (e) => {
-                        e.preventDefault(); // Prevent scrolling
-                        handleShare(e);
-                    });
-                    menuShare.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleShare(e);
-                        }
-                    });
-                }
-
-                if (menuEditNote) {
-                    const handleEditNote = (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
-                        this.showEditNoteUI(card, url);
-                    };
-                    menuEditNote.addEventListener('mousedown', handleEditNote);
-                    menuEditNote.addEventListener('touchstart', (e) => {
-                        e.preventDefault(); // Prevent scrolling
-                        handleEditNote(e);
-                    });
-                    menuEditNote.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleEditNote(e);
-                        }
-                    });
-                }
-
-                if (menuMove) {
-                    const handleMove = (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
-                        this.moveStationToUserList(url);
-                    };
-                    menuMove.addEventListener('mousedown', handleMove);
-                    menuMove.addEventListener('touchstart', (e) => {
-                        e.preventDefault(); // Prevent scrolling
-                        handleMove(e);
-                    });
-                    menuMove.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleMove(e);
-                        }
-                    });
-                }
-
-                if (menuHomepage) {
-                    const handleHomepage = (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
-                        let foundStation = null;
-                        for (const list of this.stationLists) {
-                            foundStation = list.stations.find(s => s.url === url);
-                            if (foundStation) break;
-                        }
-                        if (foundStation && foundStation.homepage) {
-                            window.open(foundStation.homepage, '_blank');
-                        }
-                    };
-                    menuHomepage.addEventListener('mousedown', handleHomepage);
-                    menuHomepage.addEventListener('touchstart', (e) => {
-                        e.preventDefault(); // Prevent scrolling
-                        handleHomepage(e);
-                    });
-                    menuHomepage.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleHomepage(e);
-                        }
-                    });
-                }
-
-                if (menuDelete) {
-                    const handleDelete = async (e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        menu.classList.add('hidden');
-                        overlay.classList.add('hidden');
-                        let foundStation = null;
-                        for (const list of this.stationLists) {
-                            foundStation = list.stations.find(s => s.url === url);
-                            if (foundStation) break;
-                        }
-                        if (foundStation) await this.confirmAndRemoveSharedStation(url, foundStation.name);
-                    };
-                    menuDelete.addEventListener('mousedown', handleDelete);
-                    menuDelete.addEventListener('touchstart', (e) => {
-                        e.preventDefault(); // Prevent scrolling
-                        handleDelete(e);
-                    });
-                    menuDelete.addEventListener('keydown', (e) => {
-                        if (e.key === 'Enter' || e.key === ' ') {
-                            e.preventDefault();
-                            handleDelete(e);
-                        }
-                    });
-                }
             }
+            menu.querySelector('.menu-homepage').addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                settingsOverlay.classList.remove('hidden');
+                let foundStation = null;
+                for (const list of this.stationLists) {
+                    foundStation = list.stations.find(s => s.url === url);
+                    if (foundStation) break;
+                }
+                if (foundStation && foundStation.homepage) {
+                    window.open(foundStation.homepage, '_blank');
+                }
+            });
+            menu.querySelector('.menu-delete').addEventListener('click', async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                menu.classList.add('hidden');
+                settingsOverlay.classList.remove('hidden');
+                let foundStation = null;
+                for (const list of this.stationLists) {
+                    foundStation = list.stations.find(s => s.url === url);
+                    if (foundStation) break;
+                }
+                if (foundStation) await this.confirmAndRemoveStation(url, foundStation.name);
+            });
+
+            // Add touch event handlers to prevent default touch behavior
+            const menuButtons = menu.querySelectorAll('button');
+            menuButtons.forEach(button => {
+                button.addEventListener('touchstart', (e) => {
+                    e.preventDefault(); // Prevent default touch behavior
+                }, { passive: false });
+            });
         });
     }
 
@@ -1715,7 +1578,7 @@ class RadioPlayer {
                             </div>
                         </div>
                         <div class="station-controls">
-                            ${this.currentStation && this.currentStation.url === station.url && this.isPlaying ? 
+                            ${isCurrentlyPlaying ? 
                                 `<button class="stop-btn">
                                     <span class="material-symbols-rounded">stop</span>
                                 </button>` : 
@@ -1730,8 +1593,9 @@ class RadioPlayer {
                             <div class="station-menu hidden">
                                 <div class="station-menu-info">${station.name}</div>
                                 <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
+                                <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit note</button>
                                 <button class="menu-move"><span class="material-symbols-rounded">content_copy</span> Copy to your radio</button>
-                                <button class="menu-homepage"><span class="material-symbols-rounded">open_in_new</span> Visit Website</button>
+                                <button class="menu-homepage"><span class="material-symbols-rounded">open_in_new</span> Visit website</button>
                                 <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
                             </div>
                         </div>
@@ -1747,6 +1611,22 @@ class RadioPlayer {
         // Add the new lists container
         savedStationsSection.appendChild(listsContainer);
         this.addSharedStationEventListeners();
+        
+        // Add event listeners for list edit buttons
+        document.querySelectorAll('.list-control-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const listIndex = btn.dataset.listIndex;
+                const list = this.stationLists[listIndex];
+                if (!list) return;
+                
+                const listElement = btn.closest('.station-list');
+                const stationsContainer = listElement.querySelector('.list-stations');
+                
+                // Toggle edit mode for this list
+                stationsContainer.classList.toggle('edit-mode');
+                btn.classList.toggle('active');
+            });
+        });
     }
 
     moveStationToUserList(url) {
@@ -1772,73 +1652,6 @@ class RadioPlayer {
         this.displayStations();
         showNotification('Station moved to your list!', 'success');
     }
-
-    confirmAndRemoveStation = async function(url, name) {
-        const confirmed = await showConfirmationModal({
-            title: 'Remove Station',
-            message: `Are you sure you want to remove ${name} from your list?`,
-            confirmText: 'Remove',
-            danger: true
-        });
-        if (confirmed) {
-            this.removeStation(url);
-        }
-    };
-
-    confirmAndRemoveSharedStation = async function(url, name) {
-        const confirmed = await showConfirmationModal({
-            title: 'Remove Station',
-            message: `Are you sure you want to remove ${name} from this shared list?`,
-            confirmText: 'Remove',
-            danger: true
-        });
-        if (confirmed) {
-            // Find which list contains this station
-            for (let i = 0; i < this.stationLists.length; i++) {
-                const list = this.stationLists[i];
-                const stationIndex = list.stations.findIndex(s => s.url === url);
-                if (stationIndex !== -1) {
-                    // Remove the station from the list
-                    list.stations.splice(stationIndex, 1);
-                    
-                    // If the list is now empty, remove it
-                    if (list.stations.length === 0) {
-                        this.stationLists.splice(i, 1);
-                    }
-                    
-                    // Save and update UI
-                    this.saveStationLists();
-                    this.displayStationLists();
-                    showNotification('Station removed from shared list.', 'success');
-                    return;
-                }
-            }
-        }
-    };
-
-    moveStationToUserList = function(url) {
-        // Find the station in the shared lists
-        let foundStation = null;
-        for (const list of this.stationLists) {
-            foundStation = list.stations.find(s => s.url === url);
-            if (foundStation) break;
-        }
-        if (!foundStation) {
-            showNotification('Station not found in shared lists.', 'error');
-            return;
-        }
-        // Check for duplicates in user's own list
-        const exists = this.stations.some(s => s.url === foundStation.url);
-        if (exists) {
-            showNotification('Station already exists in your list.', 'warning');
-            return;
-        }
-        // Add to user's own list
-        this.stations.push(foundStation);
-        this.saveStations();
-        this.displayStations();
-        showNotification('Station moved to your list!', 'success');
-    };
 }
 
 // Initialize the radio player
