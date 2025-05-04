@@ -10,6 +10,7 @@
     --accent-color: #9151F0;
     /* --accent-color: #9e66f2; */
     --accent-color-30: #9151F054;
+    --neon-green: #1fda8c;
     --border-color: #333333;
     --purple-color: #291d69;
     --error-color: #ff3b30;
@@ -210,14 +211,19 @@ main {
     }
     gap: 1rem;
     padding: 0.75rem 0.875rem;
-    transition: background 0.2s ease;
     margin-bottom: 0.5rem;
 }
-.station-card:hover, .search-result-card:hover {
-    background: var(--accent-color-30);
+.station-card:hover, .search-result-card:hover, .station-card.playing:hover {
+    background: var(--bg-secondary);
+    @media (max-width: 768px) {
+        background: transparent;
+    }
 }
 .station-card.playing {
-    background: var(--accent-color-30);
+    background: transparent;
+    @media (max-width: 768px) {
+        background: transparent;
+    }
 }
 .station-card .now-playing-icon {
     display: none;
@@ -321,13 +327,6 @@ main {
     align-items: center;
     gap: 0.5rem;
 }
-.station-card svg {
-    filter: opacity(0.25);
-    transition: filter 0.2s ease;
-}
-.station-card:hover svg, .station-card.playing svg {
-    filter: opacity(1);
-}
 .station-favicon {
     width: 48px;
     height: 48px;
@@ -346,7 +345,6 @@ main {
     height: 100%;
     object-fit: contain;
 }
-
 .station-favicon .material-symbols-rounded {
     font-size: 26.4px;
     color: var(--on-surface-variant);
@@ -402,6 +400,9 @@ main {
     @media (max-width: 768px) {
         font-size: 0.9625rem;
     }
+}
+.station-card.playing .station-details h3 {
+    color: var(--neon-green);
 }
 
 .station-controls, .search-result-controls {
@@ -644,17 +645,21 @@ input[type="range"] {
     font-size: 1.925em;
 }
 
-.station-meta {
+.station-card .station-meta {
     display: flex;
     gap: 1rem;
-    color: var(--text-secondary);
+    color: var(--text-primary);
+    filter: opacity(0.5);
     font-size: 0.9625rem;
     @media (max-width: 768px) {
         display: none;
     }
 }
-.playing .station-meta {
-    color: var(--text-primary);
+.station-card:hover .station-meta {
+    filter: opacity(1);
+}
+.station-card.playing .station-meta {
+    filter: opacity(1);
 }
 
 .station-meta span {
