@@ -2412,7 +2412,6 @@ async function searchStations(query) {
         const searchResultsSection = document.getElementById('search-results');
         const resultsGrid = searchResultsSection.querySelector('.results-grid');
         const sectionTitle = searchResultsSection.querySelector('.section-title');
-        const searchTip = searchResultsSection.querySelector('.tip');
 
         searchTip.classList.remove('hidden');
         searchResultsSection.classList.remove('hidden');
@@ -2435,12 +2434,10 @@ async function displaySearchResults(stations) {
     const searchResultsSection = document.getElementById('search-results');
     const resultsGrid = searchResultsSection.querySelector('.results-grid');
     const sectionTitle = searchResultsSection.querySelector('.section-title');
-    const searchTip = searchResultsSection.querySelector('.tip');
     
     // Show loading indicator
     searchResultsSection.classList.add('loading');
     searchResultsSection.classList.remove('hidden');
-    searchTip.classList.remove('hidden');
     // Hide the section title and clear button while loading
     sectionTitle.style.display = 'none';
     if (clearResultsBtn) clearResultsBtn.style.display = 'none';
@@ -2476,6 +2473,7 @@ async function displaySearchResults(stations) {
     // Remove loading indicator
     loadingIndicator.remove();
     searchResultsSection.classList.remove('loading');
+    
     // Show the section title and clear button now that results are ready
     sectionTitle.style.display = '';
     if (clearResultsBtn) clearResultsBtn.style.display = '';
@@ -2486,6 +2484,7 @@ async function displaySearchResults(stations) {
     const supportedCount = supportedStations.length;
     
     sectionTitle.textContent = `${supportedCount} playable stations found (${totalStations} total) for "${searchInput.value}"`;
+    searchTip.classList.remove('hidden');
     
     // Return early if no supported stations
     if (supportedStations.length === 0) {
