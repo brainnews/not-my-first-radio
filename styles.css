@@ -645,7 +645,7 @@ input[type="range"] {
     font-size: 1.925em;
 }
 
-.station-card .station-meta {
+.station-card .station-meta, .search-result-card .station-meta {
     display: flex;
     gap: 1rem;
     color: var(--text-primary);
@@ -655,10 +655,10 @@ input[type="range"] {
         display: none;
     }
 }
-.station-card:hover .station-meta {
+.station-card:hover .station-meta, .search-result-card:hover .station-meta {
     filter: opacity(1);
 }
-.station-card.playing .station-meta {
+.station-card.playing .station-meta, .search-result-card.playing .station-meta {
     filter: opacity(1);
 }
 
