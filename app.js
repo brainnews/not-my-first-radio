@@ -896,7 +896,7 @@ class RadioPlayer {
                         overlay.classList.add('hidden');
                         this.showEditNoteUI(card, url);
                     };
-                    menuEditNote.addEventListener('mousedown', handleEditNote);
+                    menuEditNote.addEventListener('click', handleEditNote);
                     menuEditNote.addEventListener('touchstart', (e) => {
                         e.preventDefault(); // Prevent scrolling
                         handleEditNote(e);
@@ -1646,8 +1646,21 @@ class RadioPlayer {
             showNotification('Station already exists in your list.', 'warning');
             return;
         }
+        // Create new station object with only required fields
+        const stationData = {
+            name: foundStation.name,
+            url: foundStation.url,
+            favicon: foundStation.favicon,
+            homepage: foundStation.homepage,
+            bitrate: foundStation.bitrate,
+            countrycode: foundStation.countrycode,
+            votes: foundStation.votes,
+            note: foundStation.note,
+            stationuuid: foundStation.stationuuid,
+            tags: foundStation.tags
+        };
         // Add to user's own list
-        this.stations.push(foundStation);
+        this.stations.push(stationData);
         this.saveStations();
         this.displayStations();
         showNotification('Station moved to your list!', 'success');
@@ -2324,9 +2337,63 @@ const clearInputBtn = document.getElementById('clear-input');
 const searchResults = document.getElementById('search-results');
 const clearResultsBtn = document.getElementById('clear-results');
 const searchTip = document.querySelector('.search-results .tip');
+const sortSelect = document.getElementById('sort-results');
 let previewAudio = null;
 let searchTimeout = null;
+let currentSearchResults = []; // Store current search results for sorting
 const SEARCH_DELAY = 500; // milliseconds delay for search after user stops typing
+
+// Load saved sort preference
+const savedSortPreference = localStorage.getItem('sortPreference') || 'default';
+sortSelect.value = savedSortPreference;
+
+// Add event listener for sort selection changes
+sortSelect.addEventListener('change', () => {
+    if (currentSearchResults.length > 0) {
+        // Save the new preference
+        localStorage.setItem('sortPreference', sortSelect.value);
+        displaySortedResults(sortSelect.value);
+    }
+});
+
+// Function to sort stations
+function sortStations(stations, sortBy) {
+    if (!stations) return [];
+    
+    // Create a copy of the array to avoid modifying the original
+    const sortedStations = [...stations];
+    
+    switch (sortBy) {
+        case 'bitrate':
+            return sortedStations.sort((a, b) => {
+                const bitrateA = parseInt(a.bitrate) || 0;
+                const bitrateB = parseInt(b.bitrate) || 0;
+                return bitrateB - bitrateA; // High to low
+            });
+        case 'votes':
+            return sortedStations.sort((a, b) => {
+                const votesA = parseInt(a.votes) || 0;
+                const votesB = parseInt(b.votes) || 0;
+                return votesB - votesA; // High to low
+            });
+        case 'countrycode':
+            return sortedStations.sort((a, b) => {
+                const countryA = (a.countrycode || '').toLowerCase();
+                const countryB = (b.countrycode || '').toLowerCase();
+                return countryA.localeCompare(countryB);
+            });
+        case 'default':
+            return sortedStations.sort((a, b) => {
+                const nameA = (a.name || '').toLowerCase();
+                const nameB = (b.name || '').toLowerCase();
+                return nameA.localeCompare(nameB);
+            });
+        case 'none':
+            return sortedStations; // Return unsorted results
+        default:
+            return sortedStations;
+    }
+}
 
 // Function to clear search results
 function clearSearchResults() {
@@ -2429,7 +2496,7 @@ async function searchStations(query) {
     }
 }
 
-// Display search results
+// Update displaySearchResults to store results and handle sorting
 async function displaySearchResults(stations) {
     const searchResultsSection = document.getElementById('search-results');
     const resultsGrid = searchResultsSection.querySelector('.results-grid');
@@ -2470,6 +2537,9 @@ async function displaySearchResults(stations) {
     const testResults = await Promise.all(testPromises);
     const supportedStations = testResults.filter(station => station !== null);
     
+    // Store the results for sorting
+    currentSearchResults = supportedStations;
+    
     // Remove loading indicator
     loadingIndicator.remove();
     searchResultsSection.classList.remove('loading');
@@ -2501,7 +2571,19 @@ async function displaySearchResults(stations) {
         return;
     }
     
-    resultsGrid.innerHTML = supportedStations.map(station => {
+    // Sort and display the results using the current sort selection
+    const currentSort = sortSelect.value;
+    displaySortedResults(currentSort);
+}
+
+// Function to display sorted results
+function displaySortedResults(sortBy) {
+    if (!currentSearchResults || currentSearchResults.length === 0) return;
+    
+    const resultsGrid = document.querySelector('.results-grid');
+    const sortedStations = sortStations(currentSearchResults, sortBy);
+    
+    resultsGrid.innerHTML = sortedStations.map(station => {
         const safeStation = {
             name: station.name || 'Unknown Station',
             tags: station.tags || 'No tags available',
@@ -2515,8 +2597,6 @@ async function displaySearchResults(stations) {
         };
         
         const safeStationJson = JSON.stringify(safeStation).replace(/"/g, '&quot;');
-        // Fix: define isCurrentlyPlaying for this card
-        const isCurrentlyPlaying = radioPlayer.currentStation && radioPlayer.isPlaying && radioPlayer.currentStation.url === station.url;
         return `
             <div class="search-result-card">
                 <div class="station-info">
@@ -2548,7 +2628,7 @@ async function displaySearchResults(stations) {
         `;
     }).join('');
 
-    // Add event listeners
+    // Add event listeners for preview and add buttons
     document.querySelectorAll('.preview-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             const url = btn.dataset.url;
@@ -2569,7 +2649,6 @@ async function displaySearchResults(stations) {
             
             if (exists) {
                 radioPlayer.removeStation(station.url);
-                // replace checkmark with add icon
                 btn.querySelector('.material-symbols-rounded').textContent = 'playlist_add';
                 btn.classList.remove('success');
             } else {
@@ -2893,8 +2972,21 @@ RadioPlayer.prototype.moveStationToUserList = function(url) {
         showNotification('Station already exists in your list.', 'warning');
         return;
     }
+    // Create new station object with only required fields
+    const stationData = {
+        name: foundStation.name,
+        url: foundStation.url,
+        favicon: foundStation.favicon,
+        homepage: foundStation.homepage,
+        bitrate: foundStation.bitrate,
+        countrycode: foundStation.countrycode,
+        votes: foundStation.votes,
+        note: foundStation.note,
+        stationuuid: foundStation.stationuuid,
+        tags: foundStation.tags
+    };
     // Add to user's own list
-    this.stations.push(foundStation);
+    this.stations.push(stationData);
     this.saveStations();
     this.displayStations();
     showNotification('Station moved to your list!', 'success');

@@ -11,7 +11,7 @@
     /* --accent-color: #9e66f2; */
     --accent-color-30: #9151F054;
     --neon-green: #1fda8c;
-    --border-color: #333333;
+    --border-color: #444444;
     --purple-color: #291d69;
     --error-color: #ff3b30;
     --border-style-primary: 1px dashed var(--accent-color-30);
@@ -702,6 +702,10 @@ input[type="range"] {
     background: var(--bg-primary);
     backdrop-filter: blur(10px);
     border-bottom: 1px solid var(--border-color);
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 .search-results .tip {
     padding: 1rem;
@@ -2367,5 +2371,48 @@ input[type="range"] {
 
 .add-starter-pack-btn .material-symbols-rounded {
     font-size: 1.25rem;
+}
+
+.results-controls {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    @media (max-width: 768px) {
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 0.5rem;
+        margin-top: 0.5rem;
+    }
+}
+
+.sort-select {
+    padding: 0.55rem 0.825rem;
+    border: 1px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--bg-primary);
+    color: var(--text-primary);
+    font-size: 0.875rem;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-position: right 0.5rem center;
+    background-size: 1em;
+    padding-right: 2.5rem;
+    @media (max-width: 768px) {
+        max-width: 75%;
+    }
+}
+
+.sort-select:focus {
+    outline: none;
+    border-color: var(--accent-color);
+}
+
+.sort-select option {
+    background: var(--bg-primary);
+    color: var(--text-primary);
 }
 

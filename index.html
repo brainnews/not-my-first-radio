@@ -185,9 +185,18 @@
             <section id="search-results" class="search-results hidden">
                 <div class="results-header">
                     <h2 class="section-title"></h2>
-                    <button id="clear-results" class="clear-results-btn">
-                        <span>Done</span>
-                    </button>
+                    <div class="results-controls">
+                        <select id="sort-results" class="sort-select">
+                            <option value="default">Sort by</option>
+                            <option value="none">No sorting</option>
+                            <option value="bitrate">Bitrate (High to Low)</option>
+                            <option value="votes">Popularity (High to Low)</option>
+                            <option value="countrycode">Country (A-Z)</option>
+                        </select>
+                        <button id="clear-results" class="clear-results-btn">
+                            <span>Done</span>
+                        </button>
+                    </div>
                 </div>
                 <p class="tip hidden">Some stations may take several seconds to connect. Please be patient. You will be notified when a station fails to connect.</p>
                 <div class="results-grid"></div>
