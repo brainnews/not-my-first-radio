@@ -716,7 +716,14 @@ class RadioPlayer {
                     </button>
                     <div class="station-menu-overlay hidden"></div>
                     <div class="station-menu hidden">
-                        <div class="station-menu-info">${station.name}</div>
+                        <div class="station-menu-info">
+                            <div class="station-menu-name">${station.name}</div>
+                            <div class="station-menu-data">
+                                <div class="station-menu-data-item"><span class="material-symbols-rounded">radio</span>${station.bitrate ? `${station.bitrate}kbps` : ''}</div>
+                                <div class="station-menu-data-item"><span class="material-symbols-rounded">public</span>${station.countrycode ? `${station.countrycode}` : ''}</div>
+                                <div class="station-menu-data-item"><span class="material-symbols-rounded">local_fire_department</span>${station.votes ? `${station.votes}` : ''}</div>
+                            </div>
+                        </div>
                         <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
                         <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit Note</button>
                         <button class="menu-homepage"><span class="material-symbols-rounded">open_in_new</span> Visit Website</button>
@@ -971,6 +978,7 @@ class RadioPlayer {
                     e.target.closest('.share-btn') ||
                     e.target.closest('.more-btn') ||
                     e.target.closest('.station-menu') ||
+                    e.target.closest('.station-menu-overlay') ||
                     e.target.classList.contains('note-input') ||
                     e.target.closest('.note-input') ||
                     e.target.classList.contains('note-actions') ||
@@ -1017,30 +1025,44 @@ class RadioPlayer {
             // More menu logic
             const moreBtn = card.querySelector('.more-btn');
             const menu = card.querySelector('.station-menu');
-            if (moreBtn && menu) {
+            const overlay = card.querySelector('.station-menu-overlay');
+            if (moreBtn && menu && overlay) {
                 moreBtn.addEventListener('click', (e) => {
                     e.stopPropagation();
                     document.querySelectorAll('.station-menu').forEach(m => m.classList.add('hidden'));
-                    menu.classList.toggle('hidden');
+                    menu.classList.remove('hidden');
+                    overlay.classList.remove('hidden');
+                    if (window.innerWidth <= 768) {
+                        menu.classList.add('active');
+                    }
                 });
             }
+            const closeMenu = () => {
+                menu.classList.add('hidden');
+                overlay.classList.add('hidden');
+                // Remove active class for mobile
+                if (window.innerWidth <= 768) {
+                    menu.classList.remove('active');
+                }
+            };
             document.addEventListener('click', (e) => {
-                if (!card.contains(e.target)) menu.classList.add('hidden');
+                if (!card.contains(e.target)) closeMenu();
+            });
+            document.addEventListener('touchstart', (e) => {
+                if (!card.contains(e.target)) closeMenu();
+            });
+            overlay.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                closeMenu();
             });
             menu.querySelector('.menu-share').addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
                 menu.classList.add('hidden');
-                settingsOverlay.classList.remove('hidden');
+                overlay.classList.add('hidden');
                 const station = this.stations.find(s => s.url === url);
                 if (station) this.shareStation(station);
-            });
-            menu.querySelector('.menu-edit-note').addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                menu.classList.add('hidden');
-                settingsOverlay.classList.remove('hidden');
-                this.showEditNoteUI(card, url);
             });
             const moveBtn = menu.querySelector('.menu-move');
             if (moveBtn) {
@@ -1048,7 +1070,7 @@ class RadioPlayer {
                     e.preventDefault();
                     e.stopPropagation();
                     menu.classList.add('hidden');
-                    settingsOverlay.classList.remove('hidden');
+                    overlay.classList.add('hidden');
                     this.moveStationToUserList(url);
                 });
             }
@@ -1056,7 +1078,7 @@ class RadioPlayer {
                 e.preventDefault();
                 e.stopPropagation();
                 menu.classList.add('hidden');
-                settingsOverlay.classList.remove('hidden');
+                overlay.classList.add('hidden');
                 let foundStation = null;
                 for (const list of this.stationLists) {
                     foundStation = list.stations.find(s => s.url === url);
@@ -1070,7 +1092,7 @@ class RadioPlayer {
                 e.preventDefault();
                 e.stopPropagation();
                 menu.classList.add('hidden');
-                settingsOverlay.classList.remove('hidden');
+                overlay.classList.add('hidden');
                 let foundStation = null;
                 for (const list of this.stationLists) {
                     foundStation = list.stations.find(s => s.url === url);
@@ -1082,10 +1104,34 @@ class RadioPlayer {
             // Add touch event handlers to prevent default touch behavior
             const menuButtons = menu.querySelectorAll('button');
             menuButtons.forEach(button => {
+                // Prevent default touch behavior
                 button.addEventListener('touchstart', (e) => {
-                    e.preventDefault(); // Prevent default touch behavior
+                    e.preventDefault();
+                }, { passive: false });
+
+                // Add touch end handler to trigger the click action
+                button.addEventListener('touchend', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    button.click();
                 }, { passive: false });
             });
+
+            // Add touch event handler for the more button
+            moreBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+            }, { passive: false });
+
+            moreBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                moreBtn.click();
+            }, { passive: false });
+
+            // Add touch event handler for the menu container
+            menu.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+            }, { passive: false });
         });
     }
 
@@ -1591,9 +1637,15 @@ class RadioPlayer {
                             </button>
                             <div class="station-menu-overlay hidden"></div>
                             <div class="station-menu hidden">
-                                <div class="station-menu-info">${station.name}</div>
+                                <div class="station-menu-info">
+                                    <div class="station-menu-name">${station.name}</div>
+                                    <div class="station-menu-data">
+                                        <div class="station-menu-data-item"><span class="material-symbols-rounded">radio</span>${station.bitrate ? `${station.bitrate}kbps` : ''}</div>
+                                        <div class="station-menu-data-item"><span class="material-symbols-rounded">public</span>${station.countrycode ? `${station.countrycode}` : ''}</div>
+                                        <div class="station-menu-data-item"><span class="material-symbols-rounded">local_fire_department</span>${station.votes ? `${station.votes}` : ''}</div>
+                                    </div>
+                                </div>
                                 <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
-                                <button class="menu-edit-note"><span class="material-symbols-rounded">edit</span> Edit note</button>
                                 <button class="menu-move"><span class="material-symbols-rounded">content_copy</span> Copy to your radio</button>
                                 <button class="menu-homepage"><span class="material-symbols-rounded">open_in_new</span> Visit website</button>
                                 <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
