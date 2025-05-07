@@ -1125,7 +1125,7 @@ input[type="range"] {
     height: auto;
 }
 
-.qr-instructions, .scanner-instructions {
+.qr-instructions {
     text-align: center;
     color: var(--text-secondary);
     margin: 0;

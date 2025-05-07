@@ -1883,13 +1883,9 @@ saveUsernameBtn.addEventListener('click', () => {
 
 // QR Code functionality
 const qrModal = document.getElementById('qr-modal');
-const scannerModal = document.getElementById('scanner-modal');
 const shareQrBtn = document.getElementById('share-qr');
-const scanQrBtn = document.getElementById('scan-qr');
 const closeQrBtn = document.getElementById('close-qr');
-const closeScannerBtn = document.getElementById('close-scanner');
 const qrCodeContainer = document.getElementById('qr-code');
-const scannerContainer = document.getElementById('scanner-container');
 
 // Load QR code libraries
 function loadScript(src) {
@@ -1909,7 +1905,6 @@ function loadScript(src) {
 
 // Initialize QR code functionality
 let qrcodeReady = false;
-let scannerReady = false;
 
 // Try loading from multiple CDNs
 const qrcodeUrls = [
@@ -1917,14 +1912,8 @@ const qrcodeUrls = [
     'https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js'
 ];
 
-const scannerUrls = [
-    'https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js',
-    'https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js'
-];
-
 async function loadLibraries() {
     let qrcodeLoaded = false;
-    let scannerLoaded = false;
 
     // Try loading QR code library from multiple sources
     for (const url of qrcodeUrls) {
@@ -1937,28 +1926,15 @@ async function loadLibraries() {
         }
     }
 
-    // Try loading scanner library from multiple sources
-    for (const url of scannerUrls) {
-        try {
-            await loadScript(url);
-            scannerLoaded = true;
-            break;
-        } catch (error) {
-            console.warn(`Failed to load scanner library from ${url}, trying next source...`);
-        }
-    }
-
-    if (!qrcodeLoaded || !scannerLoaded) {
+    if (!qrcodeLoaded) {
         throw new Error('Failed to load required QR code libraries. Please check your internet connection and try refreshing the page.');
     }
 
     qrcodeReady = true;
-    scannerReady = true;
 }
 
 loadLibraries()
     .then(() => {
-        
         // Remove any existing event listener first
         const newCloseQrBtn = document.getElementById('close-qr');
         const oldCloseQrBtn = closeQrBtn;
@@ -1991,26 +1967,32 @@ shareQrBtn.addEventListener('click', () => {
     }
 
     try {
-        // Only share UUIDs and username
-        const data = {
-            u: currentUsername, // username
-            i: radioPlayer.stations.map(station => station.stationuuid).filter(uuid => uuid) // station uuids
+        // Create shareable URL
+        const shareData = {
+            u: currentUsername,
+            i: radioPlayer.stations.map(station => station.stationuuid).filter(uuid => uuid)
         };
-        
-        const dataStr = JSON.stringify(data);
+        const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
         
         // Clear any existing QR code
         qrCodeContainer.innerHTML = '';
         
-        // Create new QR code
+        // Create new QR code with mobile-optimized settings
         new QRCode(qrCodeContainer, {
-            text: dataStr,
+            text: shareUrl,
             width: 256,
             height: 256,
-            colorDark: '#000000',
-            colorLight: '#ffffff',
-            correctLevel: QRCode.CorrectLevel.L
+            colorDark: '#000000', // Pure black for better contrast
+            colorLight: '#ffffff', // Pure white for better contrast
+            correctLevel: QRCode.CorrectLevel.H, // Higher error correction for better scanning
+            quietZone: 15, // Add quiet zone around QR code
+            quietZoneColor: '#ffffff' // White quiet zone
         });
+        
+        // Add a white background container for better contrast
+        qrCodeContainer.style.backgroundColor = '#ffffff';
+        qrCodeContainer.style.padding = '15px';
+        qrCodeContainer.style.borderRadius = '8px';
         
         qrModal.classList.remove('hidden');
     } catch (error) {
@@ -2138,198 +2120,7 @@ function showQrImportOptions(options) {
     });
 }
 
-// Update the scan success handler to use the new modal
-const onScanSuccess = async (decodedText, decodedResult) => {
-    try {
-        // Stop the scanner immediately after successful scan
-        if (html5QrcodeScanner) {
-            html5QrcodeScanner.clear();
-            html5QrcodeScanner = null;
-        }
 
-        const data = JSON.parse(decodedText);
-        
-        // Validate imported data
-        if (!data || !data.i || !Array.isArray(data.i)) {
-            showNotification('Invalid QR code format.', 'error');
-            return;
-        }
-        
-        if (data.i.length === 0) {
-            showNotification('No stations found in the QR code.', 'warning');
-            return;
-        }
-
-        // Show loading notification
-        showNotification('Fetching station details...', 'success');
-
-        // Fetch full station details for each UUID
-        const stations = await Promise.all(data.i.map(async (uuid) => {
-            try {
-                const response = await fetch(`https://de1.api.radio-browser.info/json/stations/byuuid/${uuid}`);
-                const apiStations = await response.json();
-                
-                if (apiStations && apiStations.length > 0) {
-                    return apiStations[0];
-                }
-                
-                // If not found in API, skip this station
-                return null;
-            } catch (error) {
-                console.warn('Error fetching station details:', error);
-                return null;
-            }
-        }));
-
-        // Filter out any failed lookups
-        const validStations = stations.filter(station => station !== null);
-        
-        if (validStations.length === 0) {
-            showNotification('No valid stations found in the QR code.', 'error');
-            return;
-        }
-
-        const sharedUsername = data.u || 'Unknown User';
-        const listName = `${sharedUsername}'s radio`;
-        
-        // Show import options using the new modal
-        const importOption = await showQrImportOptions({
-            title: 'Import Stations',
-            message: `Found ${validStations.length} stations from ${sharedUsername}.`
-        });
-
-        if (importOption === null) return;
-
-        switch (importOption) {
-            case '1':
-                // Merge stations, avoiding duplicates
-                const existingUrls = radioPlayer.stations.map(s => s.url);
-                for (const station of validStations) {
-                    if (!existingUrls.includes(station.url)) {
-                        radioPlayer.stations.push(station);
-                        existingUrls.push(station.url);
-                    }
-                }
-                break;
-            
-            case '3':
-                // Add as separate list
-                const newList = {
-                    name: listName,
-                    stations: validStations
-                };
-                
-                // Add new list to the player's lists
-                radioPlayer.stationLists.push(newList);
-                
-                // Save lists
-                radioPlayer.saveStationLists();
-                
-                // Update UI to show the new list
-                radioPlayer.displayStationLists();
-                break;
-        }
-        
-        // Save and display the new stations
-        radioPlayer.saveStations();
-        radioPlayer.displayStations();
-        
-        showNotification(`Import successful! You now have ${radioPlayer.stations.length} stations.`, 'success');
-        
-        // Close scanner modal
-        scannerModal.classList.add('hidden');
-    } catch (error) {
-        console.error('Error parsing QR code data:', error);
-        showNotification('Error parsing QR code data. The QR code may be invalid or corrupted.', 'error');
-    }
-};
-
-// Handle QR code scanning
-let html5QrcodeScanner = null;
-let currentCameraId = null;
-
-scanQrBtn.addEventListener('click', () => {
-    if (!scannerReady) {
-        showNotification('QR scanner is still loading. Please try again in a moment.', 'warning');
-        return;
-    }
-
-    scannerModal.classList.remove('hidden');
-    
-    if (!html5QrcodeScanner) {
-        // Get available cameras
-        Html5Qrcode.getCameras().then(devices => {
-            if (devices && devices.length > 0) {
-                // Start with the rear camera if available
-                const rearCamera = devices.find(device => device.label.toLowerCase().includes('back'));
-                const initialCameraId = rearCamera ? rearCamera.id : devices[0].id;
-                currentCameraId = initialCameraId;
-
-                // Initialize scanner with the selected camera
-                html5QrcodeScanner = new Html5QrcodeScanner(
-                    "scanner-container",
-                    { 
-                        fps: 10, 
-                        qrbox: { width: 250, height: 250 },
-                        aspectRatio: 1.0,
-                        videoConstraints: {
-                            deviceId: initialCameraId
-                        }
-                    },
-                    false
-                );
-
-                // Set up camera toggle button
-                const toggleCameraBtn = document.getElementById('toggle-camera');
-                if (devices.length > 1) {
-                    toggleCameraBtn.style.display = 'flex';
-                    toggleCameraBtn.addEventListener('click', () => {
-                        const currentIndex = devices.findIndex(device => device.id === currentCameraId);
-                        const nextIndex = (currentIndex + 1) % devices.length;
-                        const nextCameraId = devices[nextIndex].id;
-                        
-                        // Stop current scanner
-                        html5QrcodeScanner.clear();
-                        
-                        // Start new scanner with next camera
-                        html5QrcodeScanner = new Html5QrcodeScanner(
-                            "scanner-container",
-                            { 
-                                fps: 10, 
-                                qrbox: { width: 250, height: 250 },
-                                aspectRatio: 1.0,
-                                videoConstraints: {
-                                    deviceId: nextCameraId
-                                }
-                            },
-                            false
-                        );
-                        
-                        currentCameraId = nextCameraId;
-                        html5QrcodeScanner.render(onScanSuccess);
-                    });
-                } else {
-                    toggleCameraBtn.style.display = 'none';
-                }
-
-                html5QrcodeScanner.render(onScanSuccess);
-            } else {
-                showNotification('No cameras found. Please check your device permissions.', 'error');
-            }
-        }).catch(err => {
-            console.error('Error getting cameras:', err);
-            showNotification('Error accessing camera. Please check your device permissions.', 'error');
-        });
-    }
-});
-
-// Close scanner modal
-closeScannerBtn.addEventListener('click', () => {
-    scannerModal.classList.add('hidden');
-    if (html5QrcodeScanner) {
-        html5QrcodeScanner.clear();
-    }
-});
 
 // Search functionality
 const searchInput = document.getElementById('search-input');

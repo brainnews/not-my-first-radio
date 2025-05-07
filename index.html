@@ -280,10 +280,6 @@
                             Upload a QR code
                         </label>
                     </div>
-                    <button id="scan-qr" class="settings-btn">
-                        <span class="material-symbols-rounded">camera_alt</span>
-                        Scan a QR code (beta)
-                    </button>
                     <div class="file-input-wrapper settings-btn">
                         <input type="file" id="import-file" accept=".json" style="display: none;">
                         <label for="import-file">
@@ -331,27 +327,8 @@
                 </div>
                 <div class="modal-body">
                     <div id="qr-code"></div>
-                    <p class="qr-instructions">Scan this QR code to import these stations on another device</p>
+                    <p class="qr-instructions">Scan this QR code with your phone's camera and click the link when prompted.</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- QR Scanner Modal -->
-        <div id="scanner-modal" class="modal hidden">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Scan QR Code</h2>
-                    <button id="close-scanner" class="close-modal-btn">
-                        <span class="material-symbols-rounded">close</span>
-                    </button>
-                </div>
-                <div id="scanner-container"></div>
-                <div class="scanner-controls">
-                    <button id="toggle-camera" class="control-btn">
-                        <span class="material-symbols-rounded">flip_camera_ios</span>
-                    </button>
-                </div>
-                <p class="scanner-instructions">Point your camera at a QR code to scan it.</p>
             </div>
         </div>
 
