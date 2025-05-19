@@ -2010,7 +2010,7 @@ loadLibraries()
     });
 
 // Handle QR code sharing
-shareQrBtn.addEventListener('click', () => {
+shareQrBtn.addEventListener('click', async () => {
     if (!qrcodeReady) {
         showNotification('QR code functionality is still loading. Please try again in a moment.', 'warning');
         return;
@@ -2028,28 +2028,64 @@ shareQrBtn.addEventListener('click', () => {
             i: radioPlayer.stations.map(station => station.stationuuid).filter(uuid => uuid)
         };
         const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
-        
-        // Clear any existing QR code
-        qrCodeContainer.innerHTML = '';
-        
-        // Create new QR code with mobile-optimized settings
-        new QRCode(qrCodeContainer, {
-            text: shareUrl,
-            width: 256,
-            height: 256,
-            colorDark: '#000000', // Pure black for better contrast
-            colorLight: '#ffffff', // Pure white for better contrast
-            correctLevel: QRCode.CorrectLevel.H, // Higher error correction for better scanning
-            quietZone: 15, // Add quiet zone around QR code
-            quietZoneColor: '#ffffff' // White quiet zone
-        });
-        
-        // Add a white background container for better contrast
-        qrCodeContainer.style.backgroundColor = '#ffffff';
-        qrCodeContainer.style.padding = '15px';
-        qrCodeContainer.style.borderRadius = '8px';
-        
-        qrModal.classList.remove('hidden');
+
+        try {
+            // Call your shortener API
+            const response = await fetch('https://s.notmyfirstradio.com', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ longUrl: shareUrl })
+            });
+            const data = await response.json();
+            if (data.shortUrl) {
+                // Clear any existing QR code
+                qrCodeContainer.innerHTML = '';
+                
+                // Create new QR code with mobile-optimized settings
+                new QRCode(qrCodeContainer, {
+                    text: data.shortUrl,
+                    width: 256,
+                    height: 256,
+                    colorDark: '#000000', // Pure black for better contrast
+                    colorLight: '#ffffff', // Pure white for better contrast
+                    correctLevel: QRCode.CorrectLevel.H, // Higher error correction for better scanning
+                    quietZone: 15, // Add quiet zone around QR code
+                    quietZoneColor: '#ffffff' // White quiet zone
+                });
+                
+                // Add a white background container for better contrast
+                qrCodeContainer.style.backgroundColor = '#ffffff';
+                qrCodeContainer.style.padding = '15px';
+                qrCodeContainer.style.borderRadius = '8px';
+                
+                qrModal.classList.remove('hidden');
+            } else {
+                throw new Error('No shortUrl in response');
+            }
+        } catch (err) {
+            // Fallback to long URL if shortener fails
+            // Clear any existing QR code
+            qrCodeContainer.innerHTML = '';
+            
+            // Create new QR code with mobile-optimized settings
+            new QRCode(qrCodeContainer, {
+                text: shareUrl,
+                width: 256,
+                height: 256,
+                colorDark: '#000000', // Pure black for better contrast
+                colorLight: '#ffffff', // Pure white for better contrast
+                correctLevel: QRCode.CorrectLevel.H, // Higher error correction for better scanning
+                quietZone: 15, // Add quiet zone around QR code
+                quietZoneColor: '#ffffff' // White quiet zone
+            });
+            
+            // Add a white background container for better contrast
+            qrCodeContainer.style.backgroundColor = '#ffffff';
+            qrCodeContainer.style.padding = '15px';
+            qrCodeContainer.style.borderRadius = '8px';
+            
+            qrModal.classList.remove('hidden');
+        }
     } catch (error) {
         console.error('Error preparing data for QR code:', error);
         showNotification('Error preparing data for QR code. Please try again.', 'error');
@@ -2735,7 +2771,7 @@ function showConfirmationModal(options) {
 }
 
 // Add these as prototype methods or standalone functions after the class
-RadioPlayer.prototype.shareStation = function(station) {
+RadioPlayer.prototype.shareStation = async function(station) {
     const shareData = {
         u: currentUsername,
         i: station.stationuuid ? [station.stationuuid] : [{
@@ -2748,12 +2784,27 @@ RadioPlayer.prototype.shareStation = function(station) {
             note: station.note || ''
         }]
     };
-    const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
-    navigator.clipboard.writeText(shareUrl).then(() => {
-        showNotification('Station sharing link copied to clipboard!', 'success');
-    }).catch(() => {
-        showNotification('Failed to copy link. Please try again.', 'error');
-    });
+    const longShareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
+
+    try {
+        // Call your shortener API
+        const response = await fetch('https://s.notmyfirstradio.com', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ longUrl: longShareUrl })
+        });
+        const data = await response.json();
+        if (data.shortUrl) {
+            await navigator.clipboard.writeText(data.shortUrl);
+            showNotification('Short sharing link copied to clipboard!', 'success');
+        } else {
+            throw new Error('No shortUrl in response');
+        }
+    } catch (err) {
+        // Fallback to long URL if shortener fails
+        await navigator.clipboard.writeText(longShareUrl);
+        showNotification('Failed to shorten link, copied full link instead.', 'warning');
+    }
 };
 
 RadioPlayer.prototype.showEditNoteUI = function(card, url) {
@@ -2840,7 +2891,7 @@ RadioPlayer.prototype.moveStationToUserList = function(url) {
 
 const shareUrlBtn = document.getElementById('share-url');
 if (shareUrlBtn) {
-    shareUrlBtn.addEventListener('click', () => {
+    shareUrlBtn.addEventListener('click', async () => {
         if (!radioPlayer || !radioPlayer.stations || radioPlayer.stations.length === 0) {
             showNotification('No stations to share.', 'warning');
             return;
@@ -2856,11 +2907,26 @@ if (shareUrlBtn) {
             name: 'My Stations'
         };
         const shareUrl = `${window.location.origin}${window.location.pathname}?share=${encodeURIComponent(JSON.stringify(shareData))}`;
-        navigator.clipboard.writeText(shareUrl).then(() => {
-            showNotification('Shareable URL copied to clipboard!', 'success');
-        }).catch(() => {
-            showNotification('Failed to copy URL. Please try again.', 'error');
-        });
+
+        try {
+            // Call your shortener API
+            const response = await fetch('https://s.notmyfirstradio.com', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ longUrl: shareUrl })
+            });
+            const data = await response.json();
+            if (data.shortUrl) {
+                await navigator.clipboard.writeText(data.shortUrl);
+                showNotification('Short sharing link copied to clipboard!', 'success');
+            } else {
+                throw new Error('No shortUrl in response');
+            }
+        } catch (err) {
+            // Fallback to long URL if shortener fails
+            await navigator.clipboard.writeText(shareUrl);
+            showNotification('Failed to shorten link, copied full link instead.', 'warning');
+        }
     });
 }
 
