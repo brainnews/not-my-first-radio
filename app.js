@@ -2224,6 +2224,9 @@ let previewAudio = null;
 let searchTimeout = null;
 let currentSearchResults = []; // Store current search results for sorting
 const SEARCH_DELAY = 500; // milliseconds delay for search after user stops typing
+const SEARCH_LIMIT = 500; // Limit the number of search results
+const RESULTS_PER_PAGE = 10; // Number of results to show per page
+let currentPage = 1; // Current page number
 
 // Load saved sort preference
 const savedSortPreference = localStorage.getItem('sortPreference') || 'default';
@@ -2260,6 +2263,15 @@ function sortStations(stations, sortBy) {
             });
         case 'countrycode':
             return sortedStations.sort((a, b) => {
+                const hasCountryA = Boolean(a.countrycode);
+                const hasCountryB = Boolean(b.countrycode);
+                
+                // If one has a country code and the other doesn't, put the one with country code first
+                if (hasCountryA !== hasCountryB) {
+                    return hasCountryB ? 1 : -1;
+                }
+                
+                // If both have country codes or both don't, sort alphabetically
                 const countryA = (a.countrycode || '').toLowerCase();
                 const countryB = (b.countrycode || '').toLowerCase();
                 return countryA.localeCompare(countryB);
@@ -2353,8 +2365,11 @@ async function searchStations(query) {
         return;
     }
     
+    // Reset to first page when performing a new search
+    currentPage = 1;
+    
     try {
-        const stations = await fetchFromRadioBrowser(`stations/search?name=${encodeURIComponent(query)}&limit=50`);
+        const stations = await fetchFromRadioBrowser(`stations/search?name=${encodeURIComponent(query)}&limit=${SEARCH_LIMIT}`);
         displaySearchResults(stations);
     } catch (error) {
         console.error('Error searching stations:', error);
@@ -2383,6 +2398,12 @@ async function displaySearchResults(stations) {
     const searchResultsSection = document.getElementById('search-results');
     const resultsGrid = searchResultsSection.querySelector('.results-grid');
     const sectionTitle = searchResultsSection.querySelector('.section-title');
+    
+    // Remove any existing loading indicators first
+    const existingLoadingIndicator = searchResultsSection.querySelector('.loading-indicator');
+    if (existingLoadingIndicator) {
+        existingLoadingIndicator.remove();
+    }
     
     // Show loading indicator
     searchResultsSection.classList.add('loading');
@@ -2465,7 +2486,14 @@ function displaySortedResults(sortBy) {
     const resultsGrid = document.querySelector('.results-grid');
     const sortedStations = sortStations(currentSearchResults, sortBy);
     
-    resultsGrid.innerHTML = sortedStations.map(station => {
+    // Calculate pagination
+    const totalPages = Math.ceil(sortedStations.length / RESULTS_PER_PAGE);
+    const startIndex = (currentPage - 1) * RESULTS_PER_PAGE;
+    const endIndex = startIndex + RESULTS_PER_PAGE;
+    const currentPageStations = sortedStations.slice(startIndex, endIndex);
+    
+    // Generate the HTML for the current page of results
+    const resultsHTML = currentPageStations.map(station => {
         const safeStation = {
             name: station.name || 'Unknown Station',
             tags: station.tags || 'No tags available',
@@ -2479,6 +2507,8 @@ function displaySortedResults(sortBy) {
         };
         
         const safeStationJson = JSON.stringify(safeStation).replace(/"/g, '&quot;');
+        const exists = radioPlayer.stations.some(s => s.url === station.url);
+        
         return `
             <div class="search-result-card">
                 <div class="station-info">
@@ -2502,13 +2532,46 @@ function displaySortedResults(sortBy) {
                     <button class="preview-btn" data-url="${station.url}">
                         <span class="material-symbols-rounded">play_arrow</span>
                     </button>
-                    <button class="add-btn" data-station="${safeStationJson}">
-                        <span class="material-symbols-rounded">playlist_add</span>
+                    <button class="add-btn ${exists ? 'success' : ''}" data-station="${safeStationJson}">
+                        <span class="material-symbols-rounded">${exists ? 'check' : 'playlist_add'}</span>
                     </button>
                 </div>
             </div>
         `;
     }).join('');
+
+    // Generate pagination controls
+    const paginationHTML = `
+        <div class="pagination-controls">
+            <button class="pagination-btn" data-action="prev" ${currentPage === 1 ? 'disabled' : ''}>
+                <span class="material-symbols-rounded">chevron_left</span>
+            </button>
+            <span class="pagination-info">Page ${currentPage} of ${totalPages}</span>
+            <button class="pagination-btn" data-action="next" ${currentPage === totalPages ? 'disabled' : ''}>
+                <span class="material-symbols-rounded">chevron_right</span>
+            </button>
+        </div>
+    `;
+
+    // Update the results grid with the current page and pagination controls
+    resultsGrid.innerHTML = resultsHTML + paginationHTML;
+
+    // Add event listeners for pagination buttons
+    document.querySelectorAll('.pagination-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            if (btn.hasAttribute('disabled')) return;
+            
+            const action = btn.dataset.action;
+            if (action === 'prev' && currentPage > 1) {
+                currentPage--;
+            } else if (action === 'next' && currentPage < totalPages) {
+                currentPage++;
+            }
+            
+            // Redisplay the results with the new page
+            displaySortedResults(sortBy);
+        });
+    });
 
     // Add event listeners for preview and add buttons
     document.querySelectorAll('.preview-btn').forEach(btn => {
