@@ -2099,9 +2099,8 @@ input[type="range"] {
     top: -56px;
     transform: translateX(-4px);
     border: 1px solid var(--border-color);
-    background: var(--bg-secondary);
-    filter: drop-shadow(0px 2px 2px black);
-    padding: 2px;
+    background: var(--bg-primary);
+    filter: drop-shadow(0px 2px 2px var(--bg-primary));
 }
 .station-menu-favicon img {
     width: 100%;
