@@ -717,11 +717,14 @@ class RadioPlayer {
                     <div class="station-menu-overlay hidden"></div>
                     <div class="station-menu hidden">
                         <div class="station-menu-info">
+                            <div class="station-menu-favicon" style="display: ${station.favicon ? 'flex' : 'none'};">
+                                <img src="${station.favicon}" alt="${station.name} logo">
+                            </div>
                             <div class="station-menu-name">${station.name}</div>
                             <div class="station-menu-data">
-                                <div class="station-menu-data-item"><span class="material-symbols-rounded">radio</span>${station.bitrate ? `${station.bitrate}kbps` : ''}</div>
-                                <div class="station-menu-data-item"><span class="material-symbols-rounded">public</span>${station.countrycode ? `${station.countrycode}` : ''}</div>
-                                <div class="station-menu-data-item"><span class="material-symbols-rounded">local_fire_department</span>${station.votes ? `${station.votes}` : ''}</div>
+                                <div class="station-menu-data-item" style="display: ${station.bitrate ? 'flex' : 'none'};"><span class="material-symbols-rounded">radio</span>${station.bitrate ? `${station.bitrate}kbps` : ''}</div>
+                                <div class="station-menu-data-item" style="display: ${station.countrycode ? 'flex' : 'none'};"><span class="material-symbols-rounded">public</span>${station.countrycode ? `${station.countrycode}` : ''}</div>
+                                <div class="station-menu-data-item" style="display: ${station.votes ? 'flex' : 'none'};"><span class="material-symbols-rounded">local_fire_department</span>${station.votes ? `${station.votes}` : ''}</div>
                             </div>
                         </div>
                         <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
@@ -2764,8 +2767,8 @@ RadioPlayer.prototype.showEditNoteUI = function(card, url) {
     }
     noteDiv.innerHTML = `<input maxlength="100" placeholder="Add a note..." class="note-input" type="text" value="${station.note ? station.note.replace(/"/g, '&quot;') : ''}">
         <div class="note-actions">
-            <button class="save-note-btn">Save</button>
             <button class="cancel-note-btn">Cancel</button>
+            <button class="save-note-btn">Save</button>
         </div>`;
     const input = noteDiv.querySelector('.note-input');
     input.focus();
