@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Not My First Radio - Algorithm-free Internet Radio</title>
+    <title>Not My First Radio - Algorithm-Free Internet Radio Player | Online Radio Streaming</title>
     
     <!-- SEO Meta Tags -->
-    <meta name="description" content="Discover and listen to radio stations from around the world. A simple, elegant internet radio player with station sharing and favorites.">
-    <meta name="keywords" content="internet radio, radio player, online radio, radio stations, music streaming, radio streaming, web radio, music sharing">
+    <meta name="description" content="Discover and stream radio stations from around the world with our algorithm-free internet radio player. No algorithms, no tracking - just pure radio discovery and streaming.">
+    <meta name="keywords" content="internet radio, algorithm-free radio, online radio streaming, radio player, radio stations, music streaming, web radio, radio discovery, non-algorithmic radio, radio sharing">
     <meta name="author" content="Miles Gilbert">
-    <meta name="robots" content="index, follow">
+    <meta name="robots" content="index, follow, max-image-preview:large">
+    <meta name="language" content="English">
+    <meta name="revisit-after" content="7 days">
     
     <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="Not My First Radio - Algorithm-free Internet Radio">
-    <meta property="og:description" content="Discover and listen to radio stations from around the world. A simple, elegant internet radio player with station sharing and favorites.">
+    <meta property="og:title" content="Not My First Radio - Algorithm-Free Internet Radio Player">
+    <meta property="og:description" content="Discover and stream radio stations from around the world with our algorithm-free internet radio player. No algorithms, no tracking - just pure radio discovery and streaming.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://notmyfirstradio.com">
     <meta property="og:image" content="./icons/icon512.png">
+    <meta property="og:site_name" content="Not My First Radio">
     
     <!-- Twitter Card Meta Tags -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Not My First Radio - Algorithm-free Internet Radio">
-    <meta name="twitter:description" content="Discover and listen to radio stations from around the world. A simple, elegant internet radio player with station sharing and favorites.">
+    <meta name="twitter:title" content="Not My First Radio - Algorithm-Free Internet Radio Player">
+    <meta name="twitter:description" content="Discover and stream radio stations from around the world with our algorithm-free internet radio player. No algorithms, no tracking - just pure radio discovery and streaming.">
     <meta name="twitter:image" content="./icons/icon512.png">
     
     <!-- Favicon -->
@@ -45,7 +48,7 @@
         "@context": "https://schema.org",
         "@type": "WebApplication",
         "name": "Not My First Radio",
-        "description": "A lightweight, algorithm-free web app for discovering and listening to radio stations from around the world.",
+        "description": "A lightweight, algorithm-free web app for discovering and streaming radio stations from around the world. Features include station sharing, favorites, and non-algorithmic music discovery.",
         "url": "https://notmyfirstradio.com",
         "applicationCategory": "MusicApplication",
         "operatingSystem": "Any",
@@ -58,7 +61,15 @@
             "@type": "Person",
             "name": "Miles Gilbert",
             "url": "https://www.milesgilbert.xyz"
-        }
+        },
+        "keywords": "internet radio, algorithm-free radio, online radio streaming, radio player, radio stations, music streaming, web radio, radio discovery, non-algorithmic radio, radio sharing",
+        "featureList": [
+            "Algorithm-free radio discovery",
+            "Global radio station streaming",
+            "Station sharing capabilities",
+            "Favorites management",
+            "No tracking or personal data collection"
+        ]
     }
     </script>
 </head>
@@ -246,7 +257,7 @@
 
             <section id="saved-stations" class="saved-stations">
                 <div id="saved-stations-title" class="section-header hidden">
-                    <h2 class="section-title">All stations</h2>
+                    <h2 class="section-title">Your radio stations</h2>
                 </div>
                 <div id="stations" class="stations-grid"></div>
             </section>
