@@ -3,7 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NMFR</title>
+    <title>Not My First Radio - Algorithm-free Internet Radio</title>
+    
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="Discover and listen to radio stations from around the world. A simple, elegant internet radio player with station sharing and favorites.">
+    <meta name="keywords" content="internet radio, radio player, online radio, radio stations, music streaming, radio streaming, web radio, music sharing">
+    <meta name="author" content="Miles Gilbert">
+    <meta name="robots" content="index, follow">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="Not My First Radio - Algorithm-free Internet Radio">
+    <meta property="og:description" content="Discover and listen to radio stations from around the world. A simple, elegant internet radio player with station sharing and favorites.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://notmyfirstradio.com">
+    <meta property="og:image" content="./icons/icon512.png">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Not My First Radio - Algorithm-free Internet Radio">
+    <meta name="twitter:description" content="Discover and listen to radio stations from around the world. A simple, elegant internet radio player with station sharing and favorites.">
+    <meta name="twitter:image" content="./icons/icon512.png">
     
     <!-- Favicon -->
     <link rel="icon" type="image/png" sizes="32x32" href="./icons/favicon-32x32.png">
@@ -19,6 +38,29 @@
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Rounded:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Sharp:opsz,wght,FILL,GRAD@20..48,100..700,0..1,0" />
     <link rel="stylesheet" href="styles.css">
+    
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebApplication",
+        "name": "Not My First Radio",
+        "description": "A lightweight, algorithm-free web app for discovering and listening to radio stations from around the world.",
+        "url": "https://notmyfirstradio.com",
+        "applicationCategory": "MusicApplication",
+        "operatingSystem": "Any",
+        "offers": {
+            "@type": "Offer",
+            "price": "0",
+            "priceCurrency": "USD"
+        },
+        "author": {
+            "@type": "Person",
+            "name": "Miles Gilbert",
+            "url": "https://www.milesgilbert.xyz"
+        }
+    }
+    </script>
 </head>
 <body>
     <div id="import-loading-indicator" class="loading-indicator" style="display: none; position: fixed; top: 2rem; left: 50%; transform: translateX(-50%); z-index: 2000; background: var(--bg-secondary); border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.15); padding: 2rem 3rem;">
@@ -399,7 +441,7 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
-    <script src="app.js"></script>
+    <script type="module" src="app.js"></script>
     
     <!-- Service Worker Registration -->
     <script>

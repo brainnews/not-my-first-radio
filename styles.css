@@ -1748,6 +1748,19 @@ input[type="range"] {
     font-size: 1.25rem;
 }
 
+.share-btn .material-symbols-rounded.loading {
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
 /* Hide share button in edit mode */
 .edit-mode .share-btn {
     display: none;
@@ -2159,6 +2172,15 @@ input[type="range"] {
 }
 .station-menu button .material-symbols-rounded {
     font-size: 1.25rem;
+}
+
+.station-menu button .material-symbols-rounded.loading {
+    animation: spin 1s linear infinite;
+}
+
+.station-menu button:disabled {
+    opacity: 0.7;
+    cursor: wait;
 }
 
 /* Note styles */
