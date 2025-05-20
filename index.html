@@ -362,6 +362,10 @@
                 <div class="settings-section">
                     <h3>About</h3>
                     <p>Not My First Radio is developed by <a href="https://www.milesgilbert.xyz" target="_blank">Miles Gilbert</a> as part of a series of non-algorithmically driven discovery apps. It is open source and available on <a href="https://github.com/brainnews/not-my-first-radio" target="_blank">GitHub</a>.</p>
+                    <button id="open-terms" class="settings-btn">
+                        <span class="material-symbols-rounded">description</span>
+                        Terms & Privacy Facts
+                    </button>
                     <a href="https://milesgilbert.xyz/thinking/a-certification-for-algorithm-free-platforms/" target="_blank">
                         <img src="./images/non-algo-badge.png" alt="Non-Algo Project verified badge" style="width: 100%; max-width: 200px; margin-top: 2rem;">
                     </a>
@@ -446,6 +450,108 @@
                         <button id="update-now" class="update-now-btn" style="background-color: var(--accent-color);">
                             Update now
                         </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Terms & Privacy Facts Modal -->
+        <div id="terms-modal" class="modal hidden">
+            <div class="modal-content" style="max-width: 500px; max-height: 90vh; padding: 0; display: flex; flex-direction: column;">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color); flex-shrink: 0; margin-bottom: 0;">
+                    <h2 style="width: 100%; margin: 0; padding: 1rem;">Terms & Privacy Facts</h2>
+                    <button id="close-terms" class="close-modal-btn">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 0; overflow-y: auto; flex-grow: 1;">
+                    <div class="nutrition-facts" style="padding: 1.5rem; font-family: 'Helvetica Neue', Arial, sans-serif;">
+                        <div style="border: 2px solid #000; padding: 1rem;">
+                            <h1 style="margin: 0; font-size: 1.5rem; font-weight: bold; border-bottom: 2px solid #000; padding-bottom: 0.5rem;">
+                                Not My First Radio
+                            </h1>
+                            <p style="margin: 0.5rem 0; font-size: 0.9rem;">
+                                Serving Size: 1 App
+                            </p>
+                            
+                            <div style="border-top: 8px solid #000; margin: 0.5rem 0;"></div>
+                            
+                            <div style="margin: 0.5rem 0;">
+                                <p style="margin: 0; font-weight: bold;">Data Collection Facts</p>
+                                <div style="display: flex; justify-content: space-between; margin: 0.25rem 0;">
+                                    <span>Personal Data</span>
+                                    <span>0%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin: 0.25rem 0;">
+                                    <span>Tracking</span>
+                                    <span>0%</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin: 0.25rem 0;">
+                                    <span>Cookies</span>
+                                    <span>0%</span>
+                                </div>
+                            </div>
+                            
+                            <div style="border-top: 8px solid #000; margin: 0.5rem 0;"></div>
+                            
+                            <div style="margin: 0.5rem 0;">
+                                <p style="margin: 0; font-weight: bold;">Local Storage Facts</p>
+                                <div style="display: flex; justify-content: space-between; margin: 0.25rem 0;">
+                                    <span>Your Stations</span>
+                                    <span>✓</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin: 0.25rem 0;">
+                                    <span>Username</span>
+                                    <span>✓</span>
+                                </div>
+                                <div style="display: flex; justify-content: space-between; margin: 0.25rem 0;">
+                                    <span>Settings</span>
+                                    <span>✓</span>
+                                </div>
+                            </div>
+                            
+                            <div style="border-top: 8px solid #000; margin: 0.5rem 0;"></div>
+                            
+                            <div style="margin: 0.5rem 0;">
+                                <p style="margin: 0; font-weight: bold;">External Services</p>
+                                <div style="margin: 0.25rem 0;">
+                                    <span>Radio Browser API</span>
+                                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">Used only to fetch station data</p>
+                                </div>
+                                <div style="margin: 0.25rem 0;">
+                                    <span>URL Shortener</span>
+                                    <p style="margin: 0.25rem 0; font-size: 0.9rem;">Used only when sharing stations</p>
+                                </div>
+                            </div>
+                            
+                            <div style="border-top: 8px solid #000; margin: 0.5rem 0;"></div>
+                            
+                            <div style="margin: 0.5rem 0;">
+                                <p style="margin: 0; font-weight: bold;">User Rights</p>
+                                <ul style="margin: 0.25rem 0; padding-left: 1.5rem; font-size: 0.9rem;">
+                                    <li>All your data stays on your device</li>
+                                    <li>No tracking or analytics</li>
+                                    <li>No data sharing without your consent</li>
+                                    <li>Export your data anytime</li>
+                                    <li>Delete your data anytime</li>
+                                </ul>
+                            </div>
+                            
+                            <div style="border-top: 8px solid #000; margin: 0.5rem 0;"></div>
+                            
+                            <div style="margin: 0.5rem 0;">
+                                <p style="margin: 0; font-weight: bold;">Disclaimer</p>
+                                <p style="margin: 0.25rem 0; font-size: 0.9rem;">
+                                    This app is provided "as is" without any warranties. We are not responsible for the content of radio stations or any issues with streaming.
+                                </p>
+                            </div>
+                            
+                            <div style="border-top: 8px solid #000; margin: 0.5rem 0;"></div>
+                            
+                            <p style="margin: 0.5rem 0; font-size: 0.8rem; text-align: center;">
+                                Last updated: May 2025
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>

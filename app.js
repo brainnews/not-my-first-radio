@@ -3261,3 +3261,27 @@ closeAddStationBtn.addEventListener('click', () => {
 settingsOverlay.addEventListener('click', () => {
     addStationModal.classList.add('hidden');
 });
+
+// Terms & Privacy Facts Modal
+const termsModal = document.getElementById('terms-modal');
+const openTermsBtn = document.getElementById('open-terms');
+const closeTermsBtn = document.getElementById('close-terms');
+
+if (openTermsBtn) {
+    openTermsBtn.addEventListener('click', () => {
+        termsModal.classList.remove('hidden');
+    });
+}
+
+if (closeTermsBtn) {
+    closeTermsBtn.addEventListener('click', () => {
+        termsModal.classList.add('hidden');
+    });
+}
+
+// Close terms modal when clicking outside
+termsModal.addEventListener('click', (e) => {
+    if (e.target === termsModal) {
+        termsModal.classList.add('hidden');
+    }
+});

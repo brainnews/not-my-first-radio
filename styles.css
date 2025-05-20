@@ -622,6 +622,9 @@ input[type="range"] {
     cursor: pointer;
     border-radius: 4px;
 }
+.settings-btn#open-terms {
+    margin-top: 1rem;
+}
 
 .settings-btn .material-symbols-rounded {
     margin-right: 0.5rem;
