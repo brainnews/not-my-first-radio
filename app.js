@@ -1,4 +1,5 @@
 import { initLogoAnimation } from './js/logoAnimation.js';
+import AudioVisualizer from './js/audioVisualizer.js';
 
 // Initialize logo animation
 initLogoAnimation();
@@ -363,6 +364,7 @@ class RadioPlayer {
         this.isEditMode = false;
         this.stationLists = this.loadStationLists();
         this.volume = 70; // Initialize volume to 100%
+        this.visualizer = null;
 
         // DOM elements
         this.playPauseBtn = document.getElementById('play-pause');
@@ -371,6 +373,10 @@ class RadioPlayer {
         this.stationDetails = document.getElementById('station-details');
         this.stationsContainer = document.getElementById('stations');
 
+        // Initialize player controls
+        this.playerControls = document.querySelector('.player-controls');
+        this.volumeControl = document.querySelector('.volume-control');
+        
         // Event listeners
         this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
         this.audio.addEventListener('ended', () => this.handleStreamEnd());
@@ -1317,9 +1323,10 @@ class RadioPlayer {
     }
 
     updateUI() {
-        const currentFaviconContainer = document.getElementById('current-favicon-container');
+        const playPauseBtn = document.getElementById('play-pause');
         const stationName = document.getElementById('station-name');
         const stationDetails = document.getElementById('station-details');
+        const currentFaviconContainer = document.getElementById('current-favicon-container');
         
         // Always refresh the button reference to ensure we have the latest one
         this.playPauseBtn = document.getElementById('play-pause');
@@ -1397,6 +1404,15 @@ class RadioPlayer {
         // Update station cards to reflect current playing state
         this.displayStations();
         this.displayStationLists();
+
+        // Add visualizer button if not already present
+        if (!document.querySelector('.visualizer-btn')) {
+            const visualizerBtn = document.createElement('button');
+            visualizerBtn.className = 'control-btn visualizer-btn';
+            visualizerBtn.innerHTML = '<span class="material-symbols-rounded">cadence</span>';
+            visualizerBtn.onclick = () => this.toggleVisualizer();
+            this.playerControls.insertBefore(visualizerBtn, this.volumeControl);
+        }
     }
 
     // Add toggleEditMode method
@@ -1732,6 +1748,18 @@ class RadioPlayer {
         } catch (error) {
             console.error('Error removing station from shared list:', error);
             showNotification('Error removing station. Please try again.', 'error');
+        }
+    }
+
+    toggleVisualizer() {
+        if (this.visualizer && this.visualizer.isActive) {
+            this.visualizer.close();
+        } else if (this.audio && this.currentStation) {
+            this.visualizer = new AudioVisualizer(this.audio, {
+                name: this.currentStation.name,
+                details: this.currentStation.details
+            });
+            this.visualizer.init();
         }
     }
 }

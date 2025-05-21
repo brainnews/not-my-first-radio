@@ -500,9 +500,9 @@ input[type="range"] {
 .current-details {
     flex: 1;
     min-width: 0;
-    max-width: 370px;
+    max-width: 300px;
     @media (max-width: 768px) {
-        max-width: 225px;
+        max-width: 155px;
     }
 }
 
@@ -2547,5 +2547,53 @@ input[type="range"] {
 .pagination-info {
     color: var(--text-secondary);
     font-size: 0.875rem;
+}
+
+.visualizer-close-btn {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1000;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.visualizer-close-btn:hover {
+    background: rgba(0, 0, 0, 0.8);
+}
+
+.visualizer-close-btn .material-symbols-rounded {
+    color: white;
+    font-size: 24px;
+}
+
+.audio-visualizer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 999;
+    background: var(--bg-primary);
+}
+
+.audio-visualizer.hidden {
+    display: none;
+}
+
+.audio-visualizer canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
 }
 

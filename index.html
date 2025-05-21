@@ -33,8 +33,8 @@
     <link rel="shortcut icon" href="./icons/favicon.ico">
     
     <!-- PWA Meta Tags -->
-    <meta name="theme-color" content="#1c1c1c">
-    <meta name="description" content="A simple internet radio player">
+    <meta name="theme-color" content="#2c2c2c">
+    <meta name="description" content="Discover and stream radio stations from around the world with our algorithm-free internet radio player. No algorithms, no tracking - just pure radio discovery and streaming.">
     <link rel="manifest" href="./manifest.json">
     <link rel="apple-touch-icon" href="./icons/icon192.png">
     
@@ -89,6 +89,9 @@
         </div>
         <!-- Add notification container -->
         <div class="notification-container"></div>
+
+        <!-- Add audio visualizer container -->
+        <div id="audio-visualizer" class="audio-visualizer hidden"></div>
 
         <!-- Add confirmation modal -->
         <div class="confirmation-modal modal">
@@ -558,6 +561,8 @@
         </div>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/p5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.9.0/addons/p5.sound.min.js"></script>
     <script type="module" src="app.js"></script>
     
     <!-- Service Worker Registration -->

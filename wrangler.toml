@@ -1,0 +1,6 @@
+name = "visualizer-worker"
+main = "visualizer-worker.js"
+compatibility_date = "2024-01-01"
+
+[vars]
+# Add any environment variables here if needed 
