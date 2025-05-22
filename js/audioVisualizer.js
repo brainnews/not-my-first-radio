@@ -10,6 +10,7 @@ class AudioVisualizer {
         this.proxyAudio = null; // Store reference to proxy audio
         this.isLoading = true; // Track loading state
         this.currentStyle = 'baroque'; // Default style
+        this.isReconnecting = false; // Track reconnection state
         
         // Create a proxy URL for the audio stream
         const proxyUrl = new URL('https://visualizer-worker.miles-gilbert.workers.dev');
@@ -54,6 +55,61 @@ class AudioVisualizer {
                 border-color: rgba(255, 255, 255, 0.7);
                 box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2);
             }
+
+            .visualizer-controls {
+                position: absolute;
+                top: 50px;
+                left: 20px;
+                background: rgba(0, 0, 0, 0.7);
+                padding: 15px;
+                border-radius: 8px;
+                color: white;
+                z-index: 1000;
+                min-width: 250px;
+                backdrop-filter: blur(5px);
+            }
+
+            .visualizer-controls h3, .visualizer-controls h4 {
+                margin: 0 0 10px 0;
+                font-size: 14px;
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            .control-group {
+                margin-bottom: 12px;
+            }
+
+            .control-group label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 12px;
+                color: rgba(255, 255, 255, 0.8);
+            }
+
+            .control-group input[type="range"] {
+                width: 100%;
+                margin: 5px 0;
+            }
+
+            .control-group .value {
+                font-size: 11px;
+                color: rgba(255, 255, 255, 0.6);
+                text-align: right;
+            }
+
+            .visualizer-controls-toggle {
+                position: absolute;
+                top: 20px;
+                left: 20px;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                border: none;
+                padding: 8px 12px;
+                border-radius: 4px;
+                cursor: pointer;
+                z-index: 1001;
+                backdrop-filter: blur(5px);
+            }
         `;
         document.head.appendChild(styleElement);
     }
@@ -76,9 +132,85 @@ class AudioVisualizer {
         `;
         this.container.appendChild(styleSelector);
 
+        // Create controls toggle button
+        const controlsToggle = document.createElement('button');
+        controlsToggle.className = 'visualizer-controls-toggle';
+        controlsToggle.innerHTML = '⚙️ Controls';
+        this.container.appendChild(controlsToggle);
+
+        // Create controls panel
+        const controlsPanel = document.createElement('div');
+        controlsPanel.className = 'visualizer-controls';
+        controlsPanel.style.display = 'none';
+        controlsPanel.innerHTML = `
+            <div id="baroque-controls" class="style-controls">
+                <h4>Baroque Flow Controls</h4>
+                <div class="control-group">
+                    <label>Particle Speed</label>
+                    <input type="range" id="particle-speed" min="0.5" max="5" step="0.1" value="1">
+                    <div class="value">1</div>
+                </div>
+                <div class="control-group">
+                    <label>Particle Size</label>
+                    <input type="range" id="particle-size" min="1" max="10" step="0.1" value="2">
+                    <div class="value">2</div>
+                </div>
+                <div class="control-group">
+                    <label>Flow Field Scale</label>
+                    <input type="range" id="flow-scale" min="0.001" max="0.02" step="0.001" value="0.005">
+                    <div class="value">0.005</div>
+                </div>
+                <div class="control-group">
+                    <label style="display: flex; align-items: center; justify-content: space-between; gap: 4px;">Trail Length <span style="font-size: 12px; color: #ff4444; margin-left: 4px;"><span class="material-symbols-rounded" style="font-size: 12px; transform: translateY(1px); ">warning</span> May cause lag</span></label>
+                    <input type="range" id="trail-length" min="0" max="300" step="1" value="10">
+                    <div class="value">10</div>
+                </div>
+            </div>
+            <div id="perlin-controls" class="style-controls">
+                <h4>Perlin Controls</h4>
+                <div class="control-group">
+                    <label>Noise Scale</label>
+                    <input type="range" id="noise-scale" min="0.001" max="0.1" step="0.001" value="0.02">
+                    <div class="value">0.02</div>
+                </div>
+                <div class="control-group">
+                    <label>Noise Speed</label>
+                    <input type="range" id="noise-speed" min="0" max="0.001" step="0.0001" value="0.0002">
+                    <div class="value">0.0002</div>
+                </div>
+                <div class="control-group">
+                    <label>Smoothness</label>
+                    <input type="range" id="smoothness" min="0.01" max="0.5" step="0.01" value="0.1">
+                    <div class="value">0.1</div>
+                </div>
+                <div class="control-group">
+                    <label>Block Size</label>
+                    <input type="range" id="block-size" min="4" max="32" step="2" value="16">
+                    <div class="value">16</div>
+                </div>
+                <div class="control-group">
+                    <label>Ripple Sensitivity</label>
+                    <input type="range" id="ripple-sensitivity" min="20" max="100" step="1" value="50">
+                    <div class="value">50</div>
+                </div>
+            </div>
+        `;
+        this.container.appendChild(controlsPanel);
+
+        // Add controls toggle functionality
+        controlsToggle.addEventListener('click', () => {
+            controlsPanel.style.display = controlsPanel.style.display === 'none' ? 'block' : 'none';
+        });
+
         // Add style selector event listener
-        document.getElementById('visualizer-style').addEventListener('change', (e) => {
+        const styleSelect = document.getElementById('visualizer-style');
+        styleSelect.addEventListener('change', (e) => {
             this.currentStyle = e.target.value;
+            // Update visible controls based on selected style
+            document.getElementById('baroque-controls').style.display = 
+                this.currentStyle === 'baroque' ? 'block' : 'none';
+            document.getElementById('perlin-controls').style.display = 
+                this.currentStyle === 'perlin' ? 'block' : 'none';
         });
 
         // Create p5 instance
@@ -94,7 +226,7 @@ class AudioVisualizer {
             let noiseSpeed = 0;
             let colorBurst = 0;
             let lastBassValue = 0;
-            const blockSize = 16;
+            let blockSize = 16;
             let noiseZ = 0;
             let sourceNode = null;
             let lastNoiseValues = [];
@@ -104,6 +236,79 @@ class AudioVisualizer {
             let ripples = [];
             let lastPercussionValue = 0;
             const maxRipples = 30;
+            let percussionThreshold = 50;
+
+            // Store control event listeners for cleanup
+            const controlListeners = new Map();
+
+            // Add control event listeners
+            const controls = {
+                // Baroque controls
+                'particle-speed': (value) => { 
+                    particles.forEach(particle => {
+                        particle.maxSpeed = parseFloat(value);
+                    });
+                },
+                'particle-size': (value) => {
+                    particles.forEach(particle => {
+                        particle.baseSize = parseFloat(value);
+                    });
+                },
+                'flow-scale': (value) => {
+                    particles.forEach(particle => {
+                        particle.noiseScale = parseFloat(value);
+                    });
+                },
+                'trail-length': (value) => {
+                    const newLength = parseInt(value);
+                    particles.forEach(particle => {
+                        particle.trailLength = newLength;
+                        // Trim trail if new length is shorter
+                        while (particle.trail.length > newLength) {
+                            particle.trail.pop();
+                        }
+                    });
+                },
+                // Perlin controls
+                'noise-scale': (value) => { noiseScale = parseFloat(value); },
+                'noise-speed': (value) => { noiseSpeed = parseFloat(value); },
+                'smoothness': (value) => { interpolationFactor = parseFloat(value); },
+                'block-size': (value) => { blockSize = parseInt(value); },
+                'ripple-sensitivity': (value) => { percussionThreshold = parseInt(value); }
+            };
+
+            // Initialize controls with proper event listeners
+            const initializeControls = () => {
+                // Clean up existing listeners
+                controlListeners.forEach((listener, input) => {
+                    input.removeEventListener('input', listener);
+                });
+                controlListeners.clear();
+
+                // Add new listeners
+                Object.entries(controls).forEach(([id, callback]) => {
+                    const input = document.getElementById(id);
+                    if (input) {
+                        const valueDisplay = input.nextElementSibling;
+                        const listener = (e) => {
+                            const value = e.target.value;
+                            valueDisplay.textContent = value;
+                            callback(value);
+                        };
+                        input.addEventListener('input', listener);
+                        controlListeners.set(input, listener);
+                    }
+                });
+            };
+
+            // Initialize controls
+            initializeControls();
+
+            // Set initial control visibility
+            document.getElementById('baroque-controls').style.display = 
+                this.currentStyle === 'baroque' ? 'block' : 'none';
+            document.getElementById('perlin-controls').style.display = 
+                this.currentStyle === 'perlin' ? 'block' : 'none';
             
             class Ripple {
                 constructor(x, y) {
@@ -205,11 +410,13 @@ class AudioVisualizer {
                         function handleError(err) {
                             console.error('Error loading proxy audio:', err);
                             self.isLoading = false;
+                            self.isReconnecting = false;
                             
                             // Attempt to reconnect if we haven't exceeded max attempts
                             if (reconnectAttempts < maxReconnectAttempts) {
                                 reconnectAttempts++;
                                 console.log(`Attempting to reconnect (${reconnectAttempts}/${maxReconnectAttempts})...`);
+                                self.isReconnecting = true;
                                 
                                 // Clean up existing audio
                                 if (self.proxyAudio) {
@@ -227,6 +434,7 @@ class AudioVisualizer {
                                 }, 1000);
                             } else {
                                 console.error('Max reconnection attempts reached');
+                                self.isReconnecting = false;
                                 // Restore original audio
                                 self.audioElement.volume = self.originalVolume;
                             }
@@ -254,6 +462,7 @@ class AudioVisualizer {
                                 });
                                 // Set loading to false when audio is ready
                                 self.isLoading = false;
+                                self.isReconnecting = false;
                                 // Reset reconnect attempts on successful connection
                                 reconnectAttempts = 0;
                             } catch (err) {
@@ -266,6 +475,7 @@ class AudioVisualizer {
                     } catch (err) {
                         console.error('Error in setupAudio:', err);
                         self.isLoading = false;
+                        self.isReconnecting = false;
                         // Restore original audio
                         self.audioElement.volume = self.originalVolume;
                     }
@@ -292,6 +502,17 @@ class AudioVisualizer {
                     p.textAlign(p.CENTER, p.CENTER);
                     p.textSize(14);
                     p.text('Preparing visuals...', p.width/2, p.height/2);
+                    p.pop();
+                }
+
+                // Draw reconnection message if reconnecting
+                if (self.isReconnecting) {
+                    p.push();
+                    p.fill(255);
+                    p.noStroke();
+                    p.textAlign(p.CENTER, p.CENTER);
+                    p.textSize(14);
+                    p.text('Reconnecting to stream...', p.width/2, p.height/2);
                     p.pop();
                 }
 
@@ -427,7 +648,6 @@ class AudioVisualizer {
                 percussion = percussion / 100; // Average the values
                 
                 // Lower threshold and make detection more sensitive
-                let percussionThreshold = 50; // Lowered threshold
                 let percussionHit = percussion > percussionThreshold && percussion > lastPercussionValue + 5;
                 lastPercussionValue = percussion;
                 
@@ -440,7 +660,6 @@ class AudioVisualizer {
                             p.random(p.height)
                         ));
                     }
-                    console.log(`Created ${numRipples} ripples. Total: ${ripples.length}`);
                 }
                 
                 // Update and display ripples
@@ -451,17 +670,6 @@ class AudioVisualizer {
                     }
                     return active;
                 });
-                
-                // Draw debug info
-                p.push();
-                p.fill(255);
-                p.noStroke();
-                p.textSize(16);
-                p.textAlign(p.LEFT, p.TOP);
-                p.text(`Percussion: ${Math.round(percussion)}`, 20, 20);
-                p.text(`Ripples: ${ripples.length}`, 20, 50);
-                p.text(`Style: ${self.currentStyle}`, 20, 80);
-                p.pop();
                 
                 // Fade color burst
                 if (colorBurst > 0) {
@@ -514,6 +722,16 @@ class AudioVisualizer {
         if (styleSelector) {
             styleSelector.remove();
         }
+
+        // Remove controls panel and toggle button
+        const controlsPanel = document.querySelector('.visualizer-controls');
+        const controlsToggle = document.querySelector('.visualizer-controls-toggle');
+        if (controlsPanel) {
+            controlsPanel.remove();
+        }
+        if (controlsToggle) {
+            controlsToggle.remove();
+        }
         
         // Restore original audio volume
         this.audioElement.volume = this.originalVolume;
@@ -538,21 +756,31 @@ class Particle {
         this.pos = p.createVector(p.random(p.width), p.random(p.height));
         this.vel = p.createVector(0, 0);
         this.acc = p.createVector(0, 0);
-        this.maxSpeed = 1; // Increased max speed
+        this.maxSpeed = 1;
         this.hue = p.random(360);
         this.size = p.random(2, 4);
-        this.baseSize = this.size; // Store base size
+        this.baseSize = this.size;
+        this.noiseScale = 0.005;
+        this.trailLength = 10;
+        this.trail = [];
     }
 
     update(freq) {
+        // Store current position in trail
+        this.trail.unshift(this.pos.copy());
+        
+        // Limit trail length
+        while (this.trail.length > this.trailLength) {
+            this.trail.pop();
+        }
+
         // Normalize frequency to 0-1 range
         let normalizedFreq = this.p.map(freq, 0, 255, 0, 1);
         
         // Create a more dynamic flow field based on frequency
-        let noiseScale = 0.005;
         let angle = this.p.noise(
-            this.pos.x * noiseScale, 
-            this.pos.y * noiseScale, 
+            this.pos.x * this.noiseScale, 
+            this.pos.y * this.noiseScale, 
             this.p.frameCount * 0.01
         ) * this.p.TWO_PI * 2;
         
@@ -586,7 +814,17 @@ class Particle {
 
     display() {
         this.p.noStroke();
-        // Make particles more visible with higher opacity
+        
+        // Draw trail
+        for (let i = this.trail.length - 1; i >= 0; i--) {
+            const pos = this.trail[i];
+            const alpha = this.p.map(i, 0, this.trail.length - 1, 0.7, 0);
+            const size = this.p.map(i, 0, this.trail.length - 1, this.size, this.size * 0.5);
+            this.p.fill(this.hue, 80, 100, alpha);
+            this.p.ellipse(pos.x, pos.y, size, size);
+        }
+        
+        // Draw current position
         this.p.fill(this.hue, 80, 100, 0.7);
         this.p.ellipse(this.pos.x, this.pos.y, this.size, this.size);
     }

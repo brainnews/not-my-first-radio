@@ -378,7 +378,6 @@ class RadioPlayer {
         this.volumeControl = document.querySelector('.volume-control');
         
         // Event listeners
-        this.volumeSlider.addEventListener('input', (e) => this.setVolume(e.target.value));
         this.audio.addEventListener('ended', () => this.handleStreamEnd());
         
         // Set up the play/pause button listener with click for proper audio playback
@@ -474,7 +473,7 @@ class RadioPlayer {
                             <div class="loading-text">Loading starter packs...</div>
                         </div>
                     </div>
-                    <p style="color: var(--text-secondary);">Have a QR code or .json file? Open <button class="settings-btn" id="empty-state-settings" style="display: inline; width: auto;"><span class="material-symbols-rounded">settings</span>Settings</button> to import them as stations.</p>
+                    <p style="color: var(--text-secondary);">Have a .json file? Open <button class="settings-btn" id="empty-state-settings" style="display: inline; width: auto;"><span class="material-symbols-rounded">settings</span>Settings</button> to import your stations.</p>
                 </div>
             `;
 

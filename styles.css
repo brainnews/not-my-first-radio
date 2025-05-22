@@ -459,16 +459,6 @@ main {
 .player-controls .play-btn .material-symbols-rounded {
     font-size: 2.5em;
 }
-
-/* Remove volume control related styles */
-.volume-control {
-    display: none;
-}
-
-input[type="range"] {
-    display: none;
-}
-
 /* Adjust player bar layout */
 .player-bar {
     position: fixed;
