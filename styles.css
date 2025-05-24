@@ -388,7 +388,7 @@ main {
     gap: 0;
     flex-grow: 1;
     @media (max-width: 768px) {
-        max-width: 230px;
+        max-width: 260px;
     }
 }
 
