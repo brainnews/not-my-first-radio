@@ -232,6 +232,15 @@ class AudioVisualizer {
             let lastNoiseValues = [];
             let interpolationFactor = 0.1;
             
+            // Tempo detection variables
+            let lastBeatTime = 0;
+            let beatInterval = 0;
+            let beatCount = 0;
+            let tempoHistory = [];
+            const maxTempoHistory = 10;
+            let currentTempo = 120; // Default tempo in BPM
+            let tempoConfidence = 0;
+            
             // Rain effect variables
             let ripples = [];
             let lastPercussionValue = 0;
@@ -530,6 +539,47 @@ class AudioVisualizer {
                 // Get frequency data
                 let spectrum = fft.analyze();
                 
+                // Analyze tempo from spectrum
+                let bass = fft.getEnergy("bass");
+                let mid = fft.getEnergy("mid");
+                
+                // Detect beats using bass and mid frequencies
+                let currentTime = p.millis();
+                let energy = (bass + mid) / 2;
+                
+                // Beat detection threshold that adapts to the music
+                let threshold = p.map(tempoConfidence, 0, 1, 150, 200);
+                
+                if (energy > threshold && currentTime - lastBeatTime > 200) { // Minimum 200ms between beats
+                    beatInterval = currentTime - lastBeatTime;
+                    lastBeatTime = currentTime;
+                    beatCount++;
+                    
+                    // Calculate tempo in BPM
+                    if (beatCount > 1) {
+                        let newTempo = 60000 / beatInterval; // Convert to BPM
+                        
+                        // Only accept reasonable tempo values (60-180 BPM)
+                        if (newTempo >= 60 && newTempo <= 180) {
+                            tempoHistory.push(newTempo);
+                            if (tempoHistory.length > maxTempoHistory) {
+                                tempoHistory.shift();
+                            }
+                            
+                            // Calculate average tempo and confidence
+                            let avgTempo = tempoHistory.reduce((a, b) => a + b, 0) / tempoHistory.length;
+                            let variance = tempoHistory.reduce((a, b) => a + Math.pow(b - avgTempo, 2), 0) / tempoHistory.length;
+                            tempoConfidence = Math.max(0, 1 - (variance / 100));
+                            
+                            currentTempo = avgTempo;
+                        }
+                    }
+                }
+                console.log(currentTempo);
+                
+                // Calculate tempo-based speed multiplier
+                let tempoSpeedMultiplier = p.map(currentTempo, 60, 180, 0.5, 4);
+                
                 // Draw particles
                 particles.forEach((particle, i) => {
                     // Map the frequency index to focus on more audible frequencies
@@ -537,6 +587,10 @@ class AudioVisualizer {
                     let freq = spectrum[freqIndex];
                     // Increase the frequency sensitivity
                     freq = p.map(freq, 0, 255, 0, 255 * 2);
+                    
+                    // Apply tempo-based speed multiplier to particle
+                    particle.maxSpeed = particle.baseMaxSpeed * tempoSpeedMultiplier;
+                    
                     particle.update(freq);
                     particle.display();
                 });
@@ -756,7 +810,8 @@ class Particle {
         this.pos = p.createVector(p.random(p.width), p.random(p.height));
         this.vel = p.createVector(0, 0);
         this.acc = p.createVector(0, 0);
-        this.maxSpeed = 1;
+        this.baseMaxSpeed = 1; // Base speed that will be modified by tempo
+        this.maxSpeed = this.baseMaxSpeed;
         this.hue = p.random(360);
         this.size = p.random(2, 4);
         this.baseSize = this.size;

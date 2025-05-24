@@ -1408,7 +1408,12 @@ class RadioPlayer {
         if (!document.querySelector('.visualizer-btn')) {
             const visualizerBtn = document.createElement('button');
             visualizerBtn.className = 'control-btn visualizer-btn';
-            visualizerBtn.innerHTML = '<span class="material-symbols-rounded">cadence</span>';
+            visualizerBtn.style.width = '32px';
+            visualizerBtn.style.height = '32px';
+            visualizerBtn.setAttribute('aria-label', 'Open visualizer');
+            visualizerBtn.setAttribute('alt', 'Open visualizer');
+            visualizerBtn.title = 'Open visualizer';
+            visualizerBtn.innerHTML = '<img style="width: 100%; height: 100%;" src="icons/visualizer-icon.svg" alt="Visualizer">';
             visualizerBtn.onclick = () => this.toggleVisualizer();
             this.playerControls.insertBefore(visualizerBtn, this.volumeControl);
         }

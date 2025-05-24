@@ -434,6 +434,7 @@ main {
     flex-shrink: 0;
 }
 
+
 .player-controls .control-btn {
     height: 42px;
     width: 42px;
@@ -447,7 +448,40 @@ main {
     border-radius: 4px;
     flex-shrink: 0;
 }
+.control-btn.visualizer-btn {
+    padding: 0;
+    width: 32px;
+    height: 32px;
+    filter: saturate(0) blur(5px);
+    transform: translateX(-0.5rem);
+    transition: filter 0.2s ease, transform 2s ease-in-out;
+    @media (max-width: 768px) {
+        width: 28px;
+        height: 28px;
+        filter: saturate(1) blur(0px);
+    }
+}
+.control-btn.visualizer-btn:hover {
+    filter: saturate(1) blur(0px);
+    
+}
 
+.control-btn.visualizer-btn:hover img {
+    transform: translateX(0.5rem);
+    animation: floatIcon 3s ease-in-out infinite;
+}
+
+@keyframes floatIcon {
+    0% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-2px);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
 .player-controls .control-btn:hover {
     background: var(--bg-hover);
 }
