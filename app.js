@@ -4,7 +4,9 @@ import AudioVisualizer from './js/audioVisualizer.js';
 // Initialize logo animation
 initLogoAnimation();
 
-const debug = false;
+// check if path is 127.0.0.1:5500 and set debug to true
+const isLocalhost = window.location.hostname === '127.0.0.1' && window.location.port === '5500';
+const debug = isLocalhost;
 
 // detect user's theme and change the favicon accordingly
 const favicon = document.querySelector('link[rel="shortcut icon"]');
@@ -44,11 +46,7 @@ closeAlertBtn.addEventListener('keydown', (e) => {
 });
 
 // Check if alert banner should be shown
-if (!debug) {
-    if (!localStorage.getItem('alert-banner-closed')) {
-        alertBanner.classList.remove('hidden');
-    }
-} else {
+if (!localStorage.getItem('alert-banner-closed') || debug) {
     alertBanner.classList.remove('hidden');
 }
 
@@ -1405,7 +1403,7 @@ class RadioPlayer {
         this.displayStationLists();
 
         // Add visualizer button if not already present
-        if (!document.querySelector('.visualizer-btn')) {
+        if (!document.querySelector('.visualizer-btn') && debug) {
             const visualizerBtn = document.createElement('button');
             visualizerBtn.className = 'control-btn visualizer-btn';
             visualizerBtn.style.width = '32px';
