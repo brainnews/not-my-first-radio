@@ -346,7 +346,7 @@ async function testStream(url) {
         audio.addEventListener('error', () => {
             clearTimeout(timeout);
             audio.remove();
-            resolve(true); // Changed to true to be more permissive
+            resolve(false); // Changed to true to be more permissive
         });
 
         audio.src = url;
@@ -2402,6 +2402,57 @@ function debouncedSearch() {
     }, SEARCH_DELAY);
 }
 
+// Common music genres and their variations
+const GENRE_MAPPINGS = {
+    'rock': ['rock', 'rock and roll', 'rock n roll', 'rock\'n\'roll', 'rock & roll'],
+    'jazz': ['jazz', 'jazz music', 'jazz radio'],
+    'classical': ['classical', 'classical music', 'orchestral', 'symphony'],
+    'pop': ['pop', 'pop music', 'popular music'],
+    'hip hop': ['hip hop', 'hiphop', 'rap', 'rap music'],
+    'electronic': ['electronic', 'electronic music', 'edm', 'electronic dance music'],
+    'country': ['country', 'country music', 'country and western'],
+    'blues': ['blues', 'blues music'],
+    'folk': ['folk', 'folk music', 'traditional folk'],
+    'metal': ['metal', 'heavy metal', 'metal music'],
+    'reggae': ['reggae', 'reggae music'],
+    'rnb': ['rnb', 'r&b', 'rhythm and blues', 'rhythm & blues'],
+    'soul': ['soul', 'soul music'],
+    'indie': ['indie', 'indie music', 'independent music'],
+    'punk': ['punk', 'punk rock', 'punk music'],
+    'dance': ['dance', 'dance music', 'dance radio'],
+    'latin': ['latin', 'latin music', 'latin radio'],
+    'world': ['world', 'world music', 'international'],
+    'ambient': ['ambient', 'ambient music'],
+    'drum and bass': ['drum and bass', 'dnb', 'drum n bass', 'drum & bass'],
+    'house': ['house', 'house music'],
+    'techno': ['techno', 'techno music'],
+    'trance': ['trance', 'trance music'],
+    'disco': ['disco', 'disco music'],
+    'funk': ['funk', 'funk music']
+};
+
+// Function to detect genres in a search query
+function detectGenres(query) {
+    const lowerQuery = query.toLowerCase();
+    const detectedGenres = new Set();
+    
+    // First check for explicit genre: format
+    const explicitGenreMatch = lowerQuery.match(/(?:genre|tag):([^,\s]+)/i);
+    if (explicitGenreMatch) {
+        detectedGenres.add(explicitGenreMatch[1]);
+        return Array.from(detectedGenres);
+    }
+    
+    // Then check for genre keywords
+    for (const [genre, variations] of Object.entries(GENRE_MAPPINGS)) {
+        if (variations.some(variation => lowerQuery.includes(variation))) {
+            detectedGenres.add(genre);
+        }
+    }
+    
+    return Array.from(detectedGenres);
+}
+
 // Search for stations
 async function searchStations(query) {
     if (!query.trim()) {
@@ -2413,7 +2464,45 @@ async function searchStations(query) {
     currentPage = 1;
     
     try {
-        const stations = await fetchFromRadioBrowser(`stations/search?name=${encodeURIComponent(query)}&limit=${SEARCH_LIMIT}`);
+        // Parse the query to extract potential search parameters
+        const searchParams = new URLSearchParams();
+        
+        // Check if query contains country code (e.g., "US", "GB", etc.)
+        const countryMatch = query.match(/\b([A-Z]{2})\b/);
+        if (countryMatch) {
+            searchParams.append('countrycode', countryMatch[1]);
+            query = query.replace(countryMatch[0], '').trim();
+        }
+        
+        // Detect genres in the query
+        const detectedGenres = detectGenres(query);
+        if (detectedGenres.length > 0) {
+            // Add each detected genre as a tag
+            detectedGenres.forEach(genre => {
+                searchParams.append('tag', genre);
+            });
+            // Remove genre-related terms from the query
+            detectedGenres.forEach(genre => {
+                const genreVariations = GENRE_MAPPINGS[genre];
+                if (genreVariations) {
+                    genreVariations.forEach(variation => {
+                        query = query.replace(new RegExp(variation, 'gi'), '').trim();
+                    });
+                }
+            });
+        }
+        
+        // Add the remaining query as name search if it's not empty
+        if (query) {
+            searchParams.append('name', query);
+        }
+        
+        // Add common parameters
+        searchParams.append('limit', SEARCH_LIMIT);
+        searchParams.append('order', 'votes'); // Sort by popularity by default
+        searchParams.append('reverse', 'true'); // Most popular first
+        
+        const stations = await fetchFromRadioBrowser(`stations/search?${searchParams.toString()}`);
         displaySearchResults(stations);
     } catch (error) {
         console.error('Error searching stations:', error);

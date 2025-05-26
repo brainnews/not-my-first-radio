@@ -683,6 +683,11 @@ main {
         display: none;
     }
 }
+.search-result-card .station-details {
+    @media (max-width: 768px) {
+        max-width: 230PX;
+    }
+}
 .station-card:hover .station-meta, .search-result-card:hover .station-meta {
     filter: opacity(1);
 }
