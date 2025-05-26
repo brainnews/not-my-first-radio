@@ -526,7 +526,7 @@ main {
     min-width: 0;
     max-width: 300px;
     @media (max-width: 768px) {
-        max-width: 155px;
+        max-width: 230px;
     }
 }
 
