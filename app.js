@@ -1602,42 +1602,42 @@ class RadioPlayer {
                                 </div>
                                 <div class="station-meta">
                                     ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11V9ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
-                            ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
-                            ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
-                        </div>
-                        ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
-                    </div>
-                </div>
-                <div class="station-controls">
-                    ${isCurrentlyPlaying ? 
-                        `<button class="stop-btn">
-                            <span class="material-symbols-rounded">stop</span>
-                        </button>` : 
-                        `<button class="play-btn">
-                            <span class="material-symbols-rounded">play_arrow</span>
-                        </button>`
-                    }
-                    <button class="more-btn" title="More actions">
-                        <span class="material-symbols-rounded">more_vert</span>
-                    </button>
-                    <div class="station-menu-overlay hidden"></div>
-                    <div class="station-menu hidden">
-                        <div class="station-menu-info">
-                            <div class="station-menu-name">${station.name}</div>
-                            <div class="station-menu-data">
-                                <div class="station-menu-data-item"><span class="material-symbols-rounded">radio</span>${station.bitrate ? `${station.bitrate}kbps` : ''}</div>
-                                <div class="station-menu-data-item"><span class="material-symbols-rounded">public</span>${station.countrycode ? `${station.countrycode}` : ''}</div>
-                                <div class="station-menu-data-item"><span class="material-symbols-rounded">local_fire_department</span>${station.votes ? `${station.votes}` : ''}</div>
+                                    ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
+                                    ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
+                                </div>
+                                ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
                             </div>
                         </div>
-                        <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
-                        <button class="menu-move"><span class="material-symbols-rounded">content_copy</span> Copy to your radio</button>
-                        <button class="menu-homepage"><span class="material-symbols-rounded">open_in_new</span> Visit website</button>
-                        <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
+                        <div class="station-controls">
+                            ${isCurrentlyPlaying ? 
+                                `<button class="stop-btn">
+                                    <span class="material-symbols-rounded">stop</span>
+                                </button>` : 
+                                `<button class="play-btn">
+                                    <span class="material-symbols-rounded">play_arrow</span>
+                                </button>`
+                            }
+                            <button class="more-btn" title="More actions">
+                                <span class="material-symbols-rounded">more_vert</span>
+                            </button>
+                            <div class="station-menu-overlay hidden"></div>
+                            <div class="station-menu hidden">
+                                <div class="station-menu-info">
+                                    <div class="station-menu-name">${station.name}</div>
+                                    <div class="station-menu-data">
+                                        <div class="station-menu-data-item"><span class="material-symbols-rounded">radio</span>${station.bitrate ? `${station.bitrate}kbps` : ''}</div>
+                                        <div class="station-menu-data-item"><span class="material-symbols-rounded">public</span>${station.countrycode ? `${station.countrycode}` : ''}</div>
+                                        <div class="station-menu-data-item"><span class="material-symbols-rounded">local_fire_department</span>${station.votes ? `${station.votes}` : ''}</div>
+                                    </div>
+                                </div>
+                                <button class="menu-share"><span class="material-symbols-rounded">share</span> Share</button>
+                                <button class="menu-move"><span class="material-symbols-rounded">content_copy</span> Copy to your radio</button>
+                                <button class="menu-homepage"><span class="material-symbols-rounded">open_in_new</span> Visit website</button>
+                                <button class="menu-delete"><span class="material-symbols-rounded">delete</span> Delete</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </div>
-        `;
+                `;
 
                     stationsContainer.appendChild(stationElement);
                 });
@@ -2262,13 +2262,12 @@ const searchInput = document.getElementById('search-input');
 const clearInputBtn = document.getElementById('clear-input');
 const searchResults = document.getElementById('search-results');
 const clearResultsBtn = document.getElementById('clear-results');
-const searchTip = document.querySelector('.search-results .tip');
 const sortSelect = document.getElementById('sort-results');
 let previewAudio = null;
 let searchTimeout = null;
 let currentSearchResults = []; // Store current search results for sorting
 const SEARCH_DELAY = 500; // milliseconds delay for search after user stops typing
-const SEARCH_LIMIT = 500; // Limit the number of search results
+const SEARCH_LIMIT = 40000; // Limit the number of search results
 const RESULTS_PER_PAGE = 10; // Number of results to show per page
 let currentPage = 1; // Current page number
 
@@ -2337,7 +2336,6 @@ function sortStations(stations, sortBy) {
 function clearSearchResults() {
     const searchResultsSection = document.getElementById('search-results');
     searchResultsSection.classList.add('hidden');
-    searchTip.classList.add('hidden');
     const resultsGrid = searchResultsSection.querySelector('.results-grid');
     resultsGrid.innerHTML = '';
     
@@ -2510,7 +2508,6 @@ async function searchStations(query) {
         const resultsGrid = searchResultsSection.querySelector('.results-grid');
         const sectionTitle = searchResultsSection.querySelector('.section-title');
 
-        searchTip.classList.remove('hidden');
         searchResultsSection.classList.remove('hidden');
         sectionTitle.textContent = 'Error';
         resultsGrid.innerHTML = `
@@ -2550,7 +2547,7 @@ async function displaySearchResults(stations) {
     loadingIndicator.className = 'loading-indicator';
     loadingIndicator.innerHTML = `
         <div class="loading-spinner"></div>
-        <div class="loading-text">Checking stations...</div>
+        <div class="loading-text"></div>
     `;
     
     // Clear previous results and show loading indicator
@@ -2560,21 +2557,26 @@ async function displaySearchResults(stations) {
     // First filter by URL format
     const formatValidStations = stations.filter(station => isValidStreamUrl(station.url));
     
-    // Update loading text to show progress
-    loadingIndicator.querySelector('.loading-text').textContent = 
-        `Checking ${formatValidStations.length} stations...`;
+    // Store all format-valid stations for future testing
+    currentSearchResults = formatValidStations;
     
-    // Then test each stream
-    const testPromises = formatValidStations.map(async (station) => {
+    // Calculate which stations we need to test for the current page
+    const startIndex = (currentPage - 1) * RESULTS_PER_PAGE;
+    const endIndex = startIndex + RESULTS_PER_PAGE;
+    const currentPageStations = formatValidStations.slice(startIndex, endIndex);
+    
+    // Update loading text to show progress
+    // loadingIndicator.querySelector('.loading-text').textContent = 
+    //     ``;
+    
+    // Test only the streams for the current page
+    const testPromises = currentPageStations.map(async (station) => {
         const isPlayable = await testStream(station.url);
         return isPlayable ? station : null;
     });
 
     const testResults = await Promise.all(testPromises);
     const supportedStations = testResults.filter(station => station !== null);
-    
-    // Store the results for sorting
-    currentSearchResults = supportedStations;
     
     // Remove loading indicator
     loadingIndicator.remove();
@@ -2589,8 +2591,7 @@ async function displaySearchResults(stations) {
     const formatValidCount = formatValidStations.length;
     const supportedCount = supportedStations.length;
     
-    sectionTitle.textContent = `${supportedCount} playable stations found (${totalStations} total) for "${searchInput.value}"`;
-    searchTip.classList.remove('hidden');
+    sectionTitle.textContent = `${totalStations} stations found for "${searchInput.value}"`;
     
     // Return early if no supported stations
     if (supportedStations.length === 0) {
@@ -2625,115 +2626,148 @@ function displaySortedResults(sortBy) {
     const endIndex = startIndex + RESULTS_PER_PAGE;
     const currentPageStations = sortedStations.slice(startIndex, endIndex);
     
-    // Generate the HTML for the current page of results
-    const resultsHTML = currentPageStations.map(station => {
-        const safeStation = {
-            name: station.name || 'Unknown Station',
-            tags: station.tags || 'No tags available',
-            url: station.url,
-            stationuuid: station.stationuuid || '',
-            bitrate: station.bitrate || 'Unknown',
-            countrycode: station.countrycode || 'Unknown',
-            favicon: station.favicon || '',
-            homepage: station.homepage || '',
-            votes: station.votes || 0
-        };
+    // Test streams for the current page if they haven't been tested yet
+    const testCurrentPage = async () => {
+        // Check if we need to test any stations
+        const untestedStations = currentPageStations.filter(station => !station.isPlayable);
         
-        const safeStationJson = JSON.stringify(safeStation).replace(/"/g, '&quot;');
-        const exists = radioPlayer.stations.some(s => s.url === station.url);
+        if (untestedStations.length > 0) {
+            // Show loading indicator
+            const loadingIndicator = document.createElement('div');
+            loadingIndicator.className = 'loading-indicator';
+            loadingIndicator.innerHTML = `
+                <div class="loading-spinner"></div>
+                <div class="loading-text"></div>
+            `;
+            resultsGrid.innerHTML = '';
+            resultsGrid.appendChild(loadingIndicator);
+        }
+
+        const testPromises = currentPageStations.map(async (station) => {
+            // Only test if we haven't already confirmed it's playable
+            if (!station.isPlayable) {
+                const isPlayable = await testStream(station.url);
+                station.isPlayable = isPlayable;
+                return isPlayable ? station : null;
+            }
+            return station;
+        });
+
+        const testResults = await Promise.all(testPromises);
+        const supportedStations = testResults.filter(station => station !== null);
         
-        return `
-            <div class="search-result-card">
-                <div class="station-info">
-                    <div class="station-favicon">
-                        ${station.favicon ? 
-                            `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<svg width=\\'16\\' height=\\'16\\' viewBox=\\'0 0 16 16\\' fill=\\'none\\' xmlns=\\'http://www.w3.org/2000/svg\\'><path d=\\'M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 13H10V12H12V10H13V13Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 8H12V9H11V10H9V6H13V8Z\\' fill=\\'#1500FF\\'/><path d=\\'M4 8H5V10H7V11H6V12H3V7H4V8Z\\' fill=\\'#FF0000\\'/><path d=\\'M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z\\' fill=\\'#0DFF00\\'/></svg>'">` : 
-                            `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z" fill="#D9D9D9"/><path d="M13 13H10V12H12V10H13V13Z" fill="#D9D9D9"/><path d="M13 8H12V9H11V10H9V6H13V8Z" fill="#1500FF"/><path d="M4 8H5V10H7V11H6V12H3V7H4V8Z" fill="#FF0000"/><path d="M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z" fill="#0DFF00"/></svg>`
-                        }
-                    </div>
-                    <div class="station-details">
-                        <h3>${station.name}</h3>
-                        <div class="station-meta">
-                            ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11V9ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
-                            ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
-                            ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
-                        </div>
-                        ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
-                    </div>
-                </div>
-                <div class="station-controls">
-                    <button class="preview-btn" data-url="${station.url}">
-                        <span class="material-symbols-rounded">play_arrow</span>
-                    </button>
-                    <button class="add-btn ${exists ? 'success' : ''}" data-station="${safeStationJson}">
-                        <span class="material-symbols-rounded">${exists ? 'check' : 'playlist_add'}</span>
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-
-    // Generate pagination controls
-    const paginationHTML = `
-        <div class="pagination-controls">
-            <button class="pagination-btn" data-action="prev" ${currentPage === 1 ? 'disabled' : ''}>
-                <span class="material-symbols-rounded">chevron_left</span>
-            </button>
-            <span class="pagination-info">Page ${currentPage} of ${totalPages}</span>
-            <button class="pagination-btn" data-action="next" ${currentPage === totalPages ? 'disabled' : ''}>
-                <span class="material-symbols-rounded">chevron_right</span>
-            </button>
-        </div>
-    `;
-
-    // Update the results grid with the current page and pagination controls
-    resultsGrid.innerHTML = resultsHTML + paginationHTML;
-
-    // Add event listeners for pagination buttons
-    document.querySelectorAll('.pagination-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            if (btn.hasAttribute('disabled')) return;
+        // Generate the HTML for the current page of results
+        const resultsHTML = supportedStations.map(station => {
+            const safeStation = {
+                name: station.name || 'Unknown Station',
+                tags: station.tags || 'No tags available',
+                url: station.url,
+                stationuuid: station.stationuuid || '',
+                bitrate: station.bitrate || 'Unknown',
+                countrycode: station.countrycode || 'Unknown',
+                favicon: station.favicon || '',
+                homepage: station.homepage || '',
+                votes: station.votes || 0
+            };
             
-            const action = btn.dataset.action;
-            if (action === 'prev' && currentPage > 1) {
-                currentPage--;
-            } else if (action === 'next' && currentPage < totalPages) {
-                currentPage++;
-            }
-            
-            // Redisplay the results with the new page
-            displaySortedResults(sortBy);
-        });
-    });
-
-    // Add event listeners for preview and add buttons
-    document.querySelectorAll('.preview-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const url = btn.dataset.url;
-            if (radioPlayer.isPlaying && radioPlayer.currentStation && radioPlayer.currentStation.url === url) {
-                radioPlayer.togglePlay();
-                btn.querySelector('.material-symbols-rounded').textContent = 'play_arrow';
-            } else {
-                previewStation(url);
-            }
-        });
-    });
-
-    document.querySelectorAll('.add-btn').forEach(btn => {
-        btn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            const station = JSON.parse(btn.dataset.station.replace(/&quot;/g, '"'));
+            const safeStationJson = JSON.stringify(safeStation).replace(/"/g, '&quot;');
             const exists = radioPlayer.stations.some(s => s.url === station.url);
             
-            if (exists) {
-                radioPlayer.removeStation(station.url);
-                btn.querySelector('.material-symbols-rounded').textContent = 'playlist_add';
-                btn.classList.remove('success');
-            } else {
-                addStation(btn);
-            }
+            return `
+                <div class="search-result-card">
+                    <div class="station-info">
+                        <div class="station-favicon">
+                            ${station.favicon ? 
+                                `<img src="${station.favicon}" alt="${station.name} logo" onerror="this.outerHTML='<svg width=\\'16\\' height=\\'16\\' viewBox=\\'0 0 16 16\\' fill=\\'none\\' xmlns=\\'http://www.w3.org/2000/svg\\'><path d=\\'M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 13H10V12H12V10H13V13Z\\' fill=\\'#D9D9D9\\'/><path d=\\'M13 8H12V9H11V10H9V6H13V8Z\\' fill=\\'#1500FF\\'/><path d=\\'M4 8H5V10H7V11H6V12H3V7H4V8Z\\' fill=\\'#FF0000\\'/><path d=\\'M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z\\' fill=\\'#0DFF00\\'/></svg>'">` : 
+                                `<svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M16 16H9V15H15V5H11V1H1V15H3V16H0V0H12V1H13V2H12V4H14V3H15V4H16V16ZM14 3H13V2H14V3Z" fill="#D9D9D9"/><path d="M13 13H10V12H12V10H13V13Z" fill="#D9D9D9"/><path d="M13 8H12V9H11V10H9V6H13V8Z" fill="#1500FF"/><path d="M4 8H5V10H7V11H6V12H3V7H4V8Z" fill="#FF0000"/><path d="M7 4H8V6H7V7H5V6H4V4H5V3H7V4Z" fill="#0DFF00"/></svg>`
+                            }
+                        </div>
+                        <div class="station-details">
+                            <h3>${station.name}</h3>
+                            <div class="station-meta">
+                                ${station.bitrate ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M5 9V10H3V9H5Z" fill="#47B5FF"/><path d="M6 11H2V8H6V11ZM5 9H3V10H5V9Z" fill="#477EFF"/><path d="M11 10V11H7V10H11V9ZM11 9H7V8H11V9Z" fill="#262626"/><path d="M14 14H13V7H14V6H15V13H14V14Z" fill="#D29A00"/><path d="M12 15H1V7H12V15ZM2 13H3V12H2V13ZM4 13H5V12H4V13ZM6 13H9V12H6V13ZM10 13H11V12H10V13ZM2 11H6V8H2V11ZM7 11H11V10H7V11ZM7 9H11V8H7V9Z" fill="#FFC933"/><path d="M3 13H2V12H3V13ZM5 13H4V12H5V13ZM7 13H6V12H7V13ZM9 13H8V12H9V13ZM11 13H10V12H11V13Z" fill="#6D6D6D"/><path d="M4 14H3V13H4V14ZM6 14H5V13H6V14ZM8 14H7V13H8V14ZM10 14H9V13H10V14Z" fill="#6D6D6D"/><path d="M13 4V5H14V6H1V5H2V4H13Z" fill="#FFE59E"/><path d="M14 7H13V14H14V15H13V16H1V15H12V7H1V15H0V6H14V7ZM15 14H14V13H15V14ZM8 13H7V12H8V13ZM16 13H15V5H16V13Z" fill="#FFC933"/><path d="M15 6H14V5H13V4H15V6ZM13 4H11V3H13V4ZM11 3H9V2H11V3ZM9 2H7V1H9V2ZM7 1H5V0H7V1Z" fill="#DCDCDC"/></svg>${station.bitrate}kbps</span>` : ''}
+                                ${station.countrycode ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M10 3H9V5H10V6H8V5H6V6H5V7H6V8H10V9H11V11H12V12H13V14H11V15H8V12H6V11H5V9H4V7H3V6H1V5H2V3H3V2H5V1H10V3Z" fill="#1C6800"/><path d="M1 6H3V7H4V9H5V11H6V12H8V15H11V16H5V15H3V14H2V13H1V11H0V5H1V6ZM13 15H11V14H13V15ZM11 1H13V2H14V3H15V5H16V11H15V13H14V14H13V12H12V11H11V9H10V8H6V7H5V6H6V5H8V6H10V5H9V3H10V1H5V0H11V1ZM2 5H1V3H2V5ZM3 3H2V2H3V3ZM5 2H3V1H5V2Z" fill="#477EFF"/></svg>${station.countrycode}</span>` : ''}
+                                ${station.votes ? `<span><svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M9 10H10V11H11V14H10V15H9V16H7V15H6V14H5V11H6V10H7V9H9V10Z" fill="#FFC933"/><path d="M5 16H4V15H5V16ZM12 16H11V15H12V16ZM4 15H3V14H4V15ZM13 15H12V14H13V15ZM7 1H8V3H9V4H12V3H13V4H14V5H15V7H16V11H15V13H14V14H13V11H12V9H11V8H9V7H6V8H5V9H4V10H3V14H2V13H1V11H0V7H1V5H2V4H3V3H4V2H5V1H6V0H7V1Z" fill="#FF5E00"/></svg>${station.votes}</span>` : ''}
+                            </div>
+                            ${station.note ? `<div class="station-note">${station.note}</div>` : ''}
+                        </div>
+                    </div>
+                    <div class="station-controls">
+                        <button class="preview-btn" data-url="${station.url}">
+                            <span class="material-symbols-rounded">play_arrow</span>
+                        </button>
+                        <button class="add-btn ${exists ? 'success' : ''}" data-station="${safeStationJson}">
+                            <span class="material-symbols-rounded">${exists ? 'check' : 'playlist_add'}</span>
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        // Generate pagination controls
+        const paginationHTML = `
+            <div class="pagination-controls">
+                <button class="pagination-btn" data-action="prev" ${currentPage === 1 ? 'disabled' : ''}>
+                    <span class="material-symbols-rounded">chevron_left</span>
+                </button>
+                <span class="pagination-info">Page ${currentPage} of ${totalPages}</span>
+                <button class="pagination-btn" data-action="next" ${currentPage === totalPages ? 'disabled' : ''}>
+                    <span class="material-symbols-rounded">chevron_right</span>
+                </button>
+            </div>
+        `;
+
+        // Update the results grid with the current page and pagination controls
+        resultsGrid.innerHTML = resultsHTML + paginationHTML;
+
+        // Add event listeners for pagination buttons
+        document.querySelectorAll('.pagination-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.hasAttribute('disabled')) return;
+                
+                const action = btn.dataset.action;
+                if (action === 'prev' && currentPage > 1) {
+                    currentPage--;
+                } else if (action === 'next' && currentPage < totalPages) {
+                    currentPage++;
+                }
+                
+                // Redisplay the results with the new page
+                displaySortedResults(sortBy);
+            });
         });
-    });
+
+        // Add event listeners for preview and add buttons
+        document.querySelectorAll('.preview-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const url = btn.dataset.url;
+                if (radioPlayer.isPlaying && radioPlayer.currentStation && radioPlayer.currentStation.url === url) {
+                    radioPlayer.togglePlay();
+                    btn.querySelector('.material-symbols-rounded').textContent = 'play_arrow';
+                } else {
+                    previewStation(url);
+                }
+            });
+        });
+
+        document.querySelectorAll('.add-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const station = JSON.parse(btn.dataset.station.replace(/&quot;/g, '"'));
+                const exists = radioPlayer.stations.some(s => s.url === station.url);
+                
+                if (exists) {
+                    radioPlayer.removeStation(station.url);
+                    btn.querySelector('.material-symbols-rounded').textContent = 'playlist_add';
+                    btn.classList.remove('success');
+                } else {
+                    addStation(btn);
+                }
+            });
+        });
+    };
+    
+    testCurrentPage();
 }
 
 // Preview a station

@@ -727,7 +727,7 @@ main {
 .results-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
+    align-items: center;
     padding: 1rem;
     position: sticky;
     top: 0;
@@ -753,10 +753,10 @@ main {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    background: var(--bg-primary);
-    border: 1px solid var(--border-color);
+    background: var(--accent-color);
+    border: 1px solid var(--accent-color);
     border-radius: 4px;
-    color: var(--text-secondary);
+    color: var(--text-primary);
     padding: 0.55rem 0.825rem;
     cursor: pointer;
     font-size: 0.875rem;
@@ -768,7 +768,7 @@ main {
 }
 
 .clear-results-btn:hover {
-    background: var(--border-color);
+    background: var(--accent-color);
     color: var(--text-primary);
 }
 
