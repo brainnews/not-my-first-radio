@@ -2026,6 +2026,278 @@ main {
     animation-delay: calc(var(--row-index) * 0.1s);
 }
 
+/* Achievement Notification Styles */
+.achievement-notification {
+    position: fixed;
+    top: 2rem;
+    right: 2rem;
+    background: var(--bg-secondary);
+    border: 2px solid var(--accent-color);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3), 0 0 20px var(--accent-color-30);
+    z-index: 3000;
+    transform: translateX(100%);
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    max-width: 400px;
+    min-width: 320px;
+}
+
+.achievement-notification.show {
+    transform: translateX(0);
+    opacity: 1;
+}
+
+.achievement-notification-content {
+    display: flex;
+    align-items: center;
+    padding: 1.5rem;
+    gap: 1rem;
+    position: relative;
+}
+
+.achievement-icon {
+    font-size: 2.5rem;
+    flex-shrink: 0;
+    animation: achievementPulse 2s ease-in-out infinite;
+}
+
+.achievement-details {
+    flex: 1;
+    min-width: 0;
+}
+
+.achievement-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--accent-color);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 0.25rem;
+}
+
+.achievement-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.achievement-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+.achievement-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 50%;
+    color: var(--text-secondary);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.achievement-close:hover {
+    background: var(--accent-color-30);
+    color: var(--text-primary);
+}
+
+.achievement-close .material-symbols-rounded {
+    font-size: 1.25rem;
+}
+
+@keyframes achievementPulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+}
+
+/* Achievement Panel Styles */
+.achievements-section {
+    margin-bottom: 2rem;
+}
+
+.achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.achievement-card {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 1.5rem;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.achievement-card.unlocked {
+    border-color: var(--accent-color);
+    background: linear-gradient(135deg, var(--bg-primary) 0%, var(--accent-color-30) 100%);
+}
+
+.achievement-card.unlocked::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: linear-gradient(90deg, var(--accent-color), var(--neon-green));
+}
+
+.achievement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.achievement-card-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+.achievement-card-icon {
+    font-size: 2rem;
+    flex-shrink: 0;
+}
+
+.achievement-card.unlocked .achievement-card-icon {
+    animation: achievementPulse 3s ease-in-out infinite;
+}
+
+.achievement-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.achievement-card-name {
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.25rem;
+    line-height: 1.2;
+}
+
+.achievement-card-description {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.3;
+}
+
+.achievement-card-tier {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    display: flex;
+    gap: 2px;
+}
+
+.achievement-tier-star {
+    width: 8px;
+    height: 8px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+}
+
+.achievement-card.unlocked .achievement-tier-star {
+    background: var(--accent-color);
+}
+
+.achievement-card-progress {
+    margin-top: 1rem;
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+}
+
+.achievement-card.unlocked .achievement-card-progress {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
+.achievement-unlock-date {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+    text-align: center;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+.achievement-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+}
+
+.achievement-stat {
+    text-align: center;
+}
+
+.achievement-stat-value {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--accent-color);
+    display: block;
+}
+
+.achievement-stat-label {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    margin-top: 0.25rem;
+}
+
+.achievement-category-header {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0 1rem 0;
+    font-size: 1.125rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    text-transform: capitalize;
+}
+
+.achievement-category-icon {
+    font-size: 1.25rem;
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+    .achievement-notification {
+        top: 1rem;
+        right: 1rem;
+        left: 1rem;
+        max-width: none;
+        min-width: 0;
+    }
+    
+    .achievements-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .achievement-stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 /* Station menu styles */
 .station-controls {
     position: relative;
@@ -2192,7 +2464,7 @@ main {
     justify-content: flex-start;
     gap: 0.5rem;
     border-radius: 0;
-    transition: background 0.2s;
+    transition: all 0.2s ease;
     width: 100%;
     @media (max-width: 768px) {
         font-size: 1.25rem;
@@ -2208,11 +2480,18 @@ main {
 
 .station-menu button .material-symbols-rounded.loading {
     animation: spin 1s linear infinite;
+    color: var(--accent-color);
+    filter: brightness(1.2);
 }
 
 .station-menu button:disabled {
-    opacity: 0.7;
+    opacity: 0.8;
     cursor: wait;
+}
+
+.station-menu button:disabled:hover {
+    background: var(--bg-secondary);
+    transform: none;
 }
 
 /* Note styles */

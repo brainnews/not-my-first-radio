@@ -1,5 +1,6 @@
 import { initLogoAnimation } from './js/logoAnimation.js';
 import AudioVisualizer from './js/audioVisualizer.js';
+import AchievementSystem from './js/achievements.js';
 
 // Initialize logo animation
 initLogoAnimation();
@@ -25,6 +26,7 @@ const exportDataBtn = document.getElementById('export-data');
 const importFileInput = document.getElementById('import-file');
 const clearStationsBtn = document.getElementById('clear-stations');
 const addManualStationBtn = document.getElementById('add-manual-station');
+const resetAchievementsBtn = document.getElementById('reset-achievements');
 
 // Alert banner functionality
 const alertBanner = document.querySelector('.alert-banner');
@@ -125,6 +127,11 @@ const handleExportData = (e) => {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
         
+        // Track export achievement
+        if (window.achievementSystem) {
+            window.achievementSystem.trackProgress('export', 1);
+        }
+        
         showNotification('Stations exported successfully!', 'success');
     } catch (error) {
         console.error('Error exporting stations:', error);
@@ -179,6 +186,14 @@ importFileInput.addEventListener('change', async (event) => {
                     }
                     radioPlayer.saveStations();
                     radioPlayer.displayStations();
+                    
+                    // Track import achievement
+                    if (window.achievementSystem) {
+                        window.achievementSystem.trackProgress('import', 1, {
+                            isSharedList: true
+                        });
+                    }
+                    
                     showNotification('Stations merged successfully!', 'success');
                     break;
                 
@@ -192,6 +207,14 @@ importFileInput.addEventListener('change', async (event) => {
                     radioPlayer.stationLists.push(newList);
                     radioPlayer.saveStationLists();
                     radioPlayer.displayStationLists();
+                    
+                    // Track import achievement
+                    if (window.achievementSystem) {
+                        window.achievementSystem.trackProgress('import', 1, {
+                            isSharedList: true
+                        });
+                    }
+                    
                     showNotification('New station list added!', 'success');
                     break;
             }
@@ -226,6 +249,45 @@ const handleClearStations = async (e) => {
         showNotification('All stations have been removed.', 'success');
     }
 };
+
+// Handle reset achievements
+const handleResetAchievements = async (e) => {
+    e.preventDefault();
+    
+    if (!window.achievementSystem) {
+        showNotification('Achievement system not available.', 'error');
+        return;
+    }
+    
+    const progress = window.achievementSystem.getUserProgress();
+    if (progress.unlockedCount === 0 && progress.stats.stationsAdded === 0 && progress.stats.searchCount === 0) {
+        showNotification('No achievement progress to reset.', 'warning');
+        return;
+    }
+    
+    const achievementText = progress.unlockedCount > 0 
+        ? `${progress.unlockedCount} achievements and all progress` 
+        : 'all achievement progress';
+    
+    const confirmed = await showConfirmationModal({
+        title: 'Reset All Achievements',
+        message: `Are you sure you want to reset ${achievementText}? This will permanently clear your achievement data and cannot be undone.`,
+        confirmText: 'Reset Achievements',
+        danger: true
+    });
+    
+    if (confirmed) {
+        window.achievementSystem.resetAchievements();
+        showNotification('All achievements have been reset.', 'success');
+        
+        // If achievements modal is open, refresh it
+        const achievementsModal = document.getElementById('achievements-modal');
+        if (achievementsModal && !achievementsModal.classList.contains('hidden')) {
+            showAchievementsModal();
+        }
+    }
+};
+
 clearStationsBtn.addEventListener('click', handleClearStations);
 clearStationsBtn.addEventListener('keydown', (e) => {
     if (e.key === 'Enter' || e.key === ' ') {
@@ -233,6 +295,17 @@ clearStationsBtn.addEventListener('keydown', (e) => {
         handleClearStations(e);
     }
 });
+
+// Reset achievements button event listeners
+if (resetAchievementsBtn) {
+    resetAchievementsBtn.addEventListener('click', handleResetAchievements);
+    resetAchievementsBtn.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            handleResetAchievements(e);
+        }
+    });
+}
 
 // Handle empty state settings button
 const emptyStateSettingsBtn = document.getElementById('empty-state-settings');
@@ -837,6 +910,13 @@ class RadioPlayer {
                     const handleShare = (e) => {
                         e.preventDefault();
                         e.stopPropagation();
+                        
+                        // Add immediate visual feedback
+                        menuShare.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            menuShare.style.transform = '';
+                        }, 150);
+                        
                         menu.classList.add('hidden');
                         overlay.classList.add('hidden');
                         const station = this.stations.find(s => s.url === url);
@@ -1016,9 +1096,17 @@ class RadioPlayer {
                 e.stopPropagation();
                 closeMenu();
             });
-            menu.querySelector('.menu-share').addEventListener('click', (e) => {
+            const sharedMenuShare = menu.querySelector('.menu-share');
+            sharedMenuShare.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
+                
+                // Add immediate visual feedback
+                sharedMenuShare.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    sharedMenuShare.style.transform = '';
+                }, 150);
+                
                 menu.classList.add('hidden');
                 overlay.classList.add('hidden');
                 const station = this.stations.find(s => s.url === url);
@@ -1208,6 +1296,16 @@ class RadioPlayer {
                 document.querySelector('.player-bar').classList.remove('loading');
                 document.querySelector('.static').classList.add('hidden');
                 this.updateUI();
+                
+                // Track achievement for station play
+                if (window.achievementSystem) {
+                    window.achievementSystem.trackProgress('stationPlayed', 1, {
+                        stationId: station.stationuuid || station.url
+                    });
+                }
+                
+                // Start listening time tracking
+                this.startListeningTimeTracking();
             }
         };
 
@@ -1298,9 +1396,11 @@ class RadioPlayer {
         if (this.isPlaying) {
             this.audio.pause();
             this.isPlaying = false;
+            this.stopListeningTimeTracking();
         } else {
             this.audio.play();
             this.isPlaying = true;
+            this.startListeningTimeTracking();
         }
 
         // Update UI
@@ -1762,12 +1862,89 @@ class RadioPlayer {
                 details: this.currentStation.details
             });
             this.visualizer.init();
+            
+            // Track visualizer achievement
+            if (window.achievementSystem) {
+                window.achievementSystem.trackProgress('visualizerUsed', 1);
+            }
+        }
+    }
+    
+    // Listening time tracking methods
+    startListeningTimeTracking() {
+        this.listeningStartTime = Date.now();
+        
+        // Clear any existing interval
+        if (this.listeningTimeInterval) {
+            clearInterval(this.listeningTimeInterval);
+        }
+        
+        // Track listening time every 30 seconds
+        this.listeningTimeInterval = setInterval(() => {
+            if (this.isPlaying && this.listeningStartTime) {
+                const currentTime = Date.now();
+                const sessionTime = currentTime - this.listeningStartTime;
+                
+                if (window.achievementSystem) {
+                    window.achievementSystem.trackProgress('listeningTime', sessionTime);
+                }
+                
+                // Reset start time for next interval
+                this.listeningStartTime = currentTime;
+            }
+        }, 30000); // Track every 30 seconds
+    }
+    
+    stopListeningTimeTracking() {
+        if (this.listeningTimeInterval) {
+            clearInterval(this.listeningTimeInterval);
+            this.listeningTimeInterval = null;
+        }
+        
+        // Track final session time
+        if (this.listeningStartTime) {
+            const sessionTime = Date.now() - this.listeningStartTime;
+            if (window.achievementSystem) {
+                window.achievementSystem.trackProgress('listeningTime', sessionTime);
+            }
+            this.listeningStartTime = null;
         }
     }
 }
 
 // Initialize the radio player
 const radioPlayer = new RadioPlayer();
+
+// Initialize achievement tracking for existing data
+document.addEventListener('DOMContentLoaded', () => {
+    if (window.achievementSystem) {
+        // Check existing username
+        const savedUsername = localStorage.getItem('radio-username');
+        if (savedUsername && savedUsername.trim()) {
+            window.achievementSystem.trackProgress('usernameSet');
+        }
+        
+        // Check existing stations for achievement tracking
+        const savedStations = localStorage.getItem('radio-stations');
+        if (savedStations) {
+            try {
+                const stations = JSON.parse(savedStations);
+                if (Array.isArray(stations)) {
+                    stations.forEach(station => {
+                        window.achievementSystem.trackProgress('stationAdded', 1, {
+                            countrycode: station.countrycode,
+                            tags: station.tags,
+                            bitrate: station.bitrate,
+                            isManual: false
+                        });
+                    });
+                }
+            } catch (error) {
+                console.error('Error processing existing stations for achievements:', error);
+            }
+        }
+    }
+});
 
 // Debug: Check localStorage on page load
 window.addEventListener('load', () => {
@@ -1977,6 +2154,12 @@ saveUsernameBtn.addEventListener('click', () => {
     
     currentUsername = newUsername;
     saveUsername(currentUsername);
+    
+    // Track username achievement
+    if (window.achievementSystem) {
+        window.achievementSystem.trackProgress('usernameSet');
+    }
+    
     showNotification('Username updated successfully!', 'success');
 });
 
@@ -2101,6 +2284,11 @@ shareQrBtn.addEventListener('click', async () => {
                 qrCodeContainer.style.backgroundColor = '#ffffff';
                 qrCodeContainer.style.padding = '15px';
                 qrCodeContainer.style.borderRadius = '8px';
+                
+                // Track QR share achievement
+                if (window.achievementSystem) {
+                    window.achievementSystem.trackProgress('qrShare', 1);
+                }
                 
                 qrModal.classList.remove('hidden');
             } else {
@@ -2456,6 +2644,11 @@ async function searchStations(query) {
     if (!query.trim()) {
         clearSearchResults();
         return;
+    }
+    
+    // Track search achievement
+    if (window.achievementSystem) {
+        window.achievementSystem.trackProgress('search', 1);
     }
     
     // Reset to first page when performing a new search
@@ -2820,6 +3013,11 @@ function previewStation(url) {
 
     previewAudio.play()
         .then(() => {
+            // Track preview achievement
+            if (window.achievementSystem) {
+                window.achievementSystem.trackProgress('preview', 1);
+            }
+            
             // Update button to show stop icon when playing
             document.querySelectorAll('.preview-btn').forEach(btn => {
                 if (btn.dataset.url === url) {
@@ -2874,6 +3072,16 @@ async function addStation(btn) {
     radioPlayer.stations.push(station);
     radioPlayer.saveStations();
     radioPlayer.displayStations();
+    
+    // Track achievement
+    if (window.achievementSystem) {
+        window.achievementSystem.trackProgress('stationAdded', 1, {
+            countrycode: station.countrycode,
+            tags: station.tags,
+            bitrate: station.bitrate,
+            isManual: false
+        });
+    }
 
     // Update the button state
     btn.querySelector('.material-symbols-rounded').textContent = 'check';
@@ -3002,16 +3210,22 @@ function showConfirmationModal(options) {
 
 // Add these as prototype methods or standalone functions after the class
 RadioPlayer.prototype.shareStation = async function(station) {
-    // Find the menu share button
-    const menuShareBtn = document.querySelector(`.station-card[data-url="${station.url}"] .menu-share`);
+    // Find the menu share button - try both main stations and shared station lists
+    let menuShareBtn = document.querySelector(`.station-card[data-url="${station.url}"] .menu-share`);
+    if (!menuShareBtn) {
+        // Try finding in shared station lists
+        menuShareBtn = document.querySelector(`.shared-station-card[data-url="${station.url}"] .menu-share`);
+    }
     let originalContent = '';
     
     if (menuShareBtn) {
         // Store original content
         originalContent = menuShareBtn.innerHTML;
-        // Show loading state
+        // Show loading state  
         menuShareBtn.innerHTML = '<span class="material-symbols-rounded loading">sync</span> Generating link...';
         menuShareBtn.disabled = true;
+        menuShareBtn.style.opacity = '0.8';
+        menuShareBtn.style.pointerEvents = 'none';
     }
 
     const shareData = {
@@ -3051,6 +3265,8 @@ RadioPlayer.prototype.shareStation = async function(station) {
         if (menuShareBtn && originalContent) {
             menuShareBtn.innerHTML = originalContent;
             menuShareBtn.disabled = false;
+            menuShareBtn.style.opacity = '';
+            menuShareBtn.style.pointerEvents = '';
         }
     }
 };
@@ -3073,13 +3289,27 @@ RadioPlayer.prototype.showEditNoteUI = function(card, url) {
     input.focus();
     input.addEventListener('keydown', (e) => {
         if (e.key === 'Enter') {
+            const oldNote = station.note || '';
             station.note = input.value.slice(0, 100);
+            
+            // Track note achievement if note was added/changed
+            if (window.achievementSystem && input.value.trim() && input.value.trim() !== oldNote) {
+                window.achievementSystem.trackProgress('noteAdded', 1);
+            }
+            
             this.saveStations();
             this.displayStations();
         }
     });
     noteDiv.querySelector('.save-note-btn').onclick = () => {
+        const oldNote = station.note || '';
         station.note = input.value.slice(0, 100);
+        
+        // Track note achievement if note was added/changed
+        if (window.achievementSystem && input.value.trim() && input.value.trim() !== oldNote) {
+            window.achievementSystem.trackProgress('noteAdded', 1);
+        }
+        
         this.saveStations();
         this.displayStations();
     };
@@ -3382,6 +3612,16 @@ addManualStationBtn.addEventListener('click', async () => {
     radioPlayer.stations.push(station);
     radioPlayer.saveStations();
     radioPlayer.displayStations();
+    
+    // Track manual station achievement
+    if (window.achievementSystem) {
+        window.achievementSystem.trackProgress('stationAdded', 1, {
+            countrycode: station.countrycode,
+            tags: station.tags || '',
+            bitrate: station.bitrate,
+            isManual: true
+        });
+    }
 
     // Clear form
     urlInput.value = '';
@@ -3438,3 +3678,127 @@ termsModal.addEventListener('click', (e) => {
         termsModal.classList.add('hidden');
     }
 });
+
+// Achievements Modal
+const achievementsModal = document.getElementById('achievements-modal');
+const openAchievementsBtn = document.getElementById('open-achievements');
+const closeAchievementsBtn = document.getElementById('close-achievements');
+
+if (openAchievementsBtn) {
+    openAchievementsBtn.addEventListener('click', () => {
+        showAchievementsModal();
+    });
+}
+
+if (closeAchievementsBtn) {
+    closeAchievementsBtn.addEventListener('click', () => {
+        achievementsModal.classList.add('hidden');
+    });
+}
+
+// Close achievements modal when clicking outside
+achievementsModal.addEventListener('click', (e) => {
+    if (e.target === achievementsModal) {
+        achievementsModal.classList.add('hidden');
+    }
+});
+
+// Show achievements modal with populated content
+function showAchievementsModal() {
+    if (!window.achievementSystem) {
+        showNotification('Achievement system not available', 'error');
+        return;
+    }
+
+    const progress = window.achievementSystem.getUserProgress();
+    const achievementsByCategory = window.achievementSystem.getAchievementsByCategory();
+    
+    // Populate stats
+    const statsContainer = document.getElementById('achievement-stats');
+    const listeningHours = Math.floor(progress.stats.totalListeningTime / 3600000);
+    const listeningMinutes = Math.floor((progress.stats.totalListeningTime % 3600000) / 60000);
+    
+    statsContainer.innerHTML = `
+        <div class="achievement-stat">
+            <span class="achievement-stat-value">${progress.unlockedCount}</span>
+            <span class="achievement-stat-label">Achievements Unlocked</span>
+        </div>
+        <div class="achievement-stat">
+            <span class="achievement-stat-value">${progress.stats.stationsAdded}</span>
+            <span class="achievement-stat-label">Stations Collected</span>
+        </div>
+        <div class="achievement-stat">
+            <span class="achievement-stat-value">${progress.stats.countriesCollected.size || Array.from(progress.stats.countriesCollected).length}</span>
+            <span class="achievement-stat-label">Countries Explored</span>
+        </div>
+        <div class="achievement-stat">
+            <span class="achievement-stat-value">${listeningHours}h ${listeningMinutes}m</span>
+            <span class="achievement-stat-label">Total Listening Time</span>
+        </div>
+        <div class="achievement-stat">
+            <span class="achievement-stat-value">${progress.stats.searchCount}</span>
+            <span class="achievement-stat-label">Searches Performed</span>
+        </div>
+        <div class="achievement-stat">
+            <span class="achievement-stat-value">${progress.stats.shareCount + progress.stats.qrShareCount}</span>
+            <span class="achievement-stat-label">Times Shared</span>
+        </div>
+    `;
+    
+    // Populate categories
+    const categoriesContainer = document.getElementById('achievements-categories');
+    const categoryIcons = {
+        collection: '📚',
+        discovery: '🔍', 
+        listening: '🎧',
+        social: '🤝',
+        technical: '⚡'
+    };
+    
+    let categoriesHTML = '';
+    
+    Object.entries(achievementsByCategory).forEach(([categoryName, achievements]) => {
+        const unlockedInCategory = achievements.filter(a => a.unlocked).length;
+        const totalInCategory = achievements.length;
+        
+        categoriesHTML += `
+            <div class="achievement-category-header">
+                <span class="achievement-category-icon">${categoryIcons[categoryName] || '🏆'}</span>
+                <span>${categoryName} (${unlockedInCategory}/${totalInCategory})</span>
+            </div>
+            <div class="achievements-grid">
+        `;
+        
+        achievements.forEach(achievement => {
+            const unlockDate = achievement.unlocked ? new Date(achievement.unlockedAt).toLocaleDateString() : '';
+            const tierStars = '●'.repeat(achievement.tier);
+            
+            categoriesHTML += `
+                <div class="achievement-card ${achievement.unlocked ? 'unlocked' : ''}">
+                    <div class="achievement-card-tier">
+                        ${tierStars.split('').map(() => '<div class="achievement-tier-star"></div>').join('')}
+                    </div>
+                    <div class="achievement-card-header">
+                        <div class="achievement-card-icon">${achievement.icon}</div>
+                        <div class="achievement-card-info">
+                            <div class="achievement-card-name">${achievement.name}</div>
+                            <div class="achievement-card-description">${achievement.description}</div>
+                        </div>
+                    </div>
+                    ${achievement.unlocked ? 
+                        `<div class="achievement-card-progress">Unlocked!</div>
+                         <div class="achievement-unlock-date">Earned ${unlockDate}</div>` : 
+                        `<div class="achievement-card-progress">Not yet unlocked</div>`
+                    }
+                </div>
+            `;
+        });
+        
+        categoriesHTML += '</div>';
+    });
+    
+    categoriesContainer.innerHTML = categoriesHTML;
+    
+    // Show modal
+    achievementsModal.classList.remove('hidden');
+}

@@ -338,12 +338,16 @@
                             Import from a .json file
                         </label>
                     </div>
-                </div>
-                <div class="settings-section">
-                    <h3>Advanced</h3>
                     <button id="open-add-station" class="settings-btn">
                         <span class="material-symbols-rounded">add_circle</span>
                         Add a station manually
+                    </button>
+                </div>
+                <div class="settings-section">
+                    <h3>Achievements</h3>
+                    <button id="open-achievements" class="settings-btn">
+                        <span class="material-symbols-rounded">emoji_events</span>
+                        View Your Achievements
                     </button>
                 </div>
                 <div class="settings-section">
@@ -355,6 +359,10 @@
                     <button id="clear-shared-stations" class="settings-btn danger">
                         <span class="material-symbols-rounded">delete_sweep</span>
                         Clear shared stations
+                    </button>
+                    <button id="reset-achievements" class="settings-btn danger">
+                        <span class="material-symbols-rounded">restart_alt</span>
+                        Reset achievements
                     </button>
                 </div>
                 <div class="settings-section">
@@ -549,6 +557,31 @@
                             <p style="margin: 0.5rem 0; font-size: 0.8rem; text-align: center;">
                                 Last updated: May 2025
                             </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Achievements Modal -->
+        <div id="achievements-modal" class="modal hidden">
+            <div class="modal-content" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
+                <div class="modal-header" style="border-bottom: 1px solid var(--border-color); flex-shrink: 0; margin-bottom: 0;">
+                    <h2 style="width: 100%; margin: 0; padding: 1rem;">🏆 Your Achievements</h2>
+                    <button id="close-achievements" class="close-modal-btn">
+                        <span class="material-symbols-rounded">close</span>
+                    </button>
+                </div>
+                <div class="modal-body" style="padding: 0; overflow-y: auto; flex-grow: 1;">
+                    <div id="achievements-content" style="padding: 1.5rem;">
+                        <!-- Achievement stats will be inserted here -->
+                        <div class="achievement-stats" id="achievement-stats">
+                            <!-- Stats grid will be populated by JavaScript -->
+                        </div>
+                        
+                        <!-- Achievement categories will be inserted here -->
+                        <div id="achievements-categories">
+                            <!-- Categories will be populated by JavaScript -->
                         </div>
                     </div>
                 </div>
