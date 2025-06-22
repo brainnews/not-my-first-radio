@@ -204,20 +204,18 @@ main {
     border-bottom: 1px solid var(--border-color);
     padding: 0.5rem 0;
     cursor: pointer;
-    border-radius: 4px;
-    transition: all 0.2s ease;
+    transition: all 0.1s ease;
     margin-bottom: 0.5rem;
+    color: var(--text-secondary);
 }
 
 .station-section-header:hover {
-    background: var(--accent-color-30);
-    padding: 0.5rem 0.75rem;
-    margin: 1rem 0.75rem 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--accent-color);
+    color: var(--text-primary);
 }
 
 .section-title {
     font-size: 1rem;
-    color: var(--text-secondary);
     margin: 0;
     flex: 1;
 }
