@@ -1,0 +1,104 @@
+{
+  "stations": [
+    {
+      "name": "DNB FM",
+      "tags": "breaks,dnb,drum and bass,liquid",
+      "url": "https://air.dnbfm.ru/listen/player/qplay",
+      "stationuuid": "6632bb70-8919-415d-9d09-6e304564543b",
+      "bitrate": 320,
+      "countrycode": "RU",
+      "favicon": "",
+      "homepage": "https://dnbfm.ru/",
+      "votes": 582,
+      "note": "DNBFM was created as a non-profit project with only one goal - to preserve and support DNB music. Donate on their homepage."
+    },
+    {
+      "name": "Atmospheric dnb s0urce",
+      "tags": "drum and bass,jungle",
+      "url": "https://brokenbeats.net/stream/aac",
+      "stationuuid": "c4eb7648-e867-4545-bdda-71b1368db779",
+      "bitrate": 320,
+      "countrycode": "RO",
+      "favicon": "https://brokenbeats.net/favicon.ico",
+      "homepage": "https://brokenbeats.net/",
+      "votes": 172,
+      "note": "chiller breakbeats. definitely check out the homepage of this stream – they have a live chat!"
+    },
+    {
+      "name": "Liquid DnB",
+      "tags": "dnb,liquid dnb",
+      "url": "https://antares.dribbcast.com/proxy/dave1/stream/",
+      "stationuuid": "b8148b29-09d0-4aa1-8bfe-43d236260170",
+      "bitrate": 128,
+      "countrycode": "GB",
+      "favicon": "",
+      "homepage": "https://liquid-dnb.com/",
+      "votes": 9,
+      "note": "Liquid DnB is an internet-based radio station dedicated to bringing you the very best in Liquid Intelligent Drum n Bass."
+    },
+    {
+      "name": "Rádio DNB TV",
+      "tags": "No tags available",
+      "url": "https://ice3.abradio.cz/shadowbox128.mp3",
+      "stationuuid": "37f9c6db-a491-4893-a1b8-dcf22e73a0c1",
+      "bitrate": 128,
+      "countrycode": "CZ",
+      "favicon": "https://www.shadowbox.cz/css/site/btn/radio_shadowbox.png",
+      "homepage": "http://www.abradio.cz/radio/71/drumandbass-radio-shadowbox/",
+      "votes": 8,
+      "note": "Shadowbox is a Czech radio station that plays a mix of drum and bass, jungle, and breakbeat music."
+    },
+    {
+      "name": "jungletrain.net - 24/7 drum and bass",
+      "tags": "No tags available",
+      "url": "https://chat.jungletrain.net/streamtest/;stream/1",
+      "stationuuid": "0adb24fb-a2fe-4a9b-97a4-bc82dfb1820c",
+      "bitrate": 256,
+      "countrycode": "NL",
+      "favicon": "https://jungletrain.net/jth-inc/images/jtlogo.png",
+      "homepage": "https://jungletrain.net/",
+      "votes": 419,
+      "note": "A live show serving dnb, jungle, and breakbeat music from around the world."
+    },
+    {
+      "name": "Jungle Planet Radio",
+      "tags": "drum and bass,jungle,uk garage",
+      "url": "https://phoebe.streamerr.co:3650/;?type=http&nocache=1739137731",
+      "stationuuid": "3dff0ca7-e8d7-4966-a37f-2d754819af6b",
+      "bitrate": 320,
+      "countrycode": "IT",
+      "favicon": "https://jungleplanetradio.com/wp-content/uploads/2023/09/JPR-round-B-1.png",
+      "homepage": "https://jungleplanetradio.com/",
+      "votes": 12,
+      "note": "An eclectic mix of drum and bass, jungle, and uk garage music."
+    },
+    {
+      "name": "Partyvibe - Drum and Bass",
+      "tags": "drum and bass,dubstep,jungle,rap",
+      "url": "https://www.partyviberadio.com:8061/;listen.pls?sid=1",
+      "stationuuid": "0c2308a7-5f34-4f9f-a0b0-b9a5467b331a",
+      "bitrate": 320,
+      "countrycode": "DE",
+      "favicon": "https://www.partyvibe.com/wp-content/uploads/2020/12/party-vibe-radio-logo.png",
+      "homepage": "https://www.partyvibe.com/",
+      "votes": 614,
+      "note": "Founded in 1997, Partyvibe DnB is one of the longest running drum and bass radio stations in the world."
+    },
+    {
+      "name": "DFM - Breakbeat",
+      "tags": "breakbeat",
+      "url": "https://dfm-breakbeat.hostingradio.ru/breakbeat96.aacp",
+      "stationuuid": "11ea7da5-283c-487f-9e66-49e115d7ac9f",
+      "bitrate": 96,
+      "countrycode": "RU",
+      "favicon": "https://dfm.ru/uploads/favicon.ico",
+      "homepage": "https://dfm.ru/",
+      "votes": 184,
+      "note": "Broadcasting from Russia."
+    }
+  ],
+  "version": "1.0",
+  "username": "Jungle/DnB",
+  "description": "A collection of jungle and drum and bass stations from around the world.",
+  "thumbnail_path": "./starter-packs/jungle-dnb-thumb.png"
+}

@@ -1,0 +1,164 @@
+{
+  "stations": [
+    {
+      "name": "KUTX 98.9 (2024 Stream, 192 kbps mp3)",
+      "tags": "indie rock",
+      "url": "https://streams.kut.org/4428_192.mp3",
+      "stationuuid": "694bc694-cd35-4224-b622-630b735af327",
+      "bitrate": 192,
+      "countrycode": "US",
+      "favicon": "https://npr.brightspotcdn.com/dims4/default/6521ea6/2147483647/strip/true/crop/1000x500+0+0/resize/1760x880!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2F03%2F7a%2Fc6bc7f9b41aa8ac869077559b6f5%2Fkut-news-logo-with-tagline-1000x500.jpg",
+      "homepage": "https://kut.org/",
+      "votes": 55,
+      "note": "make sure to check out Laurie Gallardo 1-5pm CT Mon - Thurs"
+    },
+    {
+      "name": "KMFA",
+      "tags": "classical",
+      "url": "https://kmfa.streamguys1.com/KMFA-mp3",
+      "stationuuid": "e151a924-6896-11ea-9d09-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "https://www.kmfa.org/",
+      "votes": 92,
+      "note": "a great classical station based in austin. Their tagline is \"We won't make you mad\""
+    },
+    {
+      "name": "KOOP",
+      "tags": "community radio",
+      "url": "http://streaming.koop.org/stream.mp3",
+      "stationuuid": "fa3002fd-59c7-4df3-b2f4-9700d6f1ba11",
+      "bitrate": 320,
+      "countrycode": "US",
+      "favicon": "https://koop.org/wp-content/themes/koop/images/dist/favicon/apple-icon-120x120.png",
+      "homepage": "https://koop.org/",
+      "votes": 56,
+      "note": "broadcasting from the heart of east austin! a great community-run station."
+    },
+    {
+      "name": "KVRX",
+      "tags": "No tags available",
+      "url": "https://kvrx.org/now_playing/stream",
+      "stationuuid": "51f82c18-dc04-44f2-8437-6d734468a257",
+      "bitrate": 192,
+      "countrycode": "US",
+      "favicon": "https://res.cloudinary.com/kvrx/image/fetch/f_auto,c_limit,w_64,q_auto/https://kvrx.org/static/main/images/default_album_art.png",
+      "homepage": "https://kvrx.org/",
+      "votes": 3,
+      "note": "\"none of the hits, all of the time\". the student‐run radio station at UT Austin"
+    },
+    {
+      "name": "KUT 90.5 FM (2024 Stream, 128 kbps mp3)",
+      "tags": "npr",
+      "url": "https://streams.kut.org/4426_128.mp3",
+      "stationuuid": "a6e1eef4-57f8-427d-bbb5-df077984798b",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "https://npr.brightspotcdn.com/dims4/default/6521ea6/2147483647/strip/true/crop/1000x500+0+0/resize/1760x880!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2F03%2F7a%2Fc6bc7f9b41aa8ac869077559b6f5%2Fkut-news-logo-with-tagline-1000x500.jpg",
+      "homepage": "https://kut.org/",
+      "votes": 30,
+      "note": "gotta show love to the local npr station, special shoutout to Audrey Mcglinchy, housing reporter"
+    },
+    {
+      "name": "KDRP-LP \"Sun Radio\" 100.1 FM Austin, TX",
+      "tags": "alternative country,americana,austin",
+      "url": "http://ice10.securenetsystems.net/SUNRADIO",
+      "stationuuid": "96197030-0601-11e8-ae97-52543be04c81",
+      "bitrate": 32,
+      "countrycode": "US",
+      "favicon": "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/1704/2020/10/12160146/sun-radio-favicon-150x150.png",
+      "homepage": "http://sunradio.com/",
+      "votes": 131,
+      "note": "their studio is solar powered! 🌞"
+    },
+    {
+      "name": "KLBJ The Rock of Austin",
+      "url": "https://22223.live.streamtheworld.com/KLBJFMAAC.aac",
+      "favicon": "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/1303/2020/01/16091138/header-logo.png",
+      "homepage": "https://www.klbjfm.com/listen-live/",
+      "bitrate": "",
+      "countrycode": "US",
+      "votes": 0,
+      "note": "the only old school morning radio show in Austin that is not syndicated."
+    },
+    {
+      "name": "101.5 KROX",
+      "url": "https://14013.live.streamtheworld.com/KROXFMAAC.aac?dist=triton-widget&tdsdk=js-2.9&swm=false&pname=tdwidgets&pversion=2.9&banners=728x90%2C300x250&gdpr=1&gdpr_consent=&burst-time=15&sbmid=68def216-2390-4607-d385-b4d11be382a7",
+      "favicon": "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/1315/2020/02/18162945/101X_logo.png",
+      "homepage": "https://www.101x.com/listen-live/",
+      "bitrate": "",
+      "countrycode": "US",
+      "votes": 0,
+      "note": "BIG gen x/millenial energy"
+    },
+    {
+      "name": "91.3 KNCT FM - Central Texas College",
+      "url": "https://ice41.securenetsystems.net/KNCT?playSessionID=92333B6B-A5B4-84C2-B6104BEC8532C756",
+      "favicon": "https://knct.org/img/core-img/logo_top.jpg",
+      "homepage": "https://knct.org/",
+      "bitrate": "",
+      "countrycode": "US",
+      "votes": 0,
+      "note": "Broadcasting with 50,000 watts of power from a transmitter located near Stillhouse Hollow Reservoir"
+    },
+    {
+      "name": "Hot Tejano (Austin) - Online - www.hottejano.com - hottejano.com LLC - Austin, Texas",
+      "tags": "austin,country,country music,entretenimiento,estación,inglés,moi merino,music,música,música en español e inglés,online,online only,radio,radio online,texas,usa",
+      "url": "https://ithaca.cdnstream.com/1113_96",
+      "stationuuid": "54e9be2f-8705-4841-a672-7effedcaf4d4",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "https://hottejano.com/wp-content/uploads/2020/11/hottejano250x250-140x140.png",
+      "homepage": "https://hottejano.com/",
+      "votes": 122,
+      "note": "the party station"
+    },
+    {
+      "name": "93.3 KGSR",
+      "url": "https://25103.live.streamtheworld.com/KGSRHD2AAC.aac?dist=triton-widget&tdsdk=js-2.9&swm=false&lat=30.3&long=-97.7&pname=tdwidgets&pversion=2.9&banners=728x90%2C300x250&gdpr=1&gdpr_consent=&burst-time=15&sbmid=f8ae6514-e0e1-4109-984c-4bd457a491d4",
+      "favicon": "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/1314/2020/03/12050750/kgsr-hd-2-7f77f309-84d1-4cb1-8e81-a391e4eb0b0b.png",
+      "homepage": "https://www.kgsr.com/",
+      "bitrate": "",
+      "countrycode": "US",
+      "votes": 0,
+      "note": "Creator of Blues on the Green, a free summer concert series in Zilker Park"
+    },
+    {
+      "name": "107.1 La Z",
+      "url": "https://24883.live.streamtheworld.com/KLZTFMAAC.aac?dist=triton-widget&tdsdk=js-2.9&swm=false&pname=tdwidgets&pversion=2.9&banners=728x90%2C300x250&gdpr=1&gdpr_consent=&burst-time=15&sbmid=4c89d010-ff95-4779-a786-19d0e07f2f67",
+      "favicon": "https://dehayf5mhw1h7.cloudfront.net/wp-content/uploads/sites/1302/2020/01/14142850/logo-hore.png",
+      "homepage": "https://www.1071laz.com/",
+      "bitrate": "",
+      "countrycode": "US",
+      "votes": 0,
+      "note": "great Regional Mexican music station playing music from the past and present alike"
+    },
+    {
+      "name": "KTSW",
+      "tags": "university radio",
+      "url": "https://ktswlive.txstate.edu:8102/listen",
+      "stationuuid": "a3ec23af-3e4b-417a-beb3-f77ee1a2e54f",
+      "bitrate": 96,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "https://ktsw.txst.edu/",
+      "votes": 4,
+      "note": "student-run, noncommercial radio station at Texas State University in San Marcos, TX"
+    },
+    {
+      "name": "88.7 KAZI FM",
+      "url": "https://ice8.securenetsystems.net/KAZI?playSessionID=93E3F103-DA91-74E9-338EF9814C1F4170",
+      "favicon": "https://cdn-radiotime-logos.tunein.com/s31602d.png",
+      "homepage": "https://kazifm.org/",
+      "bitrate": "",
+      "countrycode": "US",
+      "votes": 0,
+      "note": "African-American community radio station founded by UT Prof. John Warfield"
+    }
+  ],
+  "version": "1.0",
+  "username": "ATX4EVER",
+  "description": "Some of the best stations in the thriving Austin radio scene.",
+  "thumbnail_path": "./starter-packs/austin-thumb.png"
+}

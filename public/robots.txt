@@ -1,0 +1,22 @@
+# robots.txt for Not My First Radio
+User-agent: *
+Allow: /
+Allow: /index.html
+Allow: /manifest.json
+Allow: /site.webmanifest
+Allow: /sitemap.xml
+
+# Disallow access to private or temporary files
+Disallow: /private/
+Disallow: /temp/
+Disallow: /*.log$
+Disallow: /*.tmp$
+
+# Allow access to public assets
+Allow: /icons/
+Allow: /images/
+Allow: /styles.css
+Allow: /app.js
+
+# Sitemap location
+Sitemap: https://notmyfirstradio.com/sitemap.xml 
