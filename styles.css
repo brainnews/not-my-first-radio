@@ -11,6 +11,11 @@
     --accent-color: #9151F0;
     /* --accent-color: #9e66f2; */
     --accent-color-30: #9151F054;
+    --accent-color-10: #9151F01A;
+    --accent-color-20: #9151F033;
+    --accent-color-50: #9151F080;
+    --accent-color-70: #9151F0B3;
+    --accent-color-90: #9151F0E6;
     --neon-green: #1fda8c;
     --border-color: #444444;
     --purple-color: #291d69;
@@ -222,9 +227,10 @@ main {
 }
 
 .section-title {
-    font-size: 1rem;
+    font-size: 0.875rem;
     margin: 0;
     flex: 1;
+    font-weight: 500;
 }
 
 .minimize-btn {
@@ -391,39 +397,30 @@ main {
 
 /* Preset number label */
 .preset-number-label {
-    position: absolute;
-    top: 0.5rem;
-    right: 0.5rem;
-    background: var(--accent-color);
     color: white;
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 0.75rem;
     font-weight: 600;
     z-index: 1;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 
 /* Preset tiles styles */
 .presets-grid {
     display: grid;
-    grid-template-columns: repeat(6, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 1rem;
     margin: 1rem;
 }
 
 .preset-tile {
     position: relative;
-    height: 80px;
+    height: 60px;
     background: var(--bg-secondary);
     border: 2px solid transparent;
     border-radius: 12px;
-    padding: 0.75rem;
     cursor: pointer;
     transition: all 0.2s ease;
     display: flex;
@@ -434,8 +431,6 @@ main {
 }
 
 .preset-tile:hover {
-    border-color: var(--accent-color);
-    background: var(--bg-hover);
     transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -446,6 +441,8 @@ main {
     background: transparent;
     color: var(--text-secondary);
     font-size: 0.9rem;
+    justify-content: center;
+    align-items: center;
 }
 
 .preset-tile.empty:hover {
@@ -455,9 +452,7 @@ main {
 }
 
 .preset-tile.playing {
-    border-color: var(--accent-color);
-    background: var(--accent-color-20);
-    box-shadow: 0 0 20px rgba(76, 175, 80, 0.3);
+    box-shadow: 0 0 20px var(--accent-color-70);
 }
 
 .preset-slot-number {
@@ -475,16 +470,14 @@ main {
 }
 
 .preset-favicon {
-    width: 32px;
-    height: 32px;
+    width: 60px;
+    height: 60px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 6px;
     overflow: hidden;
     flex-shrink: 0;
     background-color: var(--bg-primary);
-    border: 1px solid var(--border-color);
 }
 
 .preset-favicon img {
@@ -509,6 +502,7 @@ main {
     flex-direction: column;
     justify-content: center;
     min-width: 0; /* Allow text to shrink */
+    padding-right: 0.5rem;
 }
 
 .preset-station-name {
@@ -598,14 +592,17 @@ main {
     border-radius: 12px;
 }
 
-.preset-tile:hover .preset-hover-overlay {
-    opacity: 1;
-    pointer-events: auto;
-    transition-delay: 1s;
-}
+/* Only show hover overlay on devices that support true hover */
+@media (hover: hover) and (pointer: fine) {
+    .preset-tile:hover .preset-hover-overlay {
+        opacity: 1;
+        pointer-events: auto;
+        transition-delay: 1s;
+    }
 
-.preset-tile:not(:hover) .preset-hover-overlay {
-    transition-delay: 0s;
+    .preset-tile:not(:hover) .preset-hover-overlay {
+        transition-delay: 0s;
+    }
 }
 
 .preset-remove-btn {
