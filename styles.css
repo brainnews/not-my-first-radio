@@ -133,6 +133,13 @@ header h1 {
     z-index: 1;
 }
 
+.search-loading, .search-error, .search-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
 #search-input {
     flex: 1;
     padding: 0.75rem 2.5rem 0.75rem 2.5rem;
@@ -382,32 +389,39 @@ main {
     gap: 0.5rem;
 }
 
-.pin-indicator {
-    display: inline-flex;
+/* Preset number label */
+.preset-number-label {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: var(--accent-color);
+    color: white;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
     align-items: center;
-    color: var(--accent-color);
-    font-size: 0.8rem;
-    opacity: 0.8;
+    justify-content: center;
+    font-size: 0.75rem;
+    font-weight: 600;
+    z-index: 1;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.pin-indicator .material-symbols-rounded {
-    font-size: 16px;
-}
 
 /* Preset tiles styles */
 .presets-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    grid-template-rows: repeat(2, 1fr);
+    grid-template-columns: repeat(6, 1fr);
     gap: 1rem;
-    margin-bottom: 1rem;
+    margin: 1rem;
 }
 
 .preset-tile {
     position: relative;
     height: 80px;
     background: var(--bg-secondary);
-    border: 2px solid var(--border-color);
+    border: 2px solid transparent;
     border-radius: 12px;
     padding: 0.75rem;
     cursor: pointer;
@@ -539,8 +553,8 @@ main {
 
 @media (max-width: 480px) {
     .presets-grid {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(6, 1fr);
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(3, 1fr);
         gap: 0.5rem;
     }
     
@@ -569,6 +583,102 @@ main {
         font-size: 0.65rem;
     }
 }
+
+/* Preset tile interactions */
+.preset-hover-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    transition-delay: 1s;
+    border-radius: 12px;
+}
+
+.preset-tile:hover .preset-hover-overlay {
+    opacity: 1;
+    pointer-events: auto;
+    transition-delay: 1s;
+}
+
+.preset-tile:not(:hover) .preset-hover-overlay {
+    transition-delay: 0s;
+}
+
+.preset-remove-btn {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #ff4444;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+.preset-remove-btn:hover {
+    background: #ff2222;
+    transform: scale(1.1);
+}
+
+.preset-remove-btn .material-symbols-rounded {
+    font-size: 16px;
+}
+
+/* Preset context menu */
+.preset-context-menu {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    padding: 0.5rem 0;
+    min-width: 200px;
+    z-index: 1000;
+}
+
+.preset-menu-item {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: none;
+    background: transparent;
+    color: var(--text-primary);
+    text-align: left;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+    transition: background-color 0.2s ease;
+}
+
+.preset-menu-item:hover {
+    background: var(--bg-secondary);
+}
+
+.preset-menu-item.remove {
+    color: #ff4444;
+}
+
+.preset-menu-item.remove:hover {
+    background: rgba(255, 68, 68, 0.1);
+}
+
+.preset-menu-item .material-symbols-rounded {
+    font-size: 18px;
+    width: 18px;
+    flex-shrink: 0;
+}
+
 .station-favicon {
     width: 48px;
     height: 48px;
@@ -2765,7 +2875,6 @@ main {
     color: var(--text-secondary);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    border-bottom: 1px solid var(--border-color);
     margin-bottom: 0.25rem;
 }
 
