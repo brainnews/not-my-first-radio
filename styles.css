@@ -227,6 +227,10 @@ main {
         flex-direction: column;
         align-items: flex-start;
         gap: 0.5rem;
+        @media (max-width: 768px) {
+            flex-direction: row;
+            align-items: flex-end;
+        }
     }
 }
 
@@ -236,12 +240,13 @@ main {
 
 .section-title {
     font-size: 0.875rem;
-    margin: 0;
+    margin: 0 1.5rem 0 0;
     flex: 1;
     font-weight: 500;
     padding-left: 0.5rem;
     @media (max-width: 768px) {
         padding-left: 0;
+        margin: 0;
     }
 }
 
@@ -271,7 +276,6 @@ main {
 .header-left {
     display: flex;
     align-items: center;
-    flex: 1;
 }
 
 .header-right {
@@ -422,14 +426,22 @@ main {
         min-width: 90px;
         font-size: 0.7rem;
     }
+
+    .header-left {
+        flex-direction: column;
+        align-items: flex-start;
+    }
     
     .header-right {
         gap: 0.5rem;
         flex-wrap: wrap;
-        justify-content: space-between;
+        justify-content: flex-end;
         width: 100%;
     }
 
+    .station-section-header.with-filter .section-title {
+        margin-bottom: 0.5rem;
+    }
     
     .filter-container {
         order: 1;
