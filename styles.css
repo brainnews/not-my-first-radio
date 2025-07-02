@@ -1074,7 +1074,7 @@ main {
 
 .player-bar.active {
     display: block; /* Show when active */
-    z-index: 9999;
+    z-index: 999;
 }
 
 .now-playing {
@@ -1842,7 +1842,23 @@ main {
     margin: 0;
     font-size: 0.9rem;
 }
+.modal-medium {
+        align-items: flex-start;
+        padding: 1rem;
+        overflow-y: hidden;
+}
 
+.modal-medium .modal-container {
+    width: 400px;
+    max-width: var(--neon-green);
+    max-height: calc(100vh - 2rem);
+    overflow-y: hidden;
+}
+
+.modal-medium .modal-body {
+    max-height: calc(100vh - 8rem);
+    overflow-y: scroll;
+}
 /* Mobile-specific styles for terms modal */
 @media (max-width: 768px) {
     .modal-medium {
