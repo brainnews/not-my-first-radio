@@ -250,6 +250,10 @@ main {
     }
 }
 
+.results-header .section-title {
+    padding-left: 0;
+}
+
 .minimize-btn {
     background: transparent;
     border: none;
