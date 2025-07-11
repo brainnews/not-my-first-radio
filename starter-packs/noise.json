@@ -1,0 +1,68 @@
+{
+  "stations": [
+    {
+      "name": "Nature Radio Rain",
+      "tags": "ambient,ambient and relaxation music,nature,rainorshine,relax,relaxation,relaxation music,relaxing,sounds of nature",
+      "url": "https://maggie.torontocast.com:2020/stream/natureradiorain",
+      "stationuuid": "95277bca-2c9a-4c08-b2e7-0854e5793f8e",
+      "bitrate": 128,
+      "countrycode": "CA",
+      "favicon": "",
+      "homepage": "https://radiosuitenetwork.torontocast.stream/nature-radio-rain/",
+      "votes": 2774,
+      "note": "Continuous rain sounds and nature audio for relaxation and focus"
+    },
+    {
+      "name": "NATURE RADIO SLEEP",
+      "tags": "ambient,bird,city,easy listening,forest,italy,meditation,natura,natural,nature,new age,ocean,rain,relax,relaxation,rome,sleep,soft,suoni",
+      "url": "https://az1.mediacp.eu/listen/natureradiosleep/radio.mp3",
+      "stationuuid": "77eaf32d-241f-4f25-b7d6-347783cd4471",
+      "bitrate": 128,
+      "countrycode": "IT",
+      "favicon": "https://d1ujqdpfgkvqfi.cloudfront.net/favicon-generator/htdocs/favicons/2025-03-01/fb714c8d8238b02673a9ee2b018528af.ico.png",
+      "homepage": "https://natureradiosleep.weebly.com/",
+      "votes": 103,
+      "note": "Mixed nature sounds including birds, forest, ocean, and rain for sleep and meditation"
+    },
+    {
+      "name": "White Noise Radio",
+      "tags": "white noise,sleep,relaxation",
+      "url": "http://uk1.internet-radio.com:8280/stream",
+      "stationuuid": "e6d0a24e-6a8e-4a80-a8d1-a5b2cae886ce",
+      "bitrate": 64,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "",
+      "votes": 46,
+      "note": "Continuous white noise for sleep, focus, and masking distracting sounds"
+    },
+    {
+      "name": "Radio Nature",
+      "tags": "ambient and relaxation music,meditation,sounds of nature",
+      "url": "https://stream.zeno.fm/3ac97ysh6f0uv.aac",
+      "stationuuid": "bf5b804b-45ba-41ed-a1a7-41e0544e08e9",
+      "bitrate": 128,
+      "countrycode": "ES",
+      "favicon": "https://radionature.weebly.com/uploads/7/4/0/7/74072033/icon-players_orig.png",
+      "homepage": "https://radionature.weebly.com/",
+      "votes": 1248,
+      "note": "Dedicated nature sounds including forests, birds, and natural environments"
+    },
+    {
+      "name": "Brown Noise Radio",
+      "tags": "ambient,noise,relax,sleep",
+      "url": "http://uk1.internet-radio.com:8280/listen.pls&t=.m3u",
+      "stationuuid": "bfd98b9f-f9bf-4f0c-ab2e-fc6c6dc951a9",
+      "bitrate": 64,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "http://uk1.internet-radio.com/",
+      "votes": 88,
+      "note": "Continuous brown noise for deep sleep and concentration"
+    }
+  ],
+  "version": "1.0",
+  "username": "Claude",
+  "description": "Nature sounds and white noise for sleep and relaxation.",
+  "thumbnail_path": "./starter-packs/noise-thumb.png"
+}

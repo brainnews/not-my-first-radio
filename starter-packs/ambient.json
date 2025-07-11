@@ -1,0 +1,80 @@
+{
+  "stations": [
+    {
+      "name": "SomaFM Groove Salad",
+      "tags": "ambient,chillout,downtempo,groove,lounge,sleep",
+      "url": "https://ice3.somafm.com/groovesalad-128-mp3",
+      "stationuuid": "960cf833-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "https://somafm.com/img3/groovesalad-400.jpg",
+      "homepage": "https://somafm.com/groovesalad/",
+      "votes": 42511,
+      "note": "A nicely chilled plate of ambient downtempo beats and grooves"
+    },
+    {
+      "name": "SomaFM Drone Zone",
+      "tags": "ambient,atmospheric,chillout,drone",
+      "url": "https://ice1.somafm.com/dronezone-128-mp3",
+      "stationuuid": "960eb2e9-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "https://somafm.com/img3/dronezone-400.jpg",
+      "homepage": "https://somafm.com/dronezone/",
+      "votes": 3483,
+      "note": "Atmospheric ambient drones and soundscapes for deep focus and meditation"
+    },
+    {
+      "name": "SomaFM Space Station Soma",
+      "tags": "ambient,electronica,mid-tempo",
+      "url": "https://ice3.somafm.com/spacestation-128-aac",
+      "stationuuid": "960ca1b1-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "https://somafm.com/img3/spacestation-400.jpg",
+      "homepage": "https://somafm.com/spacestation/",
+      "votes": 21804,
+      "note": "Tune in, turn on, space out - ambient and mid-tempo electronica"
+    },
+    {
+      "name": "Ambient Modern",
+      "tags": "ambient,chillout,non-commercial,relaxation music,relaxing",
+      "url": "http://radio.stereoscenic.com/mod-h",
+      "stationuuid": "961aeb3b-0601-11e8-ae97-52543be04c81",
+      "bitrate": 256,
+      "countrycode": "US",
+      "favicon": "https://ambientmodern.com/wp-content/uploads/2020/05/cropped-ambient-modern-3000-180x180.png",
+      "homepage": "https://ambientmodern.com/",
+      "votes": 2877,
+      "note": "Modern ambient compositions and relaxation music without commercial interruptions"
+    },
+    {
+      "name": "ambient.fm",
+      "tags": "ambient,ambient and relaxation music,ambient easy listening,ambient lounge,ambient techno,deep ambient,easy music,electronic,light,meditate,meditation,nevada,peace,relaxation music,relaxing,tonopah,yoga,zen ambient",
+      "url": "https://phoebe.streamerr.co:4140/ambient.mp3",
+      "stationuuid": "44b7f191-9478-46b0-a3b5-5a0ea2b2d64e",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "https://ambient.fm/",
+      "votes": 524,
+      "note": "Dedicated ambient electronic music for meditation and deep relaxation"
+    },
+    {
+      "name": "Ambient Sleeping Pill",
+      "tags": "ambient,meditation,sleep",
+      "url": "http://radio.stereoscenic.com/asp-h",
+      "stationuuid": "961fa288-0601-11e8-ae97-52543be04c81",
+      "bitrate": 256,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "http://ambientsleepingpill.com/",
+      "votes": 44557,
+      "note": "Continuous ambient soundscapes designed for sleep and deep relaxation"
+    }
+  ],
+  "version": "1.0",
+  "username": "Claude",
+  "description": "Ambient music with atmospheric soundscapes and downtempo beats.",
+  "thumbnail_path": "./starter-packs/ambient-thumb.png"
+}

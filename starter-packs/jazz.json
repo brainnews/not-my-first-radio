@@ -1,0 +1,80 @@
+{
+  "stations": [
+    {
+      "name": "JazzRadio (MRG.fm)",
+      "tags": "classic jazz,cool jazz,jazz,jazz fusion,latin jazz,nu-jazz,piano jazz,smooth jazz,vocal jazz",
+      "url": "http://listen.mrg.fm:8040/stream",
+      "stationuuid": "f176761c-0166-4033-87d4-8c12de5e30aa",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "https://mrg.fm/img/jazzradio125.jpg",
+      "homepage": "https://www.mrg.fm/",
+      "votes": 52,
+      "note": "NYC-based traditional jazz featuring bop, cool jazz, Latin jazz, and fusion"
+    },
+    {
+      "name": "101 SMOOTH JAZZ",
+      "tags": "easy listening,jazz,smooth jazz",
+      "url": "http://jking.cdnstream1.com/b22139_128mp3",
+      "stationuuid": "d28420a4-eccf-47a2-ace1-088c7e7cb7e0",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "http://101smoothjazz.com/favicon.ico",
+      "homepage": "http://101smoothjazz.com/",
+      "votes": 71280,
+      "note": "Smooth jazz for relaxation and easy listening"
+    },
+    {
+      "name": "Jazz Radio Blues",
+      "tags": "blues,jazz",
+      "url": "http://jazzblues.ice.infomaniak.ch/jazzblues-high.mp3",
+      "stationuuid": "96102c22-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "FR",
+      "favicon": "https://www.jazzradio.fr/apple-touch-icon-120x120.png",
+      "homepage": "http://www.jazzradio.fr/radio/webradio/3/blues",
+      "votes": 51639,
+      "note": "French jazz radio specializing in blues-influenced jazz"
+    },
+    {
+      "name": "Jazz Radio",
+      "tags": "jazz,soul",
+      "url": "http://jazzradio.ice.infomaniak.ch/jazzradio-high.mp3",
+      "stationuuid": "96136fe5-0601-11e8-ae97-52543be04c81",
+      "bitrate": 192,
+      "countrycode": "FR",
+      "favicon": "http://www.jazzradio.fr/apple-touch-icon-120x120.png",
+      "homepage": "http://www.jazzradio.fr/",
+      "votes": 39766,
+      "note": "Premium French jazz station with soul influences"
+    },
+    {
+      "name": "Radio Swiss Jazz",
+      "tags": "jazz,public radio,srg ssr",
+      "url": "http://livestreaming-node-4.srg-ssr.ch/srgssr/rsj/mp3/128",
+      "stationuuid": "961ac56b-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "CH",
+      "favicon": "",
+      "homepage": "http://www.radioswissjazz.ch/",
+      "votes": 22605,
+      "note": "Swiss public radio dedicated to jazz music"
+    },
+    {
+      "name": "Jazz Lounge",
+      "tags": "320kbps,classic jazz,jazz,smooth jazz",
+      "url": "http://eu8.fastcast4u.com:5068/;",
+      "stationuuid": "96237848-0601-11e8-ae97-52543be04c81",
+      "bitrate": 320,
+      "countrycode": "MY",
+      "favicon": "",
+      "homepage": "http://shoutcast.flashradio.info/#/Jazz/1292701/",
+      "votes": 15034,
+      "note": "High-bitrate classic and smooth jazz from Malaysia"
+    }
+  ],
+  "version": "1.0",
+  "username": "Claude",
+  "description": "Classic and contemporary jazz stations from around the world.",
+  "thumbnail_path": "./starter-packs/jazz-thumb.png"
+}

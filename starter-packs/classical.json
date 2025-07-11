@@ -1,0 +1,80 @@
+{
+  "stations": [
+    {
+      "name": "Classic FM UK",
+      "tags": "classical",
+      "url": "http://ice-the.musicradio.com/ClassicFMMP3",
+      "stationuuid": "96063f25-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "GB",
+      "favicon": "http://www.classicfm.com/assets_v4r/classic/img/favicon-196x196.png",
+      "homepage": "http://www.classicfm.com/",
+      "votes": 46667,
+      "note": "The UK's premier classical music station"
+    },
+    {
+      "name": "Your Classical - Relax",
+      "tags": "classical,relax",
+      "url": "http://relax.stream.publicradio.org/relax.mp3",
+      "stationuuid": "960ac54b-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "http://www.yourclassical.org/apple-touch-icon.png",
+      "homepage": "http://www.yourclassical.org/",
+      "votes": 46658,
+      "note": "Peaceful classical music for relaxation and focus"
+    },
+    {
+      "name": "Rai Radio 3",
+      "tags": "classical,culture,public radio,rai",
+      "url": "http://icecdn-19d24861e90342cc8decb03c24c8a419.msvdn.net/icecastRelay/S56630579/yEbkcBtIoSwd/icecast",
+      "stationuuid": "9608eb3e-0601-11e8-ae97-52543be04c81",
+      "bitrate": 320,
+      "countrycode": "IT",
+      "favicon": "",
+      "homepage": "http://www.radio3.rai.it/",
+      "votes": 20090,
+      "note": "Italian public radio featuring classical music and culture"
+    },
+    {
+      "name": "France Musique",
+      "tags": "classical,jazz,music,public radio,radio france",
+      "url": "http://icecast.radiofrance.fr/francemusique-midfi.mp3",
+      "stationuuid": "81440088-0a76-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "FR",
+      "favicon": "",
+      "homepage": "https://www.francemusique.fr/",
+      "votes": 17598,
+      "note": "French public radio dedicated to classical and contemporary music"
+    },
+    {
+      "name": "RMF Classic",
+      "tags": "classical",
+      "url": "http://31.192.216.8/RMFCLASSIC48",
+      "stationuuid": "960dc513-0601-11e8-ae97-52543be04c81",
+      "bitrate": 48,
+      "countrycode": "PL",
+      "favicon": "",
+      "homepage": "http://www.rmfclassic.pl/",
+      "votes": 11776,
+      "note": "Polish classical music station"
+    },
+    {
+      "name": "Your Classical - Peaceful Piano",
+      "tags": "classical,piano,peaceful,relaxing",
+      "url": "http://peacefulpiano.stream.publicradio.org/peacefulpiano.mp3",
+      "stationuuid": "f4562879-908f-4dc8-8908-d6c78b238e69",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "",
+      "votes": 2323,
+      "note": "Peaceful piano music for relaxation and focus"
+    }
+  ],
+  "version": "1.0",
+  "username": "Claude",
+  "description": "Classical music stations featuring orchestral and chamber works.",
+  "thumbnail_path": "./starter-packs/classical-thumb.png"
+}

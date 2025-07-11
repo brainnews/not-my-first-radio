@@ -1,0 +1,116 @@
+{
+  "stations": [
+    {
+      "name": "KEXP 90.3 Seattle, WA",
+      "tags": "alternative rock,indie,live,public radio,seattle,variety",
+      "url": "http://live-mp3-128.kexp.org/kexp128.mp3",
+      "stationuuid": "6a7508a9-27ab-11e8-91bf-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "http://www.kexp.org/static/assets/img/favicon-32x32.png",
+      "homepage": "http://www.kexp.org/",
+      "votes": 1671,
+      "note": "Legendary Seattle station known for discovering new indie artists"
+    },
+    {
+      "name": "KCRW 88.9 Santa Monica, CA",
+      "tags": "culture,live,music,news,npr,public radio,santa monica,santa monica college,various",
+      "url": "https://streams.kcrw.com/kcrw_mp3",
+      "stationuuid": "325a61dc-fe34-48c6-ae82-1467b710f07b",
+      "bitrate": 56,
+      "countrycode": "US",
+      "favicon": "https://www.kcrw.com/++theme++kcrw.theme/icons/apple-touch-icon.png",
+      "homepage": "https://www.kcrw.com/",
+      "votes": 150,
+      "note": "Santa Monica College's influential NPR affiliate known for music discovery"
+    },
+    {
+      "name": "KCSB UC Santa Barbara",
+      "tags": "college radio",
+      "url": "https://kcsb.streamguys1.com/live",
+      "stationuuid": "4af97ba5-4546-4132-a94a-ebca09214cfb",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "https://www.kcsb.org/",
+      "votes": 30,
+      "note": "UC Santa Barbara's diverse student-run college radio station"
+    },
+    {
+      "name": "WBRU Brown University",
+      "tags": "alternative,alternative rock,student radio,university radio",
+      "url": "https://s3.radio.co/s115121de1/listen",
+      "stationuuid": "200fb773-6b90-11ea-b1cf-52543be04c81",
+      "bitrate": 192,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "https://www.wbru.com/",
+      "votes": 45,
+      "note": "Brown University's legendary alternative rock student radio station"
+    },
+    {
+      "name": "WXPN 88.5 Philadelphia, PA",
+      "tags": "blues,folk,public radio,rock",
+      "url": "https://wxpnhi.xpn.org/xpnhi",
+      "stationuuid": "960dd7a5-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "http://www.xpn.org/favicon.ico",
+      "homepage": "http://www.xpn.org/",
+      "votes": 407,
+      "note": "University of Pennsylvania's influential AAA public radio station"
+    },
+    {
+      "name": "KUTX 98.9 Austin, TX",
+      "tags": "indie rock,local radio,music,npr for austin texas,public radio,variety",
+      "url": "https://streams.kut.org/4428_192.mp3",
+      "stationuuid": "694bc694-cd35-4224-b622-630b735af327",
+      "bitrate": 192,
+      "countrycode": "US",
+      "favicon": "https://npr.brightspotcdn.com/dims4/default/6521ea6/2147483647/strip/true/crop/1000x500+0+0/resize/1760x880!/format/webp/quality/90/?url=http%3A%2F%2Fnpr-brightspot.s3.amazonaws.com%2F03%2F7a%2Fc6bc7f9b41aa8ac869077559b6f5%2Fkut-news-logo-with-tagline-1000x500.jpg",
+      "homepage": "https://kut.org/",
+      "votes": 64,
+      "note": "University of Texas at Austin's eclectic music discovery station"
+    },
+    {
+      "name": "CITR 101.9 University of British Columbia",
+      "tags": "campus radio,eclectic",
+      "url": "http://137.82.188.97:8000/live.mp3",
+      "stationuuid": "5fd43583-7165-4145-a6b0-678cf62dcb6d",
+      "bitrate": 128,
+      "countrycode": "CA",
+      "favicon": "https://www.citr.ca/wp-content/themes/citr/assets/img/icons/favicon-48@2x.png",
+      "homepage": "https://www.citr.ca/",
+      "votes": 26,
+      "note": "University of British Columbia's eclectic campus radio station"
+    },
+    {
+      "name": "CHMA 106.9 Campus Radio",
+      "tags": "campus radio,community radio",
+      "url": "https://securestreams6.autopo.st:2111/",
+      "stationuuid": "a575e9ce-dfb1-48c6-8672-48ad748256e6",
+      "bitrate": 192,
+      "countrycode": "CA",
+      "favicon": "https://www.chmafm.com/welcome/wp-content/uploads/2024/10/cropped-android-chrome-512x512-1-192x192.png",
+      "homepage": "https://www.chmafm.com/welcome/",
+      "votes": 27,
+      "note": "Campus and community radio from Sackville, New Brunswick"
+    },
+    {
+      "name": "Insanity Radio",
+      "tags": "student radio,university radio",
+      "url": "https://stream.cor.insanityradio.com/insanity.flac",
+      "stationuuid": "03c2017f-2ba2-4338-af52-5a1f5e67aa46",
+      "bitrate": 320,
+      "countrycode": "GB",
+      "favicon": "",
+      "homepage": "https://insanityradio.com/",
+      "votes": 9,
+      "note": "Royal Holloway University of London's student radio station"
+    }
+  ],
+  "version": "1.0",
+  "username": "Claude",
+  "description": "Legendary college radio stations known for indie music discovery.",
+  "thumbnail_path": "./starter-packs/college-radio-thumb.png"
+}

@@ -1,0 +1,80 @@
+{
+  "stations": [
+    {
+      "name": "Exclusively BTS",
+      "tags": "k-pop,kpop",
+      "url": "https://nl4.mystreaming.net:443/er/bts/icecast.audio",
+      "stationuuid": "721b8f32-8071-4cca-a10f-c999d3b65346",
+      "bitrate": 128,
+      "countrycode": "AE",
+      "favicon": "https://play.exclusive.radio/static/assets/img/apple-icon-120x120.png",
+      "homepage": "https://play.exclusive.radio/",
+      "votes": 1207,
+      "note": "Dedicated station playing exclusively BTS music"
+    },
+    {
+      "name": "Listen.moe (K-Pop)",
+      "tags": "k-pop",
+      "url": "https://listen.moe/kpop/fallback",
+      "stationuuid": "38df1bf6-fff0-4f39-8615-ad0f7341d55b",
+      "bitrate": 256,
+      "countrycode": "KR",
+      "favicon": "https://listen.moe/favicon.ico",
+      "homepage": "https://listen.moe/",
+      "votes": 918,
+      "note": "High-quality K-Pop streaming from Korea"
+    },
+    {
+      "name": "SBS PopAsia",
+      "tags": "c-pop,cantonese,chinese pop,cpop,hong kong music,j-pop,japanese music,jpop,k-pop,korean music,kpop,multicultural,pop music,taiwanese pop",
+      "url": "https://sbs-ice.streamguys1.com/sbs-popasia-sbs-web",
+      "stationuuid": "7078d270-62b8-49c3-a729-ad325d60d29c",
+      "bitrate": 97,
+      "countrycode": "AU",
+      "favicon": "https://www.sbs.com.au/_next/static/img/language/app-icon_128x128-18ef105.png",
+      "homepage": "https://www.sbs.com.au/popasia/",
+      "votes": 382,
+      "note": "Multicultural Asian pop including K-Pop, J-Pop, and C-Pop"
+    },
+    {
+      "name": "RauteMusik K-POP",
+      "tags": "#,#charts,asian,asian pop,charts,hits,k-pop,korean,korean music,música pop,pop,pop music,top charts,world,world music",
+      "url": "https://rautemusik.stream43.radiohost.de/main?ref=radiobrowser&upd-meta=0&upd-scheme=https&_art=dD0xNzUyMjQ5NTY4JmQ9ODY4MzZiMjQzZDVkOTA5NTliNTE",
+      "stationuuid": "4548080b-3497-46dc-a72b-55c136b16f06",
+      "bitrate": 192,
+      "countrycode": "DE",
+      "favicon": "https://i.ibb.co/Kbvr4xf/k-pop-400x400.jpg",
+      "homepage": "https://rm.fm/k-pop",
+      "votes": 366,
+      "note": "German station featuring K-Pop hits and charts"
+    },
+    {
+      "name": "OnlyHit K-Pop",
+      "tags": "hits,k-pop,korean,korean music,korean pop,kpop",
+      "url": "https://ais-sa3.cdnstream1.com/2630_128.mp3",
+      "stationuuid": "2e53ff8e-1d21-4e04-b0e9-f68257c4e7e9",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "https://kpop.onlyhit.us/logo.png",
+      "homepage": "https://onlyhit.us/",
+      "votes": 46,
+      "note": "US-based station playing only K-Pop hits"
+    },
+    {
+      "name": "Generacion Kpop",
+      "tags": "kpop,spanish,latin america",
+      "url": "http://stream9.mexiserver.com:8242/stream",
+      "stationuuid": "b931cfd0-ce31-4bd8-891e-04e40550f3be",
+      "bitrate": 64,
+      "countrycode": "PE",
+      "favicon": "http://www.generacionkpop.net/favicon.ico",
+      "homepage": "http://www.generacionkpop.net/",
+      "votes": 263,
+      "note": "Peruvian K-Pop station bringing Korean music to Latin America"
+    }
+  ],
+  "version": "1.0",
+  "username": "Claude",
+  "description": "Korean pop music stations featuring the latest K-Pop hits.",
+  "thumbnail_path": "./starter-packs/kpop-thumb.png"
+}

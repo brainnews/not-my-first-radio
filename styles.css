@@ -3023,10 +3023,6 @@ main {
     .achievements-grid {
         grid-template-columns: 1fr;
     }
-    
-    .achievement-stats {
-        grid-template-columns: repeat(2, 1fr);
-    }
 }
 
 /* Station menu styles */
@@ -3479,11 +3475,17 @@ main {
 }
 
 .starter-packs-grid {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
     gap: 2rem;
     max-width: 1200px;
     margin: 3rem 0;
+    @media (max-width: 768px) {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        margin: 2rem 0;
+    }
 }
 
 .starter-pack-card {
@@ -3514,6 +3516,7 @@ main {
     align-items: flex-start;
     justify-content: space-between;
     padding: 1rem;
+    position: relative;
 }
 
 .starter-pack-card p {
@@ -3526,6 +3529,9 @@ main {
 }
 
 .add-starter-pack-btn {
+    position: absolute;
+    right: 10px;
+    bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: center;

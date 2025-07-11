@@ -1,0 +1,80 @@
+{
+  "stations": [
+    {
+      "name": "Jazz Radio Blues",
+      "tags": "blues,jazz",
+      "url": "http://jazzblues.ice.infomaniak.ch/jazzblues-high.mp3",
+      "stationuuid": "96102c22-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "FR",
+      "favicon": "https://www.jazzradio.fr/apple-touch-icon-120x120.png",
+      "homepage": "http://www.jazzradio.fr/radio/webradio/3/blues",
+      "votes": 51639,
+      "note": "French station specializing in blues and jazz fusion"
+    },
+    {
+      "name": "WWOZ 90.7 New Orleans",
+      "tags": "blues,jazz,new orleans,southern blues,louisiana music",
+      "url": "https://wwoz-sc.streamguys1.com/wwoz-hi.mp3",
+      "stationuuid": "9612b6e2-0601-11e8-ae97-52543be04c81",
+      "bitrate": 320,
+      "countrycode": "US",
+      "favicon": "https://www.wwoz.org/sites/default/files/favicon.ico",
+      "homepage": "https://www.wwoz.org/",
+      "votes": 12847,
+      "note": "Legendary New Orleans station featuring authentic Southern blues, jazz, and Louisiana music"
+    },
+    {
+      "name": "1.FM - Blues Radio",
+      "tags": "blues",
+      "url": "http://strm112.1.fm/blues_mobile_mp3",
+      "stationuuid": "9617ccb4-0601-11e8-ae97-52543be04c81",
+      "bitrate": 192,
+      "countrycode": "CH",
+      "favicon": "",
+      "homepage": "https://www.1.fm/",
+      "votes": 8898,
+      "note": "Swiss blues station with classic and contemporary tracks"
+    },
+    {
+      "name": "181.FM - True Blues",
+      "tags": "blues,waynesboro",
+      "url": "http://listen.181fm.com/181-blues_128k.mp3",
+      "stationuuid": "961e719c-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "http://www.181.fm/favicon.ico",
+      "homepage": "http://www.181.fm/",
+      "votes": 5253,
+      "note": "Authentic blues programming from Virginia"
+    },
+    {
+      "name": "Houston Blues Radio",
+      "tags": "blues",
+      "url": "http://edge3.peta.live365.net/b76353_128mp3",
+      "stationuuid": "45aedebf-bf75-11e9-8502-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "",
+      "homepage": "http://www.houstonbluesradio.net/",
+      "votes": 4919,
+      "note": "Texas blues radio featuring local and regional artists"
+    },
+    {
+      "name": "WDCB 90.9 \"Jazz & Blues\" Chicago, IL",
+      "tags": "blues,chicago,jazz",
+      "url": "http://wdcb-ice.streamguys.org/wdcb128",
+      "stationuuid": "96145775-0601-11e8-ae97-52543be04c81",
+      "bitrate": 128,
+      "countrycode": "US",
+      "favicon": "http://wdcb.org/img/favicons/apple-touch-icon-120x120.png",
+      "homepage": "http://wdcb.org/",
+      "votes": 1730,
+      "note": "Chicago public radio featuring the best in jazz and blues"
+    }
+  ],
+  "version": "1.0",
+  "username": "Claude",
+  "description": "Blues stations featuring classic and contemporary blues music.",
+  "thumbnail_path": "./starter-packs/blues-thumb.png"
+}
