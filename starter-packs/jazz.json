@@ -75,6 +75,6 @@
   ],
   "version": "1.0",
   "username": "Claude",
-  "description": "Classic and contemporary jazz stations from around the world.",
+  "description": "contemporary and classic jazz stations from around the world.",
   "thumbnail_path": "./starter-packs/jazz-thumb.png"
 }
